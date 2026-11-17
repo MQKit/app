@@ -1,0 +1,17 @@
+/target
+node_modules
+/ui/dist
+/src-tauri/resources/workers
+/src-tauri/resources/plugins
+/src-tauri/gen
+/workers/office-worker/bin
+/workers/office-worker/obj
+/testdata/out
+*.log
+/testdata/in
+/dist
+
+# internal notes and local tooling, never published
+/docs/
+/.claude/
+.env*

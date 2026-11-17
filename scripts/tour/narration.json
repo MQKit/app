@@ -1,0 +1,12 @@
+[
+  { "scene": "intro", "text": "This is MQKit: 44 tools for your files, in one free app for Windows.", "say": "This is M Q Kit: forty-four tools for your files, in one free app for Windows." },
+  { "scene": "private", "text": "Everything happens on your own computer. Your files are never uploaded." },
+  { "scene": "search", "text": "Type what you want to do, in your own words, or a tool's number." },
+  { "scene": "drop", "text": "Or just drop your files in, and MQKit shows the tools that fit them.", "say": "Or just drop your files in, and M Q Kit shows the tools that fit them." },
+  { "scene": "compress", "text": "To shrink a PDF, say what it's for, and see how big it will be before you start." },
+  { "scene": "result", "text": "The result is a new file. Your originals stay untouched." },
+  { "scene": "heic", "text": "Photos from an iPhone? Turn them into JPGs, a whole folder at once." },
+  { "scene": "mp3", "text": "Need the sound from a video? One click, and it's an MP3." },
+  { "scene": "dark", "text": "Light or dark, it follows Windows." },
+  { "scene": "outro", "text": "MQKit is free, with no ads and no account. Get it at mqkit.com.", "say": "M Q Kit is free, with no ads and no account. Get it at em cue kit dot com." }
+]

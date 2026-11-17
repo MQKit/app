@@ -1,0 +1,12 @@
+[package]
+name = "whisper"
+version.workspace = true
+edition.workspace = true
+publish = false
+license = "MIT"
+description = "Speech to text: whisper.cpp 1.9.5 (MIT, vendored), built from source, behind a small C shim"
+build = "build.rs"
+
+[build-dependencies]
+cmake = "0.1"
+cc = "1"

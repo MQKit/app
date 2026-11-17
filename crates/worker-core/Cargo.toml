@@ -1,0 +1,87 @@
+[package]
+name = "worker-core"
+version.workspace = true
+edition.workspace = true
+publish = false
+license.workspace = true
+
+[[bin]]
+name = "worker-core"
+path = "src/main.rs"
+
+[dependencies]
+contract = { path = "../contract" }
+serde.workspace = true
+serde_json = { workspace = true, features = ["preserve_order"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "bmp", "tiff", "gif", "ico", "rayon"] }
+mozjpeg = "0.10"
+oxipng = { version = "10", default-features = false, features = ["parallel", "zopfli"] }
+imagequant = { version = "4", default-features = false, features = ["threads"] }
+png = "0.18"
+webp = "0.3"
+lopdf = "0.47"
+flate2 = "1"
+zip = { version = "9", default-features = false, features = ["deflate", "deflate64", "aes-crypto", "bzip2", "lzma", "xz"] }
+getrandom = "0.4"
+encoding_rs = "0.8"
+pulldown-cmark = { version = "0.13", default-features = false, features = ["html"] }
+calamine = "0.38.0"
+rust_xlsxwriter = "0.102.0"
+csv = "1.4.0"
+jxl-oxide = { version = "0.12.6", features = ["image"] }
+resvg = "0.50.0"
+visioncortex = "0.8"
+chardetng = "1.0.0"
+skrifa = "0.49"
+harfrust = "0.15"
+unicode-bidi = "0.3"
+sevenz-rust2 = { version = "0.25", features = ["aes256"] }
+tar = "0.4"
+ruzstd = "0.9.1"
+bzip2 = "0.6"
+lzma-rust2 = { version = "0.25", features = ["xz"] }
+woofwoof = "1.0.2"
+hb-subset = { path = "../hb-subset" }
+whisper = { path = "../whisper" }
+unicode-script = "0.5.9"
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "load-dynamic", "directml", "api-24"] }
+outlook-pst = "1.2.0"
+cfb = "0.16"
+tiff = "0.11"
+aes = "0.9"
+cbc = "0.2"
+sha1 = "0.11"
+sha2 = "0.11"
+mail-parser = { version = "1.0.1", features = ["full_encoding"] } # Shift_JIS, EUC-JP, GB18030, Big5… mail bodies
+compressed-rtf = "1.0.1"
+mail-builder = "2.0.1"
+chrono = "0.4"
+rawler = "0.8.0"
+quick-xml = "0.42"
+gltf = "1.4.1"
+dxf = "0.6.2"
+ufbx = "0.11.5"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+  "Foundation",
+  "Foundation_Collections",
+  "Data_Pdf",
+  "Media_Core",
+  "Media_Ocr",
+  "Globalization",
+  "Win32_Globalization",
+  "Win32_Graphics_GdiPlus",
+  "Win32_Storage_FileSystem",
+  "Win32_System_Time",
+  "Media_SpeechSynthesis",
+  "Storage",
+  "Storage_Streams",
+  "Graphics_Imaging",
+  "UI",
+  "Win32_System_WinRT",
+  "Win32_System_Com",
+  "Win32_System_LibraryLoader",
+  "Win32_Foundation",
+] }
+windows-core = "0.62"

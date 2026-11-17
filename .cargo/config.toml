@@ -1,0 +1,5 @@
+[env]
+# whisper.cpp (crates/whisper) is built with CMake. The one from cmake.org (4.0) doesn't know
+# the "Visual Studio 18 2026" generator yet; the one that comes with Visual Studio Build
+# Tools 2026 does. On a PC with a newer CMake on PATH this line can go.
+CMAKE = 'C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe'

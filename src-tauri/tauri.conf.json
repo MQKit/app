@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MQKit",
+  "version": "0.1.0",
+  "identifier": "com.mqkit.app",
+  "build": {
+    "frontendDist": "../ui/dist",
+    "devUrl": "http://localhost:5199",
+    "beforeDevCommand": { "script": "npm run dev", "cwd": "../ui", "wait": false },
+    "beforeBuildCommand": { "script": "npm run build", "cwd": "../ui" }
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "MQKit",
+        "width": 1000,
+        "height": 700,
+        "minWidth": 780,
+        "minHeight": 560,
+        "decorations": false,
+        "transparent": true,
+        "center": true,
+        "dragDropEnabled": true,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src ipc: http://ipc.localhost",
+      "assetProtocol": { "enable": true, "scope": [] }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"],
+    "resources": { "resources/workers/": "workers/", "resources/plugins/": "plugins/", "engines.toml": "engines.toml", "engines.python.toml": "engines.python.toml", "../LICENSE": "LICENSE.txt", "../THIRD-PARTY-NOTICES.txt": "THIRD-PARTY-NOTICES.txt" },
+    "windows": { "nsis": { "installMode": "currentUser", "installerHooks": "windows/hooks.nsh" } },
+    "license": "AGPL-3.0-or-later",
+    "publisher": "Software Hive S.R.L.",
+    "copyright": "Copyright (C) 2026 Software Hive S.R.L.",
+    "homepage": "https://softwarehive.ro",
+    "shortDescription": "MQKit: free offline file converter"
+  }
+}

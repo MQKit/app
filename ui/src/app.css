@@ -1,0 +1,384 @@
+/*
+ * Design tokens, after Windows 11 / Fluent 2 layering:
+ *   base layer    — title bar and navigation, on Mica (Windows 11) or a solid fallback;
+ *   content layer — one white surface with a rounded top-left corner;
+ *   cards         — on the content layer, a soft stroke and a light shadow on hover.
+ * Clean cool neutrals, one clear accent, colour otherwise only for meaning
+ * (category icons, status).
+ */
+:root {
+  --base: #eef0f3;
+  --layer: rgba(255, 255, 255, 0.72);
+  --layer-solid: #ffffff;
+  --layer-stroke: rgba(16, 24, 40, 0.08);
+  --card: #ffffff;
+  --card-hover: #ffffff;
+  --card-stroke: rgba(16, 24, 40, 0.09);
+  --control: #ffffff;
+  --control-hover: #f7f8fa;
+  --control-stroke: rgba(16, 24, 40, 0.12);
+  --control-stroke-bottom: rgba(16, 24, 40, 0.22);
+  --subtle-hover: rgba(16, 24, 40, 0.045);
+  --subtle-pressed: rgba(16, 24, 40, 0.075);
+  --selected: rgba(255, 255, 255, 0.95);
+  --surface-2: #f7f8fa;
+  --text: #15181e;
+  --text-2: #4c5361;
+  --text-3: #858c99;
+  --text-secondary: var(--text-2);
+  --text-nav: #3b414d;
+  --accent: #1559c9;
+  --accent-fill: #1f66d9;
+  --accent-fill-hover: #2b72e3;
+  --on-accent: #ffffff;
+  --accent-bg: rgba(31, 102, 217, 0.08);
+  --accent-border: rgba(31, 102, 217, 0.45);
+  --warn-bg: #fff4e0;
+  --warn-text: #8a4b00;
+  --error-bg: #fdecea;
+  --error-text: #b42318;
+  --ok-text: #087a50;
+  --ok-bg: #e3f6ed;
+  --info-bg: #eef4fd;
+  --info-text: #2c4a6e;
+  --border: var(--card-stroke);
+  --border-strong: rgba(16, 24, 40, 0.18);
+  --border-dash: rgba(16, 24, 40, 0.2);
+  --hover: var(--subtle-hover);
+  --c-pdf: #d6452a;
+  --c-image: #0f8a5f;
+  --c-media: #6a5bd9;
+  --c-doc: #1f66d9;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 6px 18px rgba(16, 24, 40, 0.07);
+  --focus: 0 0 0 2px var(--layer-solid), 0 0 0 4px var(--accent-fill);
+  --surface-0: var(--base);
+  --surface-1: var(--layer-solid);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --base: #191a1d;
+  --layer: rgba(40, 41, 45, 0.55);
+  --layer-solid: #222327;
+  --layer-stroke: rgba(255, 255, 255, 0.07);
+  --card: rgba(255, 255, 255, 0.04);
+  --card-hover: rgba(255, 255, 255, 0.07);
+  --card-stroke: rgba(255, 255, 255, 0.08);
+  --control: rgba(255, 255, 255, 0.06);
+  --control-hover: rgba(255, 255, 255, 0.09);
+  --control-stroke: rgba(255, 255, 255, 0.09);
+  --control-stroke-bottom: rgba(255, 255, 255, 0.16);
+  --subtle-hover: rgba(255, 255, 255, 0.06);
+  --subtle-pressed: rgba(255, 255, 255, 0.04);
+  --selected: rgba(255, 255, 255, 0.08);
+  --surface-2: rgba(255, 255, 255, 0.025);
+  --text: #f2f3f5;
+  --text-2: #c3c7cf;
+  --text-3: #8b919c;
+  --text-nav: #d2d5db;
+  --accent: #8fbcff;
+  --accent-fill: #4f8ff0;
+  --accent-fill-hover: #64a0f5;
+  --on-accent: #ffffff;
+  --accent-bg: rgba(79, 143, 240, 0.16);
+  --accent-border: rgba(143, 188, 255, 0.5);
+  --warn-bg: rgba(230, 160, 50, 0.14);
+  --warn-text: #f0c27e;
+  --error-bg: rgba(230, 90, 70, 0.15);
+  --error-text: #f5a090;
+  --ok-text: #6ad7a8;
+  --ok-bg: rgba(60, 180, 130, 0.14);
+  --info-bg: rgba(79, 143, 240, 0.1);
+  --info-text: #b9cbe2;
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-dash: rgba(255, 255, 255, 0.24);
+  --c-pdf: #f07d5e;
+  --c-image: #45c79a;
+  --c-media: #a79df5;
+  --c-doc: #6ea8f2;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--base);
+  color: var(--text);
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* Windows 11: Mica shows through the base layer. */
+:root[data-mica="true"] body,
+:root[data-mica="true"] html {
+  background: transparent;
+}
+:root[data-mica="true"] {
+  --layer-solid: transparent;
+}
+
+#app {
+  height: 100%;
+}
+
+h1,
+h2 {
+  font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  color: inherit;
+}
+
+input[type="text"],
+input[type="search"],
+input[type="password"],
+input[type="number"],
+select {
+  height: 34px;
+  border: 1px solid var(--control-stroke);
+  border-bottom-color: var(--control-stroke-bottom);
+  border-radius: var(--radius-sm);
+  padding: 0 11px;
+  background: var(--control);
+  outline: none;
+  user-select: text;
+  min-width: 0;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+input[type="text"]:hover,
+input[type="search"]:hover,
+input[type="password"]:hover,
+input[type="number"]:hover,
+select:hover {
+  background: var(--control-hover);
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus {
+  border-bottom: 2px solid var(--accent-fill);
+  padding-bottom: 0;
+}
+
+button:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible,
+input[type="checkbox"]:focus-visible,
+input[type="range"]:focus-visible {
+  box-shadow: var(--focus);
+  outline: none;
+}
+
+select {
+  appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8984' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  cursor: pointer;
+}
+
+option {
+  background: var(--layer-solid);
+  color: var(--text);
+}
+:root[data-mica="true"] option {
+  background: var(--base);
+}
+
+button {
+  border: 1px solid var(--control-stroke);
+  border-bottom-color: var(--control-stroke-bottom);
+  border-radius: var(--radius-sm);
+  background: var(--control);
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s, transform 0.08s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--control-hover);
+}
+
+button:active:not(:disabled) {
+  background: var(--subtle-pressed);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--accent-fill);
+  border-color: rgba(255, 255, 255, 0.08);
+  border-bottom-color: rgba(0, 0, 0, 0.25);
+  color: var(--on-accent);
+  font-size: 14px;
+  padding: 8px 22px;
+  font-weight: 600;
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--accent-fill-hover);
+}
+
+button.primary:disabled {
+  opacity: 0.4;
+}
+
+button.ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+button.ghost:hover:not(:disabled) {
+  background: var(--subtle-hover);
+}
+
+button.link {
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  background: none;
+}
+
+button.link:hover:not(:disabled) {
+  background: none;
+  text-decoration: underline;
+}
+
+button.icon {
+  border: 0;
+  padding: 5px;
+  line-height: 1;
+  color: var(--text-3);
+  border-radius: var(--radius-sm);
+  background: transparent;
+}
+
+button.icon:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--subtle-hover);
+}
+
+.chip {
+  font-size: 13px;
+  padding: 5px 13px;
+  border-radius: 999px;
+}
+
+.chip.on {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.lbl {
+  font-size: 13px;
+  color: var(--text-2);
+  margin: 0 0 6px;
+}
+
+.muted {
+  color: var(--text-3);
+}
+
+.secondary {
+  color: var(--text-2);
+}
+
+.ti {
+  line-height: 1;
+}
+
+input[type="range"] {
+  accent-color: var(--accent-fill);
+  cursor: pointer;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--accent-fill);
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.note {
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  font-size: 13px;
+  line-height: 18px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.note .ti {
+  font-size: 16px;
+  margin-top: 1px;
+}
+
+.note.warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.note.error {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.note.info {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.note.ok {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+
+.selectable {
+  user-select: text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

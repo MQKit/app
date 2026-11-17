@@ -1,0 +1,66 @@
+# cargo-deny: what MQKit's dependencies may be.
+# `cargo deny check` runs in CI on every push.
+
+[graph]
+targets = ["x86_64-pc-windows-msvc"]
+all-features = false
+
+[advisories]
+# Known vulnerabilities fail the build; unmaintained crates only warn.
+version = 2
+yanked = "deny"
+unmaintained = "workspace"
+ignore = [
+    # chrono is unmaintained, but lopdf, dxf and rawler build on it anyway; MQKit only
+    # formats a few dates with it. Revisit when those move to jiff or time.
+    { id = "RUSTSEC-2026-0543", reason = "pulled in by lopdf, dxf and rawler; only date formatting here" },
+]
+
+[licenses]
+version = 2
+# MQKit is AGPL-3.0-or-later; what it builds on must be permissive (or AGPL itself,
+# its own crates), so the whole stays distributable under the AGPL.
+allow = [
+    "AGPL-3.0-or-later",
+    "MIT",
+    "MIT-0",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "BSL-1.0",
+    "CC0-1.0",
+    "OFL-1.1",
+    "Ubuntu-font-1.0",
+    "MPL-2.0",
+    "CDLA-Permissive-2.0",
+    "bzip2-1.0.6",
+    # mozjpeg: the Independent JPEG Group's permissive license
+    "IJG",
+]
+confidence-threshold = 0.9
+
+# Copyleft libraries the AGPL can take in: GPL-3.0-or-later (AGPL section 13), and
+# LGPL-2.1, which may be relicensed under the GPL (its section 3). Named one by one,
+# so a new copyleft dependency is a decision, not an accident.
+[[licenses.exceptions]]
+crate = "imagequant"
+allow = ["GPL-3.0-or-later"]
+
+[[licenses.exceptions]]
+crate = "rawler"
+allow = ["LGPL-2.1"]
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

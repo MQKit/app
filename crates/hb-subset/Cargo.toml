@@ -1,0 +1,11 @@
+[package]
+name = "hb-subset"
+version.workspace = true
+edition.workspace = true
+publish = false
+license = "MIT"
+description = "HarfBuzz font subsetter (vendored HarfBuzz 15.1.0, MIT), built from source"
+build = "build.rs"
+
+[build-dependencies]
+cc = "1"

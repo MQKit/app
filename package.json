@@ -1,0 +1,17 @@
+{
+  "name": "mqkit",
+  "private": true,
+  "version": "0.1.0",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "workers": "node scripts/build-workers.mjs",
+    "workers:release": "node scripts/build-workers.mjs --release",
+    "dev": "npm run workers && tauri dev",
+    "build": "npm run workers:release && tauri build",
+    "notices": "node scripts/generate-notices.mjs",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4"
+  }
+}

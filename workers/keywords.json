@@ -1,0 +1,2588 @@
+{
+  "_about": "Search words for each tool, merged into every plugin.json at build (scripts/build-workers.mjs). Search ignores diacritics and case, and looks in every language, so a German word finds the tool in the Romanian interface too. Add freely: synonyms, everyday phrases, common typos, file extensions, brand words people type.",
+  "pdf-compress": {
+    "ro": [
+      "micșorează pdf",
+      "reduce pdf",
+      "comprimă pdf",
+      "comprimare",
+      "pdf mic",
+      "pdf mai mic",
+      "scade mărimea",
+      "mărime",
+      "dimensiune",
+      "greutate",
+      "pdf prea mare",
+      "pdf mare",
+      "pentru email",
+      "pentru e-mail",
+      "atașament",
+      "trimite pe mail",
+      "optimizează pdf",
+      "pdf ușor",
+      "comprima",
+      "compresie",
+      "mb",
+      "megabytes",
+      "scanări mari",
+      "pdf scanat",
+      "upload",
+      "încarcă pe site",
+      "portal",
+      "ghișeul",
+      "anaf",
+      "spv",
+      "limita de mărime",
+      "sub 10 mb",
+      "sub 5 mb",
+      "sub 2 mb"
+    ],
+    "en": [
+      "compress pdf",
+      "shrink pdf",
+      "reduce pdf size",
+      "make pdf smaller",
+      "smaller pdf",
+      "pdf too big",
+      "large pdf",
+      "pdf size",
+      "file size",
+      "optimize pdf",
+      "email attachment",
+      "send by email",
+      "gmail limit",
+      "outlook limit",
+      "upload limit",
+      "under 10mb",
+      "under 5mb",
+      "under 2mb",
+      "lighter pdf",
+      "pdf compressor",
+      "minify pdf",
+      "squeeze pdf",
+      "scanned pdf too big"
+    ],
+    "de": [
+      "pdf verkleinern",
+      "pdf komprimieren",
+      "pdf kleiner machen",
+      "pdf größe reduzieren",
+      "dateigröße"
+    ],
+    "fr": [
+      "compresser pdf",
+      "réduire pdf",
+      "réduire la taille pdf",
+      "alléger pdf",
+      "pdf trop lourd"
+    ],
+    "es": [
+      "comprimir pdf",
+      "reducir pdf",
+      "reducir tamaño pdf",
+      "pdf más pequeño",
+      "pdf pesado"
+    ],
+    "it": [
+      "comprimere pdf",
+      "ridurre pdf",
+      "pdf più piccolo",
+      "ridurre dimensione pdf"
+    ],
+    "pt": [
+      "comprimir pdf",
+      "reduzir pdf",
+      "diminuir pdf",
+      "pdf menor"
+    ]
+  },
+  "pdf-to-word": {
+    "ro": [
+      "pdf în word",
+      "pdf in word",
+      "pdf în doc",
+      "pdf în docx",
+      "transformă pdf",
+      "convertește pdf",
+      "editează pdf",
+      "modifică pdf",
+      "schimbă textul din pdf",
+      "corectează pdf",
+      "pdf editabil",
+      "text din pdf",
+      "copiază text din pdf",
+      "word",
+      "doc",
+      "docx",
+      "document word",
+      "rtf",
+      "odt",
+      "deschide pdf în word"
+    ],
+    "en": [
+      "pdf to word",
+      "pdf to doc",
+      "pdf to docx",
+      "convert pdf to word",
+      "edit pdf",
+      "editable pdf",
+      "change pdf text",
+      "modify pdf",
+      "pdf converter",
+      "pdf to editable",
+      "extract text from pdf",
+      "copy text from pdf",
+      "pdf to rtf",
+      "pdf to odt",
+      "word document",
+      "microsoft word",
+      "ms word"
+    ],
+    "de": [
+      "pdf in word",
+      "pdf zu word",
+      "pdf umwandeln",
+      "pdf bearbeiten",
+      "pdf in docx"
+    ],
+    "fr": [
+      "pdf en word",
+      "convertir pdf en word",
+      "modifier pdf",
+      "pdf en docx"
+    ],
+    "es": [
+      "pdf a word",
+      "convertir pdf a word",
+      "editar pdf",
+      "pdf a docx"
+    ],
+    "it": [
+      "pdf in word",
+      "convertire pdf in word",
+      "modificare pdf",
+      "pdf a word"
+    ],
+    "pt": [
+      "pdf para word",
+      "converter pdf em word",
+      "editar pdf"
+    ]
+  },
+  "pdf-merge": {
+    "ro": [
+      "unește pdf",
+      "uneste pdf",
+      "unire pdf",
+      "combină pdf",
+      "lipește pdf",
+      "pune împreună",
+      "mai multe pdf într-unul",
+      "un singur pdf",
+      "adaugă pagini",
+      "alipește",
+      "concatenează",
+      "îmbină pdf",
+      "merge",
+      "atașează documente",
+      "dosar",
+      "acte într-un pdf",
+      "ordine pagini"
+    ],
+    "en": [
+      "merge pdf",
+      "combine pdf",
+      "join pdf",
+      "join pdfs",
+      "append pdf",
+      "put pdfs together",
+      "one pdf",
+      "single pdf",
+      "many pdfs into one",
+      "concatenate pdf",
+      "pdf binder",
+      "pdf combiner",
+      "add pages to pdf",
+      "bundle documents"
+    ],
+    "de": [
+      "pdf zusammenfügen",
+      "pdf verbinden",
+      "pdf kombinieren",
+      "pdfs zusammenführen"
+    ],
+    "fr": [
+      "fusionner pdf",
+      "combiner pdf",
+      "assembler pdf",
+      "joindre pdf"
+    ],
+    "es": [
+      "unir pdf",
+      "combinar pdf",
+      "juntar pdf",
+      "fusionar pdf"
+    ],
+    "it": [
+      "unire pdf",
+      "unisci pdf",
+      "combinare pdf"
+    ],
+    "pt": [
+      "juntar pdf",
+      "unir pdf",
+      "combinar pdf",
+      "mesclar pdf"
+    ]
+  },
+  "images-to-pdf": {
+    "ro": [
+      "jpg în pdf",
+      "jpg in pdf",
+      "poze în pdf",
+      "imagini în pdf",
+      "fotografii în pdf",
+      "png în pdf",
+      "scanări în pdf",
+      "acte poze pdf",
+      "buletin pdf",
+      "pozele documentelor",
+      "fă un pdf",
+      "creează pdf",
+      "pdf din poze",
+      "heic în pdf",
+      "tiff în pdf",
+      "album pdf",
+      "chitanțe în pdf",
+      "facturi poze pdf",
+      "foto pdf"
+    ],
+    "en": [
+      "jpg to pdf",
+      "jpeg to pdf",
+      "image to pdf",
+      "images to pdf",
+      "photo to pdf",
+      "photos to pdf",
+      "png to pdf",
+      "picture to pdf",
+      "scan to pdf",
+      "pictures into pdf",
+      "make a pdf",
+      "create pdf",
+      "pdf from images",
+      "heic to pdf",
+      "tiff to pdf",
+      "webp to pdf",
+      "receipts to pdf"
+    ],
+    "de": [
+      "jpg in pdf",
+      "bilder in pdf",
+      "fotos in pdf",
+      "bild zu pdf"
+    ],
+    "fr": [
+      "jpg en pdf",
+      "image en pdf",
+      "photos en pdf",
+      "convertir image en pdf"
+    ],
+    "es": [
+      "jpg a pdf",
+      "imagen a pdf",
+      "fotos a pdf",
+      "convertir imagen a pdf"
+    ],
+    "it": [
+      "jpg in pdf",
+      "immagini in pdf",
+      "foto in pdf"
+    ],
+    "pt": [
+      "jpg para pdf",
+      "imagem para pdf",
+      "fotos para pdf"
+    ]
+  },
+  "word-to-pdf": {
+    "ro": [
+      "word în pdf",
+      "word in pdf",
+      "doc în pdf",
+      "docx în pdf",
+      "salvează ca pdf",
+      "transformă în pdf",
+      "document în pdf",
+      "cv în pdf",
+      "contract în pdf",
+      "rtf în pdf",
+      "odt în pdf",
+      "txt în pdf",
+      "text în pdf",
+      "printează pdf",
+      "pdf din word",
+      "trimite document",
+      "imprimantă pdf"
+    ],
+    "en": [
+      "word to pdf",
+      "doc to pdf",
+      "docx to pdf",
+      "save as pdf",
+      "convert to pdf",
+      "document to pdf",
+      "resume to pdf",
+      "cv to pdf",
+      "rtf to pdf",
+      "odt to pdf",
+      "txt to pdf",
+      "text to pdf",
+      "print to pdf",
+      "pdf from word",
+      "microsoft word to pdf",
+      "libreoffice"
+    ],
+    "de": [
+      "word in pdf",
+      "docx in pdf",
+      "als pdf speichern",
+      "word zu pdf"
+    ],
+    "fr": [
+      "word en pdf",
+      "docx en pdf",
+      "enregistrer en pdf",
+      "convertir word en pdf"
+    ],
+    "es": [
+      "word a pdf",
+      "docx a pdf",
+      "guardar como pdf",
+      "convertir word a pdf"
+    ],
+    "it": [
+      "word in pdf",
+      "docx in pdf",
+      "salvare come pdf",
+      "convertire word in pdf"
+    ],
+    "pt": [
+      "word para pdf",
+      "docx para pdf",
+      "salvar como pdf"
+    ]
+  },
+  "pdf-to-images": {
+    "ro": [
+      "pdf în jpg",
+      "pdf in jpg",
+      "pdf în png",
+      "pdf în poze",
+      "pdf în imagini",
+      "pagini în poze",
+      "captură pdf",
+      "screenshot pdf",
+      "extrage pagina ca imagine",
+      "pdf în imagine",
+      "pdf în webp",
+      "pagina ca poză",
+      "pdf pentru instagram",
+      "pdf pentru whatsapp"
+    ],
+    "en": [
+      "pdf to jpg",
+      "pdf to jpeg",
+      "pdf to png",
+      "pdf to image",
+      "pdf to images",
+      "pdf to picture",
+      "pdf to photo",
+      "pdf pages to images",
+      "save pdf page as image",
+      "pdf screenshot",
+      "pdf to webp",
+      "render pdf",
+      "pdf thumbnail"
+    ],
+    "de": [
+      "pdf in jpg",
+      "pdf in bild",
+      "pdf zu png",
+      "pdf in bilder umwandeln"
+    ],
+    "fr": [
+      "pdf en jpg",
+      "pdf en image",
+      "pdf en png",
+      "convertir pdf en image"
+    ],
+    "es": [
+      "pdf a jpg",
+      "pdf a imagen",
+      "pdf a png",
+      "convertir pdf a imagen"
+    ],
+    "it": [
+      "pdf in jpg",
+      "pdf in immagine",
+      "pdf in png"
+    ],
+    "pt": [
+      "pdf para jpg",
+      "pdf para imagem",
+      "pdf para png"
+    ]
+  },
+  "image-compress": {
+    "ro": [
+      "micșorează poza",
+      "micsoreaza poza",
+      "comprimă poze",
+      "comprimare imagini",
+      "reduce poza",
+      "poză mai mică",
+      "imagine mică",
+      "scade mărimea pozei",
+      "optimizează imagini",
+      "poze pentru site",
+      "poze pentru email",
+      "poze prea mari",
+      "jpg mic",
+      "png mic",
+      "redimensionează poza",
+      "rezoluție",
+      "mărime poză",
+      "kb",
+      "mb",
+      "fotografii",
+      "telefon",
+      "whatsapp",
+      "olx",
+      "upload poze",
+      "imagini web"
+    ],
+    "en": [
+      "compress image",
+      "compress images",
+      "compress photo",
+      "compress jpg",
+      "compress png",
+      "compress webp",
+      "reduce image size",
+      "make image smaller",
+      "shrink image",
+      "shrink photo",
+      "optimize images",
+      "image optimizer",
+      "smaller jpg",
+      "photos for website",
+      "photos for email",
+      "image too big",
+      "resize photo",
+      "tinypng",
+      "kb",
+      "lossy png",
+      "photo size"
+    ],
+    "de": [
+      "bild verkleinern",
+      "bilder komprimieren",
+      "foto verkleinern",
+      "jpg komprimieren"
+    ],
+    "fr": [
+      "compresser image",
+      "réduire taille image",
+      "compresser photo",
+      "optimiser image"
+    ],
+    "es": [
+      "comprimir imagen",
+      "reducir tamaño imagen",
+      "comprimir foto",
+      "optimizar imagen"
+    ],
+    "it": [
+      "comprimere immagine",
+      "ridurre immagine",
+      "comprimere foto"
+    ],
+    "pt": [
+      "comprimir imagem",
+      "reduzir imagem",
+      "comprimir foto"
+    ]
+  },
+  "image-convert": {
+    "ro": [
+      "convertește imagine",
+      "schimbă formatul",
+      "format poză",
+      "transformă poza",
+      "png în jpg",
+      "jpg în png",
+      "webp în jpg",
+      "jpg în webp",
+      "bmp în jpg",
+      "tiff în jpg",
+      "gif în png",
+      "ico",
+      "iconiță",
+      "favicon",
+      "avif în jpg",
+      "heic în png",
+      "transparent",
+      "fundal transparent",
+      "convertor imagini",
+      "poze din telefon"
+    ],
+    "en": [
+      "convert image",
+      "image converter",
+      "change image format",
+      "photo converter",
+      "png to jpg",
+      "jpg to png",
+      "webp to jpg",
+      "webp to png",
+      "jpg to webp",
+      "png to webp",
+      "bmp to jpg",
+      "tiff to jpg",
+      "gif to png",
+      "png to ico",
+      "make icon",
+      "favicon",
+      "avif to jpg",
+      "heic to png",
+      "jpeg",
+      "convert picture",
+      "gif to webp"
+    ],
+    "de": [
+      "bild umwandeln",
+      "png in jpg",
+      "webp in jpg",
+      "bildformat ändern"
+    ],
+    "fr": [
+      "convertir image",
+      "png en jpg",
+      "webp en jpg",
+      "changer format image"
+    ],
+    "es": [
+      "convertir imagen",
+      "png a jpg",
+      "webp a jpg",
+      "cambiar formato imagen"
+    ],
+    "it": [
+      "convertire immagine",
+      "png in jpg",
+      "webp in jpg"
+    ],
+    "pt": [
+      "converter imagem",
+      "png para jpg",
+      "webp para jpg"
+    ]
+  },
+  "heic-to-jpg": {
+    "ro": [
+      "heic în jpg",
+      "heic in jpg",
+      "heic",
+      "heif",
+      "poze iphone",
+      "poze de pe iphone",
+      "poze apple",
+      "deschide heic",
+      "nu se deschid pozele",
+      "iphone în jpg",
+      "ipad poze",
+      "live photo",
+      "poze din icloud",
+      "heic în png",
+      "fotografii iphone"
+    ],
+    "en": [
+      "heic to jpg",
+      "heic to jpeg",
+      "heic to png",
+      "heic converter",
+      "heif to jpg",
+      "iphone photos",
+      "iphone pictures",
+      "apple photos",
+      "open heic",
+      "can't open heic",
+      "convert iphone photos",
+      "icloud photos",
+      "ipad photos",
+      "live photo"
+    ],
+    "de": [
+      "heic in jpg",
+      "heic umwandeln",
+      "iphone fotos"
+    ],
+    "fr": [
+      "heic en jpg",
+      "convertir heic",
+      "photos iphone"
+    ],
+    "es": [
+      "heic a jpg",
+      "convertir heic",
+      "fotos iphone"
+    ],
+    "it": [
+      "heic in jpg",
+      "convertire heic",
+      "foto iphone"
+    ],
+    "pt": [
+      "heic para jpg",
+      "converter heic",
+      "fotos iphone"
+    ]
+  },
+  "video-to-mp3": {
+    "ro": [
+      "video în mp3",
+      "video in mp3",
+      "mp4 în mp3",
+      "extrage sunetul",
+      "extrage audio",
+      "scoate sunetul",
+      "muzică din video",
+      "melodie din video",
+      "audio din film",
+      "sunet din clip",
+      "youtube mp3",
+      "convertor mp3",
+      "m4a",
+      "wav",
+      "flac",
+      "ogg",
+      "opus",
+      "sonerie",
+      "podcast",
+      "înregistrare",
+      "mkv în mp3",
+      "mov în mp3",
+      "taie melodia"
+    ],
+    "en": [
+      "video to mp3",
+      "mp4 to mp3",
+      "extract audio",
+      "extract sound",
+      "rip audio",
+      "audio from video",
+      "music from video",
+      "convert to mp3",
+      "mp3 converter",
+      "video to audio",
+      "mov to mp3",
+      "mkv to mp3",
+      "avi to mp3",
+      "webm to mp3",
+      "m4a",
+      "wav",
+      "flac",
+      "ogg",
+      "opus",
+      "ringtone",
+      "podcast",
+      "audio track"
+    ],
+    "de": [
+      "video in mp3",
+      "mp4 in mp3",
+      "ton extrahieren",
+      "audio extrahieren"
+    ],
+    "fr": [
+      "vidéo en mp3",
+      "mp4 en mp3",
+      "extraire audio",
+      "extraire le son"
+    ],
+    "es": [
+      "video a mp3",
+      "mp4 a mp3",
+      "extraer audio",
+      "sacar audio de video"
+    ],
+    "it": [
+      "video in mp3",
+      "mp4 in mp3",
+      "estrarre audio"
+    ],
+    "pt": [
+      "vídeo para mp3",
+      "mp4 para mp3",
+      "extrair áudio"
+    ]
+  },
+  "pdf-split": {
+    "en": [
+      "split pdf",
+      "separate pdf",
+      "cut pdf",
+      "extract pages",
+      "pdf splitter",
+      "break pdf",
+      "divide pdf",
+      "pdf into pages",
+      "one page per file",
+      "split by chapter",
+      "split by bookmarks",
+      "split by size",
+      "pdf too big for email",
+      "odd and even pages",
+      "remove pages from pdf",
+      "save pages as pdf",
+      "chapters"
+    ],
+    "ro": [
+      "împarte pdf",
+      "imparte pdf",
+      "împărțire pdf",
+      "separă pdf",
+      "taie pdf",
+      "extrage pagini",
+      "pagini separate",
+      "fiecare pagină",
+      "capitole",
+      "după cuprins",
+      "pe capitole",
+      "prea mare pentru email",
+      "bucăți",
+      "pare și impare",
+      "salvează pagini",
+      "scoate pagini"
+    ],
+    "de": [
+      "pdf teilen",
+      "pdf aufteilen",
+      "seiten extrahieren",
+      "pdf trennen"
+    ],
+    "fr": [
+      "diviser pdf",
+      "séparer pdf",
+      "extraire pages",
+      "couper pdf"
+    ],
+    "es": [
+      "dividir pdf",
+      "separar pdf",
+      "extraer páginas",
+      "cortar pdf"
+    ],
+    "it": [
+      "dividere pdf",
+      "separare pdf",
+      "estrarre pagine"
+    ],
+    "pt": [
+      "dividir pdf",
+      "separar pdf",
+      "extrair páginas"
+    ]
+  },
+  "image-resize": {
+    "en": [
+      "resize image",
+      "resize photo",
+      "make image smaller",
+      "reduce dimensions",
+      "scale image",
+      "shrink photo",
+      "change image size",
+      "pixels",
+      "width height",
+      "crop to square",
+      "instagram size",
+      "thumbnail",
+      "bulk resize",
+      "batch resize",
+      "photo for email",
+      "16:9",
+      "1:1",
+      "enlarge image"
+    ],
+    "ro": [
+      "redimensionează",
+      "redimensionare",
+      "micșorează poza",
+      "micsoreaza poza",
+      "mărește poza",
+      "dimensiune poză",
+      "schimbă mărimea",
+      "pixeli",
+      "lățime înălțime",
+      "pătrat",
+      "decupează",
+      "decupare",
+      "miniatură",
+      "poze pentru email",
+      "mai multe poze deodată",
+      "rezoluție"
+    ],
+    "de": [
+      "bild verkleinern",
+      "bildgröße ändern",
+      "foto verkleinern",
+      "bilder skalieren"
+    ],
+    "fr": [
+      "redimensionner image",
+      "réduire photo",
+      "changer taille image"
+    ],
+    "es": [
+      "redimensionar imagen",
+      "cambiar tamaño imagen",
+      "reducir foto"
+    ],
+    "it": [
+      "ridimensionare immagine",
+      "ridurre foto"
+    ],
+    "pt": [
+      "redimensionar imagem",
+      "reduzir foto",
+      "mudar tamanho imagem"
+    ]
+  },
+  "pdf-password": {
+    "en": [
+      "password protect pdf",
+      "add password to pdf",
+      "encrypt pdf",
+      "lock pdf",
+      "secure pdf",
+      "remove pdf password",
+      "unlock pdf",
+      "decrypt pdf",
+      "pdf without password",
+      "restrict printing",
+      "prevent copying",
+      "protect pdf",
+      "aes 256"
+    ],
+    "ro": [
+      "parolă pdf",
+      "parola pdf",
+      "pune parolă",
+      "protejează pdf",
+      "criptează pdf",
+      "blochează pdf",
+      "scoate parola",
+      "deblochează pdf",
+      "pdf fără parolă",
+      "interzice tipărirea",
+      "interzice copierea",
+      "securizează pdf",
+      "confidențial"
+    ],
+    "de": [
+      "pdf passwort",
+      "pdf verschlüsseln",
+      "pdf entsperren",
+      "passwort entfernen"
+    ],
+    "fr": [
+      "protéger pdf",
+      "mot de passe pdf",
+      "déverrouiller pdf",
+      "chiffrer pdf"
+    ],
+    "es": [
+      "proteger pdf",
+      "contraseña pdf",
+      "desbloquear pdf",
+      "quitar contraseña pdf"
+    ],
+    "it": [
+      "proteggere pdf",
+      "password pdf",
+      "sbloccare pdf"
+    ],
+    "pt": [
+      "proteger pdf",
+      "senha pdf",
+      "desbloquear pdf",
+      "remover senha pdf"
+    ]
+  },
+  "icons": {
+    "en": [
+      "png to ico",
+      "jpg to ico",
+      "make icon",
+      "ico file",
+      "favicon generator",
+      "favicon",
+      "website icon",
+      "app icon",
+      "windows icon",
+      "apple touch icon",
+      "site.webmanifest",
+      "icon sizes",
+      "extract ico",
+      "ico to png",
+      "shortcut icon",
+      "folder icon"
+    ],
+    "ro": [
+      "iconiță",
+      "iconita",
+      "pictogramă",
+      "ico",
+      "favicon",
+      "png în ico",
+      "jpg în ico",
+      "iconiță pentru site",
+      "iconiță aplicație",
+      "iconiță windows",
+      "iconiță folder",
+      "scurtătură",
+      "ico în png",
+      "scoate din ico"
+    ],
+    "de": [
+      "png in ico",
+      "favicon erstellen",
+      "icon erstellen",
+      "symbol erstellen"
+    ],
+    "fr": [
+      "png en ico",
+      "créer favicon",
+      "créer icône"
+    ],
+    "es": [
+      "png a ico",
+      "crear favicon",
+      "crear icono"
+    ],
+    "it": [
+      "png in ico",
+      "creare favicon",
+      "creare icona"
+    ],
+    "pt": [
+      "png para ico",
+      "criar favicon",
+      "criar ícone"
+    ]
+  },
+  "video-compress": {
+    "en": [
+      "compress video",
+      "reduce video size",
+      "shrink video",
+      "make video smaller",
+      "video too big",
+      "video for email",
+      "video for whatsapp",
+      "discord 10mb",
+      "compress mp4",
+      "lower resolution",
+      "720p",
+      "1080p",
+      "h264",
+      "h265",
+      "hevc",
+      "video size limit"
+    ],
+    "ro": [
+      "comprimă video",
+      "comprima video",
+      "micșorează video",
+      "micsoreaza video",
+      "video mai mic",
+      "video prea mare",
+      "video pentru email",
+      "video pentru whatsapp",
+      "discord",
+      "comprimă mp4",
+      "rezoluție mai mică",
+      "mărime video",
+      "filmare prea mare",
+      "clip mai mic"
+    ],
+    "de": [
+      "video komprimieren",
+      "video verkleinern",
+      "videogröße reduzieren"
+    ],
+    "fr": [
+      "compresser vidéo",
+      "réduire taille vidéo"
+    ],
+    "es": [
+      "comprimir video",
+      "reducir tamaño video"
+    ],
+    "it": [
+      "comprimere video",
+      "ridurre video"
+    ],
+    "pt": [
+      "comprimir vídeo",
+      "reduzir vídeo"
+    ]
+  },
+  "video-convert": {
+    "en": [
+      "convert video",
+      "video converter",
+      "mkv to mp4",
+      "mov to mp4",
+      "avi to mp4",
+      "webm to mp4",
+      "mp4 to webm",
+      "mp4 to avi",
+      "wmv to mp4",
+      "flv to mp4",
+      "change video format",
+      "video for tv",
+      "remux",
+      "rotate video",
+      "flip video"
+    ],
+    "ro": [
+      "conversie video",
+      "convertește video",
+      "mkv în mp4",
+      "mov în mp4",
+      "avi în mp4",
+      "webm în mp4",
+      "mp4 în avi",
+      "schimbă formatul video",
+      "video pentru televizor",
+      "rotește video",
+      "întoarce video",
+      "oglindește video",
+      "format video"
+    ],
+    "de": [
+      "video konvertieren",
+      "mkv in mp4",
+      "mov in mp4"
+    ],
+    "fr": [
+      "convertir vidéo",
+      "mkv en mp4",
+      "mov en mp4"
+    ],
+    "es": [
+      "convertir video",
+      "mkv a mp4",
+      "mov a mp4"
+    ],
+    "it": [
+      "convertire video",
+      "mkv in mp4"
+    ],
+    "pt": [
+      "converter vídeo",
+      "mkv para mp4"
+    ]
+  },
+  "audio-convert": {
+    "en": [
+      "convert audio",
+      "audio converter",
+      "wav to mp3",
+      "flac to mp3",
+      "m4a to mp3",
+      "mp3 to wav",
+      "ogg to mp3",
+      "wma to mp3",
+      "opus to mp3",
+      "aiff to mp3",
+      "convert music",
+      "lossless",
+      "change audio format",
+      "normalize volume",
+      "fade in fade out",
+      "speed up audio",
+      "audiobook"
+    ],
+    "ro": [
+      "conversie audio",
+      "convertește audio",
+      "wav în mp3",
+      "flac în mp3",
+      "m4a în mp3",
+      "mp3 în wav",
+      "ogg în mp3",
+      "wma în mp3",
+      "muzică",
+      "melodii",
+      "schimbă formatul audio",
+      "volum egal",
+      "fără pierderi",
+      "carte audio",
+      "mărește viteza"
+    ],
+    "de": [
+      "audio konvertieren",
+      "wav in mp3",
+      "flac in mp3"
+    ],
+    "fr": [
+      "convertir audio",
+      "wav en mp3",
+      "flac en mp3"
+    ],
+    "es": [
+      "convertir audio",
+      "wav a mp3",
+      "flac a mp3"
+    ],
+    "it": [
+      "convertire audio",
+      "wav in mp3"
+    ],
+    "pt": [
+      "converter áudio",
+      "wav para mp3"
+    ]
+  },
+  "pdf-pages": {
+    "en": [
+      "rotate pdf",
+      "turn pdf pages",
+      "pdf upside down",
+      "delete pdf pages",
+      "remove pages from pdf",
+      "reorder pdf",
+      "reverse pdf",
+      "organize pdf",
+      "sort pdf pages",
+      "duplex scan",
+      "straighten pdf",
+      "landscape pages"
+    ],
+    "ro": [
+      "rotește pdf",
+      "roteste pdf",
+      "întoarce pagini",
+      "pdf cu susul în jos",
+      "șterge pagini pdf",
+      "scoate pagini",
+      "ordinea paginilor",
+      "inversează paginile",
+      "organizează pdf",
+      "scanare față verso",
+      "pagini culcate",
+      "îndreaptă pdf"
+    ],
+    "de": [
+      "pdf drehen",
+      "pdf seiten löschen",
+      "pdf seiten sortieren"
+    ],
+    "fr": [
+      "pivoter pdf",
+      "supprimer pages pdf",
+      "réorganiser pdf"
+    ],
+    "es": [
+      "rotar pdf",
+      "eliminar páginas pdf",
+      "ordenar pdf"
+    ],
+    "it": [
+      "ruotare pdf",
+      "eliminare pagine pdf"
+    ],
+    "pt": [
+      "girar pdf",
+      "excluir páginas pdf"
+    ]
+  },
+  "media-trim": {
+    "en": [
+      "trim video",
+      "cut video",
+      "shorten video",
+      "cut mp3",
+      "trim audio",
+      "cut audio",
+      "remove part of video",
+      "video cutter",
+      "audio cutter",
+      "ringtone",
+      "clip from video",
+      "cut the beginning",
+      "cut the end",
+      "split clip"
+    ],
+    "ro": [
+      "taie video",
+      "tăiere video",
+      "scurtează video",
+      "taie mp3",
+      "taie melodia",
+      "tăiere audio",
+      "scoate o bucată",
+      "taie începutul",
+      "taie sfârșitul",
+      "ton de apel",
+      "fragment din video",
+      "decupează clip"
+    ],
+    "de": [
+      "video schneiden",
+      "video kürzen",
+      "mp3 schneiden"
+    ],
+    "fr": [
+      "couper vidéo",
+      "découper vidéo",
+      "couper mp3"
+    ],
+    "es": [
+      "cortar video",
+      "recortar video",
+      "cortar mp3"
+    ],
+    "it": [
+      "tagliare video",
+      "tagliare mp3"
+    ],
+    "pt": [
+      "cortar vídeo",
+      "cortar mp3"
+    ]
+  },
+  "video-gif": {
+    "en": [
+      "video to gif",
+      "mp4 to gif",
+      "make a gif",
+      "gif maker",
+      "animated gif",
+      "meme",
+      "gif to mp4",
+      "gif to video",
+      "animated webp",
+      "reaction gif",
+      "screen recording to gif"
+    ],
+    "ro": [
+      "video în gif",
+      "mp4 în gif",
+      "fă un gif",
+      "creează gif",
+      "gif animat",
+      "meme",
+      "gif în mp4",
+      "gif în video",
+      "webp animat",
+      "animație"
+    ],
+    "de": [
+      "video in gif",
+      "gif erstellen",
+      "gif in mp4"
+    ],
+    "fr": [
+      "vidéo en gif",
+      "créer gif",
+      "gif en mp4"
+    ],
+    "es": [
+      "video a gif",
+      "crear gif",
+      "gif a mp4"
+    ],
+    "it": [
+      "video in gif",
+      "creare gif"
+    ],
+    "pt": [
+      "vídeo para gif",
+      "criar gif"
+    ]
+  },
+  "media-merge": {
+    "en": [
+      "merge videos",
+      "join videos",
+      "combine videos",
+      "merge mp4",
+      "join clips",
+      "merge audio",
+      "join mp3",
+      "combine songs",
+      "video joiner",
+      "put videos together",
+      "one video from many",
+      "merge recordings"
+    ],
+    "ro": [
+      "unește video",
+      "lipește clipuri",
+      "combină video",
+      "unește mp4",
+      "unește melodii",
+      "lipește mp3",
+      "mai multe clipuri într-unul",
+      "pune clipurile împreună",
+      "înregistrări într-un fișier"
+    ],
+    "de": [
+      "videos zusammenfügen",
+      "mp3 zusammenfügen"
+    ],
+    "fr": [
+      "fusionner vidéos",
+      "joindre vidéos",
+      "fusionner mp3"
+    ],
+    "es": [
+      "unir videos",
+      "juntar videos",
+      "unir mp3"
+    ],
+    "it": [
+      "unire video",
+      "unire mp3"
+    ],
+    "pt": [
+      "juntar vídeos",
+      "unir vídeos"
+    ]
+  },
+  "meta-strip": {
+    "en": [
+      "remove metadata",
+      "remove exif",
+      "delete exif",
+      "remove gps from photo",
+      "remove location from photo",
+      "strip metadata",
+      "privacy",
+      "anonymize photo",
+      "remove author from pdf",
+      "remove author from word",
+      "clean file",
+      "exif remover",
+      "hide location"
+    ],
+    "ro": [
+      "șterge metadate",
+      "sterge metadate",
+      "șterge exif",
+      "scoate locația",
+      "șterge gps",
+      "confidențialitate",
+      "anonimizează",
+      "scoate autorul",
+      "fișier curat",
+      "ascunde locația",
+      "date personale din poze"
+    ],
+    "de": [
+      "metadaten entfernen",
+      "exif entfernen",
+      "gps entfernen"
+    ],
+    "fr": [
+      "supprimer métadonnées",
+      "supprimer exif",
+      "supprimer gps"
+    ],
+    "es": [
+      "eliminar metadatos",
+      "quitar exif",
+      "quitar gps"
+    ],
+    "it": [
+      "rimuovere metadati",
+      "rimuovere exif"
+    ],
+    "pt": [
+      "remover metadados",
+      "remover exif"
+    ]
+  },
+  "subtitles": {
+    "en": [
+      "subtitles",
+      "srt",
+      "vtt",
+      "ass",
+      "captions",
+      "convert srt",
+      "srt to vtt",
+      "shift subtitles",
+      "sync subtitles",
+      "subtitle delay",
+      "fix subtitle encoding",
+      "burn subtitles",
+      "hardcode subtitles",
+      "add subtitles to video",
+      "extract subtitles",
+      "subtitle out of sync"
+    ],
+    "ro": [
+      "subtitrare",
+      "subtitrări",
+      "srt",
+      "sincronizează subtitrarea",
+      "decalează subtitrarea",
+      "subtitrare întârziată",
+      "diacritice stricate",
+      "ş ţ",
+      "repară diacriticele",
+      "lipește subtitrarea",
+      "arde subtitrarea",
+      "pune subtitrarea pe film",
+      "scoate subtitrarea",
+      "subtitrare nesincronizată",
+      "caractere ciudate subtitrare"
+    ],
+    "de": [
+      "untertitel",
+      "srt konvertieren",
+      "untertitel verschieben"
+    ],
+    "fr": [
+      "sous-titres",
+      "convertir srt",
+      "décaler sous-titres"
+    ],
+    "es": [
+      "subtítulos",
+      "convertir srt",
+      "sincronizar subtítulos"
+    ],
+    "it": [
+      "sottotitoli",
+      "convertire srt"
+    ],
+    "pt": [
+      "legendas",
+      "converter srt",
+      "sincronizar legendas"
+    ]
+  },
+  "html-to-pdf": {
+    "en": [
+      "html to pdf",
+      "web page to pdf",
+      "save web page as pdf",
+      "htm to pdf",
+      "print html",
+      "convert html",
+      "webpage pdf"
+    ],
+    "ro": [
+      "html în pdf",
+      "pagină web în pdf",
+      "salvează pagina ca pdf",
+      "htm în pdf",
+      "tipărește html",
+      "pagină salvată"
+    ],
+    "de": [
+      "html in pdf",
+      "webseite als pdf"
+    ],
+    "fr": [
+      "html en pdf",
+      "page web en pdf"
+    ],
+    "es": [
+      "html a pdf",
+      "página web a pdf"
+    ],
+    "it": [
+      "html in pdf"
+    ],
+    "pt": [
+      "html para pdf"
+    ]
+  },
+  "markdown": {
+    "en": [
+      "markdown to pdf",
+      "md to pdf",
+      "markdown to html",
+      "md to html",
+      "txt to pdf",
+      "text to pdf",
+      "readme to pdf",
+      "notes to pdf",
+      "markdown converter",
+      "table of contents"
+    ],
+    "ro": [
+      "markdown în pdf",
+      "md în pdf",
+      "markdown în html",
+      "txt în pdf",
+      "text în pdf",
+      "notițe în pdf",
+      "readme",
+      "document text",
+      "cuprins"
+    ],
+    "de": [
+      "markdown in pdf",
+      "txt in pdf"
+    ],
+    "fr": [
+      "markdown en pdf",
+      "txt en pdf"
+    ],
+    "es": [
+      "markdown a pdf",
+      "txt a pdf"
+    ],
+    "it": [
+      "markdown in pdf"
+    ],
+    "pt": [
+      "markdown para pdf"
+    ]
+  },
+  "office-to-pdf": {
+    "en": [
+      "excel to pdf",
+      "xlsx to pdf",
+      "xls to pdf",
+      "powerpoint to pdf",
+      "pptx to pdf",
+      "ppt to pdf",
+      "spreadsheet to pdf",
+      "presentation to pdf",
+      "slides to pdf",
+      "csv to pdf",
+      "ods to pdf",
+      "odp to pdf"
+    ],
+    "ro": [
+      "excel în pdf",
+      "xlsx în pdf",
+      "powerpoint în pdf",
+      "pptx în pdf",
+      "prezentare în pdf",
+      "tabel în pdf",
+      "foaie de calcul în pdf",
+      "slide-uri în pdf",
+      "csv în pdf"
+    ],
+    "de": [
+      "excel in pdf",
+      "powerpoint in pdf"
+    ],
+    "fr": [
+      "excel en pdf",
+      "powerpoint en pdf"
+    ],
+    "es": [
+      "excel a pdf",
+      "powerpoint a pdf"
+    ],
+    "it": [
+      "excel in pdf",
+      "powerpoint in pdf"
+    ],
+    "pt": [
+      "excel para pdf",
+      "powerpoint para pdf"
+    ]
+  },
+  "tts": {
+    "en": [
+      "text to speech",
+      "tts",
+      "read aloud",
+      "text to audio",
+      "text to mp3",
+      "make an audiobook",
+      "voice",
+      "narration",
+      "listen to text",
+      "word to audio",
+      "speak text"
+    ],
+    "ro": [
+      "text în voce",
+      "text în audio",
+      "citește cu voce tare",
+      "text în mp3",
+      "carte audio",
+      "narațiune",
+      "ascultă textul",
+      "voce",
+      "word în audio",
+      "citește documentul"
+    ],
+    "de": [
+      "text zu sprache",
+      "vorlesen"
+    ],
+    "fr": [
+      "synthèse vocale",
+      "texte en audio",
+      "lire à voix haute"
+    ],
+    "es": [
+      "texto a voz",
+      "leer en voz alta"
+    ],
+    "it": [
+      "sintesi vocale",
+      "testo in audio"
+    ],
+    "pt": [
+      "texto para fala",
+      "ler em voz alta"
+    ]
+  },
+  "ocr": {
+    "en": [
+      "ocr",
+      "searchable pdf",
+      "text recognition",
+      "scan to text",
+      "image to text",
+      "pdf to text",
+      "extract text from scan",
+      "copy text from picture",
+      "screenshot to text",
+      "make pdf searchable",
+      "scanned document"
+    ],
+    "ro": [
+      "ocr",
+      "pdf căutabil",
+      "recunoaștere text",
+      "text din scanare",
+      "text din poză",
+      "imagine în text",
+      "copiază textul din poză",
+      "captură de ecran în text",
+      "document scanat",
+      "caută în pdf scanat"
+    ],
+    "de": [
+      "texterkennung",
+      "durchsuchbares pdf",
+      "bild zu text"
+    ],
+    "fr": [
+      "reconnaissance de texte",
+      "pdf consultable",
+      "image en texte"
+    ],
+    "es": [
+      "reconocimiento de texto",
+      "pdf con búsqueda",
+      "imagen a texto"
+    ],
+    "it": [
+      "riconoscimento testo",
+      "pdf ricercabile"
+    ],
+    "pt": [
+      "reconhecimento de texto",
+      "pdf pesquisável"
+    ]
+  },
+  "pdf-stamp": {
+    "en": [
+      "watermark pdf",
+      "add watermark",
+      "page numbers",
+      "number pages",
+      "add page numbers to pdf",
+      "bates",
+      "confidential stamp",
+      "draft stamp",
+      "logo on every page",
+      "stamp pdf",
+      "paginate"
+    ],
+    "ro": [
+      "filigran pdf",
+      "adaugă filigran",
+      "numerotare pagini",
+      "numere de pagină",
+      "numerotează paginile",
+      "ștampilă",
+      "confidențial",
+      "ciornă",
+      "logo pe fiecare pagină",
+      "paginare"
+    ],
+    "de": [
+      "wasserzeichen pdf",
+      "seitenzahlen pdf"
+    ],
+    "fr": [
+      "filigrane pdf",
+      "numéroter pages pdf"
+    ],
+    "es": [
+      "marca de agua pdf",
+      "numerar páginas pdf"
+    ],
+    "it": [
+      "filigrana pdf",
+      "numerare pagine pdf"
+    ],
+    "pt": [
+      "marca d'água pdf",
+      "numerar páginas pdf"
+    ]
+  },
+  "tabular": {
+    "en": [
+      "csv to excel",
+      "excel to csv",
+      "xlsx to csv",
+      "csv to xlsx",
+      "json to csv",
+      "csv to json",
+      "excel to json",
+      "json to excel",
+      "xml",
+      "semicolon",
+      "csv encoding",
+      "csv diacritics",
+      "open csv in excel",
+      "export table"
+    ],
+    "ro": [
+      "csv în excel",
+      "excel în csv",
+      "xlsx în csv",
+      "json în csv",
+      "csv în json",
+      "excel în json",
+      "tabel",
+      "separator punct și virgulă",
+      "diacritice csv",
+      "deschide csv în excel",
+      "date tabel",
+      "export tabel"
+    ],
+    "de": [
+      "csv in excel",
+      "excel in csv"
+    ],
+    "fr": [
+      "csv en excel",
+      "excel en csv"
+    ],
+    "es": [
+      "csv a excel",
+      "excel a csv"
+    ],
+    "it": [
+      "csv in excel"
+    ],
+    "pt": [
+      "csv para excel"
+    ]
+  },
+  "avif": {
+    "en": [
+      "avif",
+      "jpg to avif",
+      "png to avif",
+      "avif to jpg",
+      "avif to png",
+      "open avif",
+      "jxl",
+      "jpeg xl",
+      "jxl to jpg",
+      "next-gen image format",
+      "smaller images",
+      "webp alternative"
+    ],
+    "ro": [
+      "avif",
+      "jpg în avif",
+      "png în avif",
+      "avif în jpg",
+      "avif în png",
+      "deschide avif",
+      "jxl",
+      "jpeg xl",
+      "jxl în jpg",
+      "format imagine nou",
+      "imagini mai mici"
+    ],
+    "de": [
+      "avif in jpg",
+      "jpg in avif"
+    ],
+    "fr": [
+      "avif en jpg",
+      "jpg en avif"
+    ],
+    "es": [
+      "avif a jpg",
+      "jpg a avif"
+    ],
+    "it": [
+      "avif in jpg"
+    ],
+    "pt": [
+      "avif para jpg"
+    ]
+  },
+  "pdf-to-pptx": {
+    "en": [
+      "pdf to pptx",
+      "pdf to powerpoint",
+      "pdf to ppt",
+      "pdf to slides",
+      "pdf presentation",
+      "present a pdf",
+      "pdf to slideshow",
+      "pdf pages as slides"
+    ],
+    "ro": [
+      "pdf în pptx",
+      "pdf în powerpoint",
+      "pdf în ppt",
+      "pdf în prezentare",
+      "prezentare din pdf",
+      "slide-uri din pdf",
+      "pagini pdf ca slide-uri"
+    ],
+    "de": [
+      "pdf in powerpoint",
+      "pdf in pptx"
+    ],
+    "fr": [
+      "pdf en powerpoint",
+      "pdf en pptx"
+    ],
+    "es": [
+      "pdf a powerpoint",
+      "pdf a pptx"
+    ],
+    "it": [
+      "pdf in powerpoint"
+    ],
+    "pt": [
+      "pdf para powerpoint"
+    ]
+  },
+  "svg": {
+    "en": [
+      "svg to png",
+      "svg to jpg",
+      "svg to pdf",
+      "svgz",
+      "png to svg",
+      "jpg to svg",
+      "image to svg",
+      "vectorize",
+      "vectorise",
+      "trace image",
+      "image tracing",
+      "logo to vector",
+      "vector graphics",
+      "raster to vector",
+      "vector to png",
+      "vector to jpg",
+      "emf to png",
+      "wmf to png",
+      "emf to jpg",
+      "emf to pdf",
+      "wmf to pdf",
+      "ai to png",
+      "ai to pdf",
+      "illustrator to png",
+      "open emf",
+      "open wmf",
+      "metafile"
+    ],
+    "ro": [
+      "svg în png",
+      "svg în jpg",
+      "svg în pdf",
+      "png în svg",
+      "jpg în svg",
+      "imagine în svg",
+      "vectorizare",
+      "vectorizează",
+      "logo vector",
+      "grafică vectorială",
+      "vector în png",
+      "vector în jpg",
+      "emf în png",
+      "wmf în png",
+      "emf în pdf",
+      "wmf în pdf",
+      "ai în png",
+      "ai în pdf",
+      "illustrator în png",
+      "deschide emf"
+    ],
+    "de": [
+      "svg in png",
+      "bild in svg",
+      "vektorisieren"
+    ],
+    "fr": [
+      "svg en png",
+      "image en svg",
+      "vectoriser"
+    ],
+    "es": [
+      "svg a png",
+      "imagen a svg",
+      "vectorizar"
+    ],
+    "it": [
+      "svg in png",
+      "vettorializzare"
+    ],
+    "pt": [
+      "svg para png",
+      "vetorizar"
+    ]
+  },
+  "archives": {
+    "en": [
+      "unzip",
+      "extract zip",
+      "open rar",
+      "rar to zip",
+      "extract rar",
+      "open 7z",
+      "7z to zip",
+      "extract 7z",
+      "tar.gz",
+      "tgz",
+      "unpack",
+      "decompress",
+      "create zip",
+      "zip folder",
+      "compress folder",
+      "zip with password",
+      "password protect zip",
+      "split zip",
+      "split archive",
+      "archive"
+    ],
+    "ro": [
+      "dezarhivare",
+      "dezarhivează",
+      "deschide rar",
+      "rar în zip",
+      "deschide 7z",
+      "7z în zip",
+      "dezarhivează zip",
+      "arhivează",
+      "arhivă zip",
+      "arhivează dosar",
+      "zip cu parolă",
+      "arhivă cu parolă",
+      "împarte arhiva",
+      "arhivă"
+    ],
+    "de": [
+      "entpacken",
+      "zip entpacken",
+      "rar entpacken",
+      "zip erstellen"
+    ],
+    "fr": [
+      "décompresser",
+      "extraire zip",
+      "ouvrir rar",
+      "créer zip"
+    ],
+    "es": [
+      "descomprimir",
+      "extraer zip",
+      "abrir rar",
+      "crear zip"
+    ],
+    "it": [
+      "estrarre zip",
+      "aprire rar",
+      "creare zip"
+    ],
+    "pt": [
+      "descompactar",
+      "extrair zip",
+      "abrir rar",
+      "criar zip"
+    ]
+  },
+  "fonts": {
+    "en": [
+      "ttf to woff2",
+      "otf to woff2",
+      "woff2 to ttf",
+      "woff to ttf",
+      "ttf to woff",
+      "otf to ttf",
+      "web font",
+      "font converter",
+      "font subset",
+      "subset font",
+      "reduce font size",
+      "font-face",
+      "ttc to ttf",
+      "install woff2"
+    ],
+    "ro": [
+      "ttf în woff2",
+      "otf în woff2",
+      "woff2 în ttf",
+      "woff în ttf",
+      "font web",
+      "convertor fonturi",
+      "font mai mic",
+      "micșorează font",
+      "subset font",
+      "ttc în ttf",
+      "instalează woff2"
+    ],
+    "de": [
+      "ttf in woff2",
+      "woff2 in ttf",
+      "webfont",
+      "schriftart konvertieren",
+      "schrift verkleinern",
+      "font subset"
+    ],
+    "fr": [
+      "ttf en woff2",
+      "woff2 en ttf",
+      "police web",
+      "convertir police",
+      "réduire police",
+      "sous-ensemble police"
+    ],
+    "es": [
+      "ttf a woff2",
+      "woff2 a ttf",
+      "fuente web",
+      "convertir fuente",
+      "reducir fuente",
+      "subconjunto fuente"
+    ],
+    "it": [
+      "ttf in woff2",
+      "woff2 in ttf",
+      "font web",
+      "convertire font",
+      "ridurre font"
+    ],
+    "pt": [
+      "ttf para woff2",
+      "woff2 para ttf",
+      "fonte web",
+      "converter fonte",
+      "reduzir fonte"
+    ]
+  },
+  "pdf-to-excel": {
+    "en": [
+      "pdf to excel",
+      "pdf to xlsx",
+      "pdf to csv",
+      "pdf table to excel",
+      "extract table from pdf",
+      "bank statement to excel",
+      "convert pdf table",
+      "pdf to spreadsheet",
+      "invoice to excel"
+    ],
+    "ro": [
+      "pdf în excel",
+      "pdf în xlsx",
+      "pdf în csv",
+      "tabel din pdf",
+      "extrage tabel",
+      "extras de cont în excel",
+      "pdf în foaie de calcul",
+      "factură în excel"
+    ],
+    "de": [
+      "pdf in excel",
+      "pdf zu excel",
+      "tabelle aus pdf",
+      "kontoauszug excel",
+      "pdf in csv"
+    ],
+    "fr": [
+      "pdf en excel",
+      "pdf vers excel",
+      "tableau pdf",
+      "relevé bancaire excel",
+      "pdf en csv"
+    ],
+    "es": [
+      "pdf a excel",
+      "tabla de pdf",
+      "extracto bancario excel",
+      "pdf a csv"
+    ],
+    "it": [
+      "pdf in excel",
+      "tabella da pdf",
+      "estratto conto excel",
+      "pdf in csv"
+    ],
+    "pt": [
+      "pdf para excel",
+      "tabela do pdf",
+      "extrato bancário excel",
+      "pdf para csv"
+    ]
+  },
+  "remove-background": {
+    "en": [
+      "remove background",
+      "background remover",
+      "transparent background",
+      "remove bg",
+      "cut out image",
+      "delete background",
+      "erase background",
+      "make background transparent",
+      "product photo white background",
+      "blur background"
+    ],
+    "ro": [
+      "elimină fundalul",
+      "șterge fundalul",
+      "fundal transparent",
+      "decupează poza",
+      "fundal alb",
+      "fundal încețoșat",
+      "scoate fundalul"
+    ],
+    "de": [
+      "hintergrund entfernen",
+      "transparenter hintergrund",
+      "freistellen",
+      "hintergrund löschen"
+    ],
+    "fr": [
+      "supprimer l'arrière-plan",
+      "fond transparent",
+      "détourer",
+      "enlever le fond"
+    ],
+    "es": [
+      "quitar fondo",
+      "eliminar fondo",
+      "fondo transparente",
+      "recortar imagen"
+    ],
+    "it": [
+      "rimuovere sfondo",
+      "sfondo trasparente",
+      "scontornare"
+    ],
+    "pt": [
+      "remover fundo",
+      "fundo transparente",
+      "recortar imagem"
+    ]
+  },
+  "ai-upscale": {
+    "en": [
+      "upscale image",
+      "ai upscaler",
+      "enlarge photo",
+      "increase resolution",
+      "make picture bigger",
+      "enhance photo",
+      "sharpen blurry photo",
+      "upscale 4x",
+      "super resolution"
+    ],
+    "ro": [
+      "mărește poza",
+      "mărire imagine",
+      "rezoluție mai mare",
+      "poză mai clară",
+      "îmbunătățește poza",
+      "upscale",
+      "mărire 4x"
+    ],
+    "de": [
+      "bild vergrößern",
+      "hochskalieren",
+      "auflösung erhöhen",
+      "foto verbessern"
+    ],
+    "fr": [
+      "agrandir image",
+      "augmenter la résolution",
+      "upscale",
+      "améliorer photo"
+    ],
+    "es": [
+      "ampliar imagen",
+      "aumentar resolución",
+      "escalar imagen",
+      "mejorar foto"
+    ],
+    "it": [
+      "ingrandire immagine",
+      "aumentare risoluzione",
+      "migliorare foto"
+    ],
+    "pt": [
+      "ampliar imagem",
+      "aumentar resolução",
+      "melhorar foto"
+    ]
+  },
+  "transcribe": {
+    "en": [
+      "transcribe audio",
+      "speech to text",
+      "audio to text",
+      "video to text",
+      "generate subtitles",
+      "automatic captions",
+      "transcription",
+      "voice to text",
+      "meeting transcript",
+      "whisper"
+    ],
+    "ro": [
+      "transcriere audio",
+      "din vorbire în text",
+      "audio în text",
+      "video în text",
+      "subtitrări automate",
+      "transcrie ședința",
+      "dictare"
+    ],
+    "de": [
+      "transkribieren",
+      "sprache zu text",
+      "audio zu text",
+      "untertitel erstellen"
+    ],
+    "fr": [
+      "transcrire audio",
+      "parole en texte",
+      "audio en texte",
+      "sous-titres automatiques"
+    ],
+    "es": [
+      "transcribir audio",
+      "voz a texto",
+      "audio a texto",
+      "subtítulos automáticos"
+    ],
+    "it": [
+      "trascrivere audio",
+      "voce in testo",
+      "sottotitoli automatici"
+    ],
+    "pt": [
+      "transcrever áudio",
+      "voz para texto",
+      "legendas automáticas"
+    ]
+  },
+  "mail": {
+    "en": [
+      "pst to pdf",
+      "msg to pdf",
+      "eml to pdf",
+      "pst to eml",
+      "pst to mbox",
+      "open pst without outlook",
+      "msg viewer",
+      "eml viewer",
+      "mbox to pdf",
+      "outlook archive",
+      "export outlook emails",
+      "save email as pdf"
+    ],
+    "ro": [
+      "pst în pdf",
+      "msg în pdf",
+      "eml în pdf",
+      "pst în eml",
+      "deschide pst fără outlook",
+      "arhivă outlook",
+      "e-mail în pdf",
+      "salvează e-mail ca pdf",
+      "mbox în pdf"
+    ],
+    "de": [
+      "pst in pdf",
+      "msg in pdf",
+      "eml in pdf",
+      "pst öffnen ohne outlook",
+      "outlook archiv"
+    ],
+    "fr": [
+      "pst en pdf",
+      "msg en pdf",
+      "eml en pdf",
+      "ouvrir pst sans outlook",
+      "archive outlook"
+    ],
+    "es": [
+      "pst a pdf",
+      "msg a pdf",
+      "eml a pdf",
+      "abrir pst sin outlook",
+      "archivo outlook"
+    ],
+    "it": [
+      "pst in pdf",
+      "msg in pdf",
+      "eml in pdf",
+      "aprire pst senza outlook"
+    ],
+    "pt": [
+      "pst para pdf",
+      "msg para pdf",
+      "eml para pdf",
+      "abrir pst sem outlook"
+    ]
+  },
+  "raw": {
+    "en": [
+      "raw to jpg",
+      "cr2 to jpg",
+      "cr3 to jpg",
+      "nef to jpg",
+      "arw to jpg",
+      "raf to jpg",
+      "dng to jpg",
+      "orf to jpg",
+      "rw2 to jpg",
+      "convert raw photos",
+      "camera raw"
+    ],
+    "ro": [
+      "raw în jpg",
+      "cr2 în jpg",
+      "cr3 în jpg",
+      "nef în jpg",
+      "arw în jpg",
+      "dng în jpg",
+      "poze raw",
+      "fișiere raw aparat foto"
+    ],
+    "de": [
+      "raw in jpg",
+      "cr2 in jpg",
+      "nef in jpg",
+      "raw konvertieren"
+    ],
+    "fr": [
+      "raw en jpg",
+      "cr2 en jpg",
+      "nef en jpg",
+      "convertir raw"
+    ],
+    "es": [
+      "raw a jpg",
+      "cr2 a jpg",
+      "nef a jpg",
+      "convertir raw"
+    ],
+    "it": [
+      "raw in jpg",
+      "cr2 in jpg",
+      "nef in jpg"
+    ],
+    "pt": [
+      "raw para jpg",
+      "cr2 para jpg",
+      "nef para jpg"
+    ]
+  },
+  "design-files": {
+    "en": [
+      "psd to png",
+      "psd to jpg",
+      "open psd without photoshop",
+      "psb to png",
+      "ai to png",
+      "illustrator to png",
+      "eps to png",
+      "eps to jpg",
+      "photoshop file viewer"
+    ],
+    "ro": [
+      "psd în png",
+      "psd în jpg",
+      "deschide psd fără photoshop",
+      "ai în png",
+      "eps în png",
+      "fișier photoshop"
+    ],
+    "de": [
+      "psd in png",
+      "psd in jpg",
+      "psd ohne photoshop öffnen",
+      "eps in png"
+    ],
+    "fr": [
+      "psd en png",
+      "psd en jpg",
+      "ouvrir psd sans photoshop",
+      "eps en png"
+    ],
+    "es": [
+      "psd a png",
+      "psd a jpg",
+      "abrir psd sin photoshop",
+      "eps a png"
+    ],
+    "it": [
+      "psd in png",
+      "psd in jpg",
+      "aprire psd senza photoshop"
+    ],
+    "pt": [
+      "psd para png",
+      "psd para jpg",
+      "abrir psd sem photoshop"
+    ]
+  },
+  "ebooks": {
+    "en": [
+      "epub to pdf",
+      "mobi to epub",
+      "azw3 to epub",
+      "epub converter",
+      "kindle to epub",
+      "fb2 to epub",
+      "docx to epub",
+      "word to epub",
+      "ebook converter",
+      "epub to txt",
+      "send to kindle"
+    ],
+    "ro": [
+      "epub în pdf",
+      "mobi în epub",
+      "azw3 în epub",
+      "convertor cărți electronice",
+      "kindle în epub",
+      "fb2 în epub",
+      "word în epub",
+      "carte electronică"
+    ],
+    "de": [
+      "epub in pdf",
+      "mobi in epub",
+      "azw3 in epub",
+      "ebook konvertieren",
+      "fb2 in epub"
+    ],
+    "fr": [
+      "epub en pdf",
+      "mobi en epub",
+      "azw3 en epub",
+      "convertir ebook",
+      "fb2 en epub"
+    ],
+    "es": [
+      "epub a pdf",
+      "mobi a epub",
+      "azw3 a epub",
+      "convertir libro electrónico"
+    ],
+    "it": [
+      "epub in pdf",
+      "mobi in epub",
+      "convertire ebook"
+    ],
+    "pt": [
+      "epub para pdf",
+      "mobi para epub",
+      "converter ebook"
+    ]
+  },
+  "cad-3d": {
+    "en": [
+      "stl to obj",
+      "obj to stl",
+      "stl to 3mf",
+      "fbx to glb",
+      "fbx to stl",
+      "glb to stl",
+      "ply to stl",
+      "3d model converter",
+      "dxf to pdf",
+      "dxf to svg",
+      "dxf to png",
+      "dwg"
+    ],
+    "ro": [
+      "stl în obj",
+      "obj în stl",
+      "stl în 3mf",
+      "fbx în glb",
+      "model 3d",
+      "imprimare 3d",
+      "dxf în pdf",
+      "dxf în svg",
+      "desen cad"
+    ],
+    "de": [
+      "stl in obj",
+      "obj in stl",
+      "fbx in glb",
+      "3d modell konvertieren",
+      "dxf in pdf"
+    ],
+    "fr": [
+      "stl en obj",
+      "obj en stl",
+      "fbx en glb",
+      "convertir modèle 3d",
+      "dxf en pdf"
+    ],
+    "es": [
+      "stl a obj",
+      "obj a stl",
+      "fbx a glb",
+      "convertir modelo 3d",
+      "dxf a pdf"
+    ],
+    "it": [
+      "stl in obj",
+      "fbx in glb",
+      "convertire modello 3d",
+      "dxf in pdf"
+    ],
+    "pt": [
+      "stl para obj",
+      "fbx para glb",
+      "converter modelo 3d",
+      "dxf para pdf"
+    ]
+  }
+}

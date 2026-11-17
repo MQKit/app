@@ -1,0 +1,122 @@
+# Engines downloaded on demand (contract section 3). Each archive is pinned by
+# size and SHA-256; the app refuses anything else. Only HTTPS addresses.
+#
+# FFmpeg: the build is still an open decision (09-riscuri-implementare.md, section 1).
+# For now: the official versioned "essentials" build of Gyan.dev (GPL-3.0),
+# published on GitHub. Later: our own build, hosted by us, with its source.
+
+[ffmpeg]
+version = "9.0.2"
+url = "https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-essentials_build.zip"
+size = 114768076
+sha256 = "60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba"
+license = "GPL-3.0-or-later"
+source = "https://www.gyan.dev/ffmpeg/builds/"
+# Files kept from the archive (matched by the end of their path).
+files = ["bin/ffmpeg.exe", "bin/ffprobe.exe", "LICENSE"]
+
+# LibreOffice: Word → PDF on PCs without Microsoft Word. The MSI is unpacked with
+# an administrative install (msiexec /a): nothing is installed in Windows and no
+# admin rights are needed. Pinned to the permanent archive address.
+[libreoffice]
+version = "26.8.3.1"
+url = "https://downloadarchive.documentfoundation.org/libreoffice/old/26.8.3.1/win/x86_64/LibreOffice_26.8.3.1_Win_x86-64.msi"
+size = 376311808
+sha256 = "0e6918c273eabbdbbd800ee0dacbbf130a14c13c2e4cec861b06dd59e015bf94"
+license = "MPL-2.0"
+source = "https://www.libreoffice.org/download/source-code/"
+extract = "msi"
+files = ["program/soffice.exe", "program/soffice.bin"]
+# Not needed to convert in the background: UI translations, galleries, spelling
+# and thesaurus dictionaries (hyphenation stays: it changes line breaks). 1.6 GB → 0.85 GB.
+prune = ["readmes", "share/gallery", "program/resource/*", "share/extensions/*/th_*", "share/extensions/*/*.aff", "share/extensions/*/*.dic", "share/extensions/*/*.idx"]
+keep = ["program/resource/common", "program/resource/en_GB", "program/resource/ro", "share/extensions/*/hyph_*"]
+
+# ONNX Runtime for the AI tools (remove background, …): Microsoft's DirectML build, so
+# models run on any DirectX 12 graphics card, else on the processor. Taken from its
+# PyPI wheel (25 MB, the C library and DirectML.dll inside); the Python part is skipped.
+[onnxruntime]
+version = "1.24.4"
+license = "MIT (ONNX Runtime), Microsoft DirectML redistributable licence (DirectML.dll)"
+source = "https://github.com/microsoft/onnxruntime"
+extract = "wheels"
+files = ["site-packages/onnxruntime/capi/onnxruntime.dll", "site-packages/onnxruntime/capi/DirectML.dll"]
+
+[[onnxruntime.wheels]]
+name = "onnxruntime_directml-1.24.4-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/60/53/2bd2696fac19cf8ca55496a0bcfe431f3aff9579eabbb0e231dc238acf6f/onnxruntime_directml-1.24.4-cp313-cp313-win_amd64.whl"
+size = 25112253
+sha256 = "2f1031cb2281e5b27cca9efe0b9399317c7286e4d226f7a79d4ab79bbd94d19e"
+license = "MIT"
+skip = ["onnxruntime/capi/onnxruntime_pybind11_state.pyd"]
+
+# Remove background, fast model: IS-Net (DIS, Apache-2.0), as exported to ONNX by rembg.
+[isnet]
+version = "general-use"
+url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx"
+size = 178648008
+sha256 = "60920e99c45464f2ba57bee2ad08c919a52bbf852739e96947fbb4358c0d964a"
+license = "Apache-2.0"
+source = "https://github.com/xuebinqin/DIS"
+extract = "file"
+files = ["isnet-general-use.onnx"]
+requires = ["onnxruntime"]
+
+# Remove background, fine model: BiRefNet lite (MIT), as exported to ONNX by rembg.
+[birefnet-lite]
+version = "general-epoch232"
+url = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-general-bb_swin_v1_tiny-epoch_232.onnx"
+size = 224005088
+sha256 = "5600024376f572a557870a5eb0afb1e5961636bef4e1e22132025467d0f03333"
+license = "MIT"
+source = "https://github.com/ZhengPeng7/BiRefNet"
+extract = "file"
+files = ["birefnet-lite.onnx"]
+requires = ["onnxruntime"]
+
+# AI upscale, fast model: Real-ESRGAN general x4v3 (BSD-3-Clause), Qualcomm AI Hub's ONNX export.
+[esrgan-general]
+version = "0.66.0"
+url = "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/real_esrgan_general_x4v3/releases/v0.66.0/real_esrgan_general_x4v3-onnx-float.zip"
+size = 4540895
+sha256 = "fc094329b24a00c936ebc1cc4c51bc59633e7dc36f4a553344342171cbd3c7cf"
+license = "BSD-3-Clause"
+source = "https://github.com/xinntao/Real-ESRGAN"
+extract = "all"
+files = ["real_esrgan_general_x4v3-onnx-float/real_esrgan_general_x4v3.onnx", "real_esrgan_general_x4v3-onnx-float/real_esrgan_general_x4v3.data"]
+requires = ["onnxruntime"]
+
+# AI upscale, detailed model: Real-ESRGAN x4plus (BSD-3-Clause), Qualcomm AI Hub's ONNX export.
+[esrgan-x4plus]
+version = "0.66.0"
+url = "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/real_esrgan_x4plus/releases/v0.66.0/real_esrgan_x4plus-onnx-float.zip"
+size = 62174027
+sha256 = "05aa31323c6a7e831493171cac970e398697709cae7e7ae8e0760e6da4d64ca4"
+license = "BSD-3-Clause"
+source = "https://github.com/xinntao/Real-ESRGAN"
+extract = "all"
+files = ["real_esrgan_x4plus-onnx-float/real_esrgan_x4plus.onnx", "real_esrgan_x4plus-onnx-float/real_esrgan_x4plus.data"]
+requires = ["onnxruntime"]
+
+# Transcribe, fast model: Whisper small (MIT), whisper.cpp's quantized file. whisper.cpp
+# itself is compiled into the worker (crates/whisper).
+[whisper-small]
+version = "small-q5_1"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-small-q5_1.bin"
+size = 190085487
+sha256 = "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb"
+license = "MIT"
+source = "https://github.com/openai/whisper"
+extract = "file"
+files = ["ggml-small-q5_1.bin"]
+
+# Transcribe, accurate model: Whisper large-v3-turbo (MIT), whisper.cpp's quantized file.
+[whisper-turbo]
+version = "large-v3-turbo-q5_0"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3-turbo-q5_0.bin"
+size = 574041195
+sha256 = "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2"
+license = "MIT"
+source = "https://github.com/openai/whisper"
+extract = "file"
+files = ["ggml-large-v3-turbo-q5_0.bin"]

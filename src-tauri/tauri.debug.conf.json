@@ -1,0 +1,20 @@
+{
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "MQKit",
+        "width": 1000,
+        "height": 700,
+        "minWidth": 780,
+        "minHeight": 560,
+        "decorations": false,
+        "transparent": true,
+        "center": true,
+        "dragDropEnabled": true,
+        "visible": false,
+        "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port=9333"
+      }
+    ]
+  }
+}
