@@ -920,7 +920,7 @@ dependencies = [
 
 [[package]]
 name = "contract"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -2282,7 +2282,7 @@ dependencies = [
 
 [[package]]
 name = "hb-subset"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "cc",
 ]
@@ -3520,7 +3520,7 @@ dependencies = [
 
 [[package]]
 name = "mqkit"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "contract",
  "serde",
@@ -6980,7 +6980,7 @@ checksum = "d4ca08e5ef825b65b056d9efbd95c8750683f0a6d0466d02e96dc2e4e360f3d2"
 
 [[package]]
 name = "whisper"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "cc",
  "cmake",
@@ -7346,7 +7346,7 @@ dependencies = [
 
 [[package]]
 name = "worker-core"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "aes",
  "bzip2",

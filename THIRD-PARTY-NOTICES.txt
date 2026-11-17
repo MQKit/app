@@ -863,7 +863,7 @@ hashify 0.3.2 (crate)
   source:  https://github.com/stalwartlabs/hashify
   text:    declares Apache-2.0 and ships no file; the standard text is at [5]
 
-hb-subset 0.1.0 (crate)
+hb-subset 1.0.0 (crate)
   licence: MIT
   text:    see [135]
 
@@ -2442,7 +2442,7 @@ weezl 0.2.1 (crate)
   source:  https://github.com/image-rs/weezl
   text:    see [20] [297]
 
-whisper 0.1.0 (crate)
+whisper 1.0.0 (crate)
   licence: MIT
   text:    see [298]
 
