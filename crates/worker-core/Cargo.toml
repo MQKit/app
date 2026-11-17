@@ -85,3 +85,7 @@ windows = { version = "0.62", features = [
   "Win32_Foundation",
 ] }
 windows-core = "0.62"
+
+[build-dependencies]
+# the same one Tauri builds the app's file details with (already in Cargo.lock)
+tauri-winres = "0.3"

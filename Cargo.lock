@@ -7390,6 +7390,7 @@ dependencies = [
  "sha2 0.11.1",
  "skrifa",
  "tar",
+ "tauri-winres",
  "tiff",
  "ufbx",
  "unicode-bidi",
