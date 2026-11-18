@@ -663,21 +663,33 @@ fn read_epub(path: &Path) -> Result<Book, FileError> {
     let mut zip = zip::ZipArchive::new(file).map_err(|_| not_book())?;
     if zip.by_name("META-INF/encryption.xml").is_ok() {
         let mut s = String::new();
-        let _ = zip.by_name("META-INF/encryption.xml").unwrap().read_to_string(&mut s);
+        let _ = zip.by_name("META-INF/encryption.xml").unwrap().take(16 << 20).read_to_string(&mut s);
         // Font obfuscation is fine; anything else is DRM.
         if s.contains("EncryptedData") && !s.contains("http://www.idpf.org/2008/embedding") && !s.contains("http://ns.adobe.com/pdf/enc#RC") {
             return Err(FileError::new("drm"));
         }
     }
+    // Each part is unpacked with a cap, and the whole book too: a small file can unpack to
+    // gigabytes (a zip bomb), which would stop the worker instead of failing this file.
+    const PART_LIMIT: u64 = 256 << 20;
+    const BOOK_LIMIT: u64 = 1536 << 20;
+    let unpacked = std::cell::Cell::new(0u64);
+    let too_big = std::cell::Cell::new(false);
     let mut read = |name: &str| -> Option<Vec<u8>> {
-        let mut e = zip.by_name(name).ok()?;
+        let e = zip.by_name(name).ok()?;
         let mut v = Vec::new();
-        e.read_to_end(&mut v).ok()?;
+        e.take(PART_LIMIT + 1).read_to_end(&mut v).ok()?;
+        unpacked.set(unpacked.get() + v.len() as u64);
+        if v.len() as u64 > PART_LIMIT || unpacked.get() > BOOK_LIMIT {
+            too_big.set(true);
+            return None;
+        }
         Some(v)
     };
-    let container = String::from_utf8_lossy(&read("META-INF/container.xml").ok_or_else(not_book)?).into_owned();
+    let large = || FileError::new(contract::codes::FILE_TOO_LARGE);
+    let container = String::from_utf8_lossy(&read("META-INF/container.xml").ok_or_else(|| if too_big.get() { large() } else { not_book() })?).into_owned();
     let opf_path = tags(&container, "rootfile").first().and_then(|t| attr(t, "full-path")).ok_or_else(not_book)?;
-    let opf = String::from_utf8_lossy(&read(&opf_path).ok_or_else(not_book)?).into_owned();
+    let opf = String::from_utf8_lossy(&read(&opf_path).ok_or_else(|| if too_big.get() { large() } else { not_book() })?).into_owned();
     let mut book = Book {
         title: element_text(&opf, "title").into_iter().next().unwrap_or_else(|| stem_of(path)),
         authors: element_text(&opf, "creator"),
@@ -712,6 +724,9 @@ fn read_epub(path: &Path) -> Result<Book, FileError> {
     let spine: Vec<String> = tags(&opf, "itemref").iter().filter_map(|t| attr(t, "idref")).collect();
     let mut css_done = std::collections::HashSet::new();
     for id in spine {
+        if too_big.get() {
+            return Err(large());
+        }
         let Some((p, mt, _)) = items.get(&id).cloned() else { continue };
         if !mt.contains("html") {
             continue;
@@ -751,6 +766,9 @@ fn read_epub(path: &Path) -> Result<Book, FileError> {
         });
         let title = heading(&body).or_else(|| element_text(&html, "title").into_iter().next()).unwrap_or_default();
         book.chapters.push(Chapter { title, body: xhtml(&body) });
+    }
+    if too_big.get() {
+        return Err(large());
     }
     if book.chapters.is_empty() {
         return Err(not_book());

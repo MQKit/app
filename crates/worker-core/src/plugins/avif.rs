@@ -122,6 +122,8 @@ fn decode_new(path: &Path, req: &Request) -> Result<DynamicImage, FileError> {
         "jxl" => {
             let file = std::io::BufReader::new(std::fs::File::open(path).map_err(super::io_err)?);
             let dec = jxl_oxide::integration::JxlDecoder::new(file).map_err(img::img_err)?;
+            let (w, h) = image::ImageDecoder::dimensions(&dec);
+            img::check_size(w, h, req.limits.max_megapixels)?;
             DynamicImage::from_decoder(dec).map_err(img::img_err)
         }
         "avif" => {
@@ -137,9 +139,13 @@ fn decode_new(path: &Path, req: &Request) -> Result<DynamicImage, FileError> {
                     c.args(["-filter_complex", "[0:v:0][0:v:1]alphamerge"]);
                 }
                 c.args(["-frames:v", "1", "-pix_fmt", "rgba"]).arg(&tmp).stdin(std::process::Stdio::null()).stderr(std::process::Stdio::null());
-                c.status().map(|s| s.success()).unwrap_or(false)
+                let limit = crate::common::proc::limit_for(super::file_size(path), std::time::Duration::from_secs(120), std::time::Duration::from_secs(5), std::time::Duration::from_secs(900));
+                match c.spawn() {
+                    Ok(mut child) => crate::common::proc::wait(&mut child, None, "ffmpeg", limit, || {}).map(|s| s.success()),
+                    Err(_) => Ok(false),
+                }
             };
-            if !run(true) && !run(false) {
+            if !run(true)? && !run(false)? {
                 return Err(FileError::new(codes::CORRUPT_FILE));
             }
             let im = image::open(&tmp).map_err(img::img_err)?;

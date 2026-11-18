@@ -127,7 +127,7 @@ impl Plugin for Ocr {
                 add_text_layer(&mut doc, page_id, &lines, &place, font.unwrap())?;
             }
             if total > 1 && !want_pdf {
-                text_out.push_str(&format!("\r\n—— {} {} ——\r\n\r\n", if req.locale.as_deref().unwrap_or("").starts_with("ro") { "Pagina" } else { "Page" }, p));
+                text_out.push_str(&format!("\r\n—— {} ——\r\n\r\n", crate::common::words::of(req.locale.as_deref()).page(p)));
             }
             for line in &lines {
                 text_out.push_str(&line.iter().map(|w| w.text.as_str()).collect::<Vec<_>>().join(" "));

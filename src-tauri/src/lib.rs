@@ -1,3 +1,5 @@
+#[macro_use]
+mod applog;
 mod engines;
 mod env;
 mod find;
@@ -73,8 +75,14 @@ fn walk(dir: &Path, base: &Path, depth: u32, out: &mut Vec<FileInfo>) {
 }
 
 /// Files and folders (expanded) → file list. Images are allowed for thumbnails.
+/// Files and folders dropped or picked, folders walked: off the window's thread (a
+/// folder of thousands of files on a network share would freeze it).
 #[tauri::command]
-fn expand_paths(app: tauri::AppHandle, paths: Vec<PathBuf>) -> Vec<FileInfo> {
+async fn expand_paths(app: tauri::AppHandle, paths: Vec<PathBuf>) -> Vec<FileInfo> {
+    tauri::async_runtime::spawn_blocking(move || expand(&app, paths)).await.unwrap_or_default()
+}
+
+fn expand(app: &tauri::AppHandle, paths: Vec<PathBuf>) -> Vec<FileInfo> {
     let mut out = Vec::new();
     for p in paths {
         if p.is_dir() {
@@ -143,7 +151,13 @@ fn get_tools() -> Vec<Value> {
 }
 
 #[tauri::command]
-fn get_env() -> Value {
+async fn get_env() -> Value {
+    tauri::async_runtime::spawn_blocking(env_now).await.unwrap_or_default()
+}
+
+/// The PC's state for the tools' conditions (Office, voices, OCR languages, engines):
+/// asking Windows takes a moment, so never on the window's thread.
+fn env_now() -> Value {
     let lang = state::get("settings")["language"].as_str().map(String::from).unwrap_or_else(env::system_language);
     let mut v = env::props(&lang);
     v["systemLanguage"] = json!(env::system_language());
@@ -188,6 +202,7 @@ async fn analyze(tool: String, files: Vec<AnalyzeFile>, passwords: Option<HashMa
         let passwords = passwords.unwrap_or_default();
         let mut results: HashMap<String, Value> = HashMap::new();
         let mut todo = Vec::new();
+        let mut missing_code = "analysis_failed";
         {
             let cache = ANALYSIS.lock().unwrap();
             for f in &files {
@@ -214,7 +229,9 @@ async fn analyze(tool: String, files: Vec<AnalyzeFile>, passwords: Option<HashMa
             let launch = t.analyze_launch().ok_or("engine_missing")?;
             let mut req = req;
             req["engines"] = engines_json(&launch);
-            let msgs = worker::request(&t, &launch, "analyze", &req, timeout)?;
+            let (msgs, timed_out) = worker::request_partial(&t, &launch, "analyze", &req, timeout)?;
+            // A file the worker didn't answer: why, so the screen can say it and offer a retry.
+            missing_code = if timed_out { "analysis_timeout" } else { "analysis_failed" };
             let mut cache = ANALYSIS.lock().unwrap();
             let cache = cache.get_or_insert_with(HashMap::new);
             for m in msgs {
@@ -234,7 +251,7 @@ async fn analyze(tool: String, files: Vec<AnalyzeFile>, passwords: Option<HashMa
         }
         Ok(files
             .iter()
-            .map(|f| results.remove(&f.id).unwrap_or_else(|| json!({ "file": f.id, "status": "failed", "code": "engine_failed", "props": {} })))
+            .map(|f| results.remove(&f.id).unwrap_or_else(|| json!({ "file": f.id, "status": "failed", "code": missing_code, "props": {} })))
             .collect())
     })
     .await
@@ -322,8 +339,8 @@ fn cancel_job(job_id: String, after_current: Option<bool>) {
 }
 
 #[tauri::command]
-fn engines_list() -> Value {
-    json!(engines::list())
+async fn engines_list() -> Value {
+    tauri::async_runtime::spawn_blocking(|| json!(engines::list())).await.unwrap_or_default()
 }
 
 /// Downloads an engine; events: {type:"progress",done,total} then {type:"done"} or {type:"error",code}.
@@ -351,8 +368,20 @@ fn engine_remove(name: String) -> Result<(), String> {
     engines::remove(&name)
 }
 
+/// Opens a result in its program. Only files and folders that exist, never a program or
+/// a script (a result never is one): anything runnable is shown in its folder instead.
 #[tauri::command]
 fn open_path(path: PathBuf) -> Result<(), String> {
+    const RUNNABLE: &[&str] = &[
+        "exe", "com", "bat", "cmd", "ps1", "psm1", "vbs", "vbe", "js", "jse", "wsf", "wsh", "msi", "msp", "scr", "pif", "hta", "cpl", "jar", "lnk", "url", "reg", "inf", "appref-ms", "application", "msc", "gadget", "dll", "sys",
+    ];
+    if !path.exists() {
+        return Err("not_found".into());
+    }
+    let ext = path.extension().map(|e| e.to_string_lossy().to_ascii_lowercase()).unwrap_or_default();
+    if path.is_file() && RUNNABLE.contains(&ext.as_str()) {
+        return tauri_plugin_opener::reveal_item_in_dir(path).map_err(|e| e.to_string());
+    }
     tauri_plugin_opener::open_path(path, None::<&str>).map_err(|e| e.to_string())
 }
 
@@ -376,24 +405,113 @@ fn open_url(url: String) -> Result<(), String> {
     tauri_plugin_opener::open_url(url, None::<&str>).map_err(|e| e.to_string())
 }
 
+/// HTTPS as Windows checks it (its certificate store, and the intermediate certificates
+/// a server leaves out fetched as browsers do): for engine downloads, links, the version check.
+pub(crate) fn tls() -> ureq::tls::TlsConfig {
+    ureq::tls::TlsConfig::builder().root_certs(ureq::tls::RootCerts::PlatformVerifier).build()
+}
+
+/// Files from other starts (Explorer starts one per selected file) that arrived before
+/// the interface was listening: kept here until it asks for them. `None` until then;
+/// after that, files go straight to the interface as `open-files` events.
+static SHELL_QUEUE: Mutex<Option<Vec<Value>>> = Mutex::new(Some(Vec::new()));
+
+/// Hands files from another start to the interface, or keeps them until it is ready.
+fn shell_files(app: &tauri::AppHandle, payload: Value) {
+    let mut q = SHELL_QUEUE.lock().unwrap();
+    match q.as_mut() {
+        Some(waiting) => waiting.push(payload),
+        None => {
+            let _ = tauri::Emitter::emit(app, "open-files", payload);
+        }
+    }
+}
+
+/// The interface listens now: what arrived before, in order (one entry per start).
+#[tauri::command]
+fn shell_ready() -> Vec<Value> {
+    SHELL_QUEUE.lock().unwrap().take().unwrap_or_default()
+}
+
 /// Files given on the command line: "Open with", the right-click menu (`--tool <id> <file>`).
 #[tauri::command]
-fn initial_files(app: tauri::AppHandle) -> Value {
+async fn initial_files(app: tauri::AppHandle) -> Value {
     let args: Vec<String> = std::env::args().collect();
     let (tool, files) = shell::parse_args(&args);
-    json!({ "tool": tool, "files": expand_paths(app, files) })
+    let infos = tauri::async_runtime::spawn_blocking(move || expand(&app, files)).await.unwrap_or_default();
+    json!({ "tool": tool, "files": infos })
 }
 
 /// The Explorer menu on or off.
 #[tauri::command]
-fn shell_menu(enable: bool, lang: String) -> Result<usize, String> {
+fn shell_menu(enable: bool, lang: String, names: Option<HashMap<String, String>>) -> Result<usize, String> {
     let tools = registry::all();
     if enable {
-        shell::register(&tools, &lang)
+        let names = names.unwrap_or_default();
+        // Kept, so the installer can put the same menu back after an upgrade.
+        state::set_internal("menuNames", &json!({ "lang": lang, "names": names }));
+        shell::register(&tools, &lang, &names)
     } else {
         shell::unregister(&tools);
         Ok(0)
     }
+}
+
+/// Typed or pasted text, for the tools that take text (text to speech, Markdown, HTML):
+/// saved as a file in Documents\\MQKit (the result goes next to it, where the person
+/// can find both), named "<name> <date> <time>".
+#[tauri::command]
+async fn save_text(text: String, ext: String, name: String) -> Result<FileInfo, String> {
+    if !matches!(ext.as_str(), "txt" | "md" | "html") || text.trim().is_empty() {
+        return Err("invalid".into());
+    }
+    tauri::async_runtime::spawn_blocking(move || {
+        let dir = winutil::documents_dir().join("MQKit");
+        std::fs::create_dir_all(&dir).map_err(|_| "permission_denied")?;
+        let (date, time) = state::local_date_time();
+        let stem = naming::safe(&format!("{} {date} {time}", name.trim()));
+        let used = std::collections::HashSet::new();
+        let mut path = dir.join(format!("{stem}.{ext}"));
+        if path.exists() {
+            path = naming::unique(&path, &used);
+        }
+        // Text with a BOM, so every program reads its letters right (ă, ü, 日本).
+        let mut bytes = if ext == "txt" { vec![0xEF, 0xBB, 0xBF] } else { Vec::new() };
+        bytes.extend_from_slice(text.replace("\r\n", "\n").replace('\n', "\r\n").as_bytes());
+        std::fs::write(&path, bytes).map_err(|_| "permission_denied")?;
+        file_info(&path, None).ok_or_else(|| "permission_denied".to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+/// What to paste into a bug report: version, Windows, components, the end of the log.
+/// No file names from the user's folder (see applog::redact), no settings beyond these.
+#[tauri::command]
+async fn diagnostics() -> String {
+    tauri::async_runtime::spawn_blocking(|| {
+        let engines: Vec<String> = json!(engines::list())
+            .as_array()
+            .cloned()
+            .unwrap_or_default()
+            .iter()
+            .map(|e| format!("{} {} {}", e["name"].as_str().unwrap_or(""), e["version"].as_str().unwrap_or(""), e["status"].as_str().unwrap_or("")))
+            .collect();
+        let env = env_now();
+        format!(
+            "MQKit {}\nWindows build {}\nLanguage {}\nOffice: Word {}, Excel {}, PowerPoint {}\nComponents:\n  {}\n\nLog (end):\n{}",
+            env!("CARGO_PKG_VERSION"),
+            env::os_build(),
+            env["systemLanguage"].as_str().unwrap_or(""),
+            env["office.word"].as_str().unwrap_or(""),
+            env["office.excel"].as_str().unwrap_or(""),
+            env["office.powerpoint"].as_str().unwrap_or(""),
+            engines.join("\n  "),
+            applog::redact(&applog::tail(60)),
+        )
+    })
+    .await
+    .unwrap_or_default()
 }
 
 #[tauri::command]
@@ -405,7 +523,7 @@ fn app_info() -> Value {
 /// (`testdata/out/dev/in.js` → eval in the page → `dev_result` → `out.json`).
 #[cfg(debug_assertions)]
 fn dev_bridge(app: tauri::AppHandle) {
-    let dir = std::env::current_dir().unwrap_or_default().join("..").join("testdata").join("out").join("dev");
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("testdata").join("out").join("dev");
     let _ = std::fs::create_dir_all(&dir);
     std::thread::spawn(move || loop {
         std::thread::sleep(Duration::from_millis(250));
@@ -425,7 +543,7 @@ fn dev_bridge(app: tauri::AppHandle) {
 #[cfg(debug_assertions)]
 #[tauri::command]
 fn dev_result(value: String) {
-    let dir = std::env::current_dir().unwrap_or_default().join("..").join("testdata").join("out").join("dev");
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("testdata").join("out").join("dev");
     let _ = std::fs::write(dir.join("out.json.tmp"), value);
     let _ = std::fs::rename(dir.join("out.json.tmp"), dir.join("out.json"));
 }
@@ -436,17 +554,45 @@ fn dev_result(_value: String) {}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // DLLs only from Windows and the app's own folder, never from the folder the app was
+    // started in (Explorer starts it in the selected file's folder).
+    #[cfg(windows)]
+    unsafe {
+        use windows::Win32::System::LibraryLoader::{SetDefaultDllDirectories, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS};
+        let _ = SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+    }
+    if let Some(dir) = std::env::current_exe().ok().and_then(|e| e.parent().map(std::path::Path::to_path_buf)) {
+        let _ = std::env::set_current_dir(dir);
+    }
     // The uninstaller removes the Explorer menu this way, without opening a window.
     if std::env::args().any(|a| a == "--unregister-shell") {
         shell::unregister(&[]);
+        return;
+    }
+    // The installer puts it back after an upgrade (the previous version's uninstaller,
+    // run first, took it off), as the settings ask, in their language.
+    if std::env::args().any(|a| a == "--register-shell") {
+        paths::init_cli();
+        registry::load();
+        let settings = state::get("settings");
+        if settings["contextMenu"].as_bool() != Some(false) {
+            let lang = settings["language"].as_str().filter(|l| *l != "system").map(str::to_string).unwrap_or_else(env::system_language);
+            // The names the interface last gave, in that language; else the tools' own.
+            let saved = state::get_internal("menuNames");
+            let names: HashMap<String, String> = if saved["lang"] == json!(lang) { serde_json::from_value(saved["names"].clone()).unwrap_or_default() } else { HashMap::new() };
+            let _ = shell::register(&registry::all(), &lang, &names);
+        }
         return;
     }
     tauri::Builder::default()
         // A second start (one per file selected in Explorer) hands its files to this window.
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             let (tool, files) = shell::parse_args(&args);
-            let infos = expand_paths(app.clone(), files);
-            let _ = tauri::Emitter::emit(app, "open-files", json!({ "tool": tool, "files": infos }));
+            let handle = app.clone();
+            std::thread::spawn(move || {
+                let infos = expand(&handle, files);
+                shell_files(&handle, json!({ "tool": tool, "files": infos }));
+            });
             if let Some(w) = app.get_webview_window("main") {
                 let _ = w.unminimize();
                 let _ = w.set_focus();
@@ -457,13 +603,14 @@ pub fn run() {
         .setup(|app| {
             paths::init(app.handle());
             for p in registry::load() {
-                eprintln!("manifest: {p}");
+                applog!("manifest: {p}");
             }
-            // Work folders left by a crash, on the fixed drives; old previews.
+            // Work folders left by a crash, on the fixed drives; old previews; Office
+            // programs a crashed run left open.
             std::thread::spawn(|| {
                 paths::remove_tree(&paths::data_dir().join("tmp").join("preview"));
-                let roots: Vec<PathBuf> = ('C'..='Z').map(|c| PathBuf::from(format!("{c}:\\"))).filter(|p| p.join(paths::TMP_DIR).exists()).collect();
-                paths::cleanup_stale(&roots);
+                paths::cleanup_stale(&paths::tmp_roots());
+                winutil::kill_leftover_office();
             });
             if let Some(w) = app.get_webview_window("main") {
                 // Windows 11: Mica as the base layer (title bar and navigation), Fluent's layering.
@@ -482,6 +629,9 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            save_text,
+            diagnostics,
+            shell_ready,
             expand_paths,
             find_files,
             link_download,
@@ -510,4 +660,19 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running the app");
+}
+
+#[cfg(test)]
+mod tls_tests {
+    /// A server that leaves out its intermediate certificate (as some download mirrors do)
+    /// is still reached. Needs the internet: `cargo test -p mqkit -- --ignored`.
+    #[test]
+    #[ignore]
+    fn incomplete_chain_is_completed() {
+        let agent: ureq::Agent = ureq::Agent::config_builder().tls_config(super::tls()).build().into();
+        assert!(agent.get("https://incomplete-chain.badssl.com/").call().is_ok());
+        let plain: ureq::Agent = ureq::Agent::config_builder().build().into();
+        assert!(plain.get("https://incomplete-chain.badssl.com/").call().is_err(), "without it, the same request fails");
+        assert!(agent.get("https://expired.badssl.com/").call().is_err(), "an expired certificate is still refused");
+    }
 }

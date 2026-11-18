@@ -1,7 +1,43 @@
 import type { Loc } from "./api";
 import { bytes } from "./format";
 
-export const i18n = $state({ lang: "ro" as "ro" | "en" });
+/** The interface's languages, each named in itself, with the locale for dates and numbers. */
+export const LANGS = [
+  { code: "en", name: "English", locale: "en-US" },
+  { code: "ro", name: "Română", locale: "ro-RO" },
+  { code: "de", name: "Deutsch", locale: "de-DE" },
+  { code: "es", name: "Español", locale: "es-ES" },
+  { code: "fr", name: "Français", locale: "fr-FR" },
+  { code: "it", name: "Italiano", locale: "it-IT" },
+  { code: "pt", name: "Português (Brasil)", locale: "pt-BR" },
+  { code: "pl", name: "Polski", locale: "pl-PL" },
+  { code: "tr", name: "Türkçe", locale: "tr-TR" },
+  { code: "ru", name: "Русский", locale: "ru-RU" },
+  { code: "ja", name: "日本語", locale: "ja-JP" },
+  { code: "zh", name: "简体中文", locale: "zh-CN" },
+] as const;
+export type Lang = (typeof LANGS)[number]["code"];
+export const isLang = (l: unknown): l is Lang => LANGS.some((x) => x.code === l);
+/** "ro-RO", "ja-JP"…: for dates, numbers, and the workers' own words. */
+export const localeOf = (l: string) => LANGS.find((x) => x.code === l)?.locale ?? "en-US";
+
+export const i18n = $state({ lang: "en" as Lang });
+
+/** A language's file (ui/src/lib/locales/<code>.json): the interface's texts by key,
+ *  the tools' texts by their English text (as the tools give them), and search words. */
+interface Locale {
+  ui: Record<string, string>;
+  text: Record<string, string>;
+  keywords?: Record<string, string[]>;
+}
+const locales: Record<string, Locale> = Object.fromEntries(
+  Object.entries(import.meta.glob<Locale>("./locales/*.json", { eager: true, import: "default" })).map(([p, l]) => [p.split("/").pop()!.replace(".json", ""), l]),
+);
+
+/** Search words for a tool in the current language (beyond those the tool gives). */
+export function localKeywords(toolId: string): string[] {
+  return locales[i18n.lang]?.keywords?.[toolId] ?? [];
+}
 
 const ro = {
   appName: "MQKit",
@@ -37,7 +73,13 @@ const ro = {
   pickFiles: "Alege fișiere",
   originalsSafe: "Originalele rămân neatinse. Rezultatul e un fișier nou.",
   originalsReplace: "Originalele trec în Coșul de reciclare, după ce rezultatul e verificat.",
+  origKeptNoBin: "Originalul a rămas: unitatea aceasta nu are Coș de reciclare, iar MQKit nu șterge nimic definitiv.",
+  origKeptLocked: "Originalul a rămas: Windows nu l-a putut muta în Coșul de reciclare (e deschis în alt program?).",
   dropHere: "Lasă fișierele aici",
+  busyDrop: "Așteaptă să se termine conversia, apoi adaugă fișierele",
+  busyNav: "O conversie e în curs. Oprește-o sau așteapt-o să se termine, apoi poți pleca.",
+  busyCloseTitle: "O conversie e în curs",
+  busyClose: "Dacă închizi acum, conversia se oprește. Fișierele terminate rămân. Închizi?",
   forWhat: "Pentru ce ai nevoie",
   custom: "Personalizat",
   moreOptions: "Mai multe opțiuni",
@@ -50,6 +92,7 @@ const ro = {
   unsupported: "nu se potrivește cu unealta",
   corrupt: "fișier stricat",
   analysisFailed: "nu s-a putut citi",
+  tryAgain: "Încearcă din nou",
   password: "Parola",
   unlock: "Deblochează",
   remove: "Scoate",
@@ -62,8 +105,9 @@ const ro = {
   needUnlock: "Deblochează fișierul ca să începi",
   needMinFiles: "Adaugă cel puțin {n} fișiere",
   start: "Pornește",
-  files1: "un fișier",
-  filesN: "{n} fișiere",
+  fileCount_one: "un fișier",
+  fileCount_few: "{n} fișiere",
+  fileCount_other: "{n} de fișiere",
   cancel: "Oprește",
   cancelling: "Se oprește…",
   stopAfterCurrent: "Oprește după fișierul curent",
@@ -122,13 +166,47 @@ const ro = {
   rememberLast: "Ține minte ultimele opțiuni pentru fiecare unealtă",
   about: "Despre",
   version: "Versiunea {v}",
-  freeForever: "Gratuit pentru totdeauna. Fără reclame, fără cont, fără internet.",
+  freeLine: "Gratuit. Fără reclame, fără cont. Fișierele rămân pe PC-ul tău.",
+  skippedDup_one: "Un fișier era deja în listă.",
+  skippedDup_few: "{n} fișiere erau deja în listă.",
+  skippedDup_other: "{n} de fișiere erau deja în listă.",
+  skippedType_one: "Un fișier nu e de un tip pe care unealta îl primește.",
+  skippedType_few: "{n} fișiere nu sunt de un tip pe care unealta îl primește.",
+  skippedType_other: "{n} de fișiere nu sunt de un tip pe care unealta îl primește.",
+  skippedLimit: "Unealta lucrează cu un fișier odată: l-am păstrat pe primul.",
+  skippedCount_one: "un fișier sărit",
+  skippedCount_few: "{n} fișiere sărite",
+  skippedCount_other: "{n} de fișiere sărite",
+  startReading: "Se citesc fișierele…",
+  typeText: "Scrie sau lipește text…",
+  typeTextPh_txt: "Scrie sau lipește textul aici.",
+  typeTextPh_md: "Scrie sau lipește Markdown aici: # Titlu, **aldin**, - liste…",
+  typeTextPh_html: "Lipește aici HTML-ul paginii.",
+  typeTextAdd: "Adaugă",
+  typeTextHint: "Se salvează în Documente\\MQKit, iar rezultatul ajunge lângă el.",
+  typeTextName: "Text",
+  otherValue: "Altă valoare…",
+  copyDiagnostics: "Copiază detaliile pentru o problemă",
+  copiedDiagnostics: "Copiate. Lipește-le în mesajul tău.",
+  diagnosticsHint: "Versiunea, Windows, componentele și ultimele mesaje ale aplicației, fără numele fișierelor tale.",
+  savedIn: "Salvate în {path}",
+  savedInFolders_one: "Salvate într-un folder:",
+  savedInFolders_few: "Salvate în {n} foldere, lângă fișierele originale:",
+  savedInFolders_other: "Salvate în {n} de foldere, lângă fișierele originale:",
+  startFixOption: "Corectează opțiunea marcată mai sus",
+  startConfirm: "Bifează confirmarea de mai sus",
+  startNotHere: "Nu se poate pe acest PC",
+  engineErr_busy: "Componenta e folosită chiar acum. Încearcă din nou după ce se termină descărcarea sau conversia.",
+  engineErr_permission_denied: "Nu se poate scrie în folderul aplicației. Repornește calculatorul și încearcă din nou.",
+  engineErr_unknown_engine: "Componenta nu mai e disponibilă în această versiune.",
+  removeBigTitle: "Ștergi componenta?",
+  removeBig: "{name} ocupă {size}. Dacă o ștergi, se descarcă din nou când o unealtă are nevoie de ea.",
   license: "Cod deschis, licența AGPL-3.0.",
   dataFolder: "Folderul de date",
   logsFolder: "Jurnale",
   clearHistory: "Șterge istoricul",
   historyEmpty: "Aici apar conversiile făcute.",
-  supportTitle: "Aplicația e gratuită pentru totdeauna",
+  supportTitle: "Aplicația e gratuită",
   supportText: "Nu cerem bani și nu arătăm reclame. Dacă îți e de folos, ne ajuți cel mai mult așa:",
   supportShare: "Spune-le prietenilor și colegilor de ea.",
   supportBugs: "Spune-ne când ceva nu merge sau când o conversie iese prost.",
@@ -136,7 +214,7 @@ const ro = {
   supportTranslate: "Ajută la traducerea în limba ta.",
   newBadge: "Nou",
   beta: "beta",
-  engineMissing: "Lipsește FFmpeg. În versiunea finală se descarcă automat; acum instalează-l cu „winget install ffmpeg”.",
+  engineMissing: "Lipsește o componentă de care unealta are nevoie, iar această versiune nu o poate descărca. Instalează versiunea nouă de pe mqkit.com.",
   wordMissing: "Unealta are nevoie de Microsoft Word instalat. Varianta fără Word vine într-o actualizare.",
   heifMissing: "Windows nu are decodorul HEIC. Instalează gratuit „HEIF Image Extensions” din Microsoft Store.",
   openStore: "Deschide Microsoft Store",
@@ -156,6 +234,7 @@ const ro = {
   "engineWhat_esrgan-x4plus": "un model AI gratuit care mărește pozele cu mai multe detalii, pe calculatorul tău",
   "engineWhat_whisper-small": "un model AI gratuit care transcrie vorbirea, pe calculatorul tău",
   "engineWhat_whisper-turbo": "un model AI gratuit și precis care transcrie vorbirea în aproape 100 de limbi, pe calculatorul tău",
+  engineWhat_kokoro: "un model AI gratuit cu voci naturale, care citește textul pe PC-ul tău",
   engineWhat_other: "un program gratuit",
   engineErr_install_failed: "Instalarea nu a mers. Încearcă din nou.",
   noEntry: "Unealta nu poate rula pe acest calculator.",
@@ -231,7 +310,13 @@ const en: Record<Key, string> = {
   pickFiles: "Choose files",
   originalsSafe: "Your originals stay untouched. The result is a new file.",
   originalsReplace: "Originals go to the Recycle Bin after the result is checked.",
+  origKeptNoBin: "The original was kept: this drive has no Recycle Bin, and MQKit never deletes anything for good.",
+  origKeptLocked: "The original was kept: Windows couldn't move it to the Recycle Bin (is it open in another program?).",
   dropHere: "Drop the files here",
+  busyDrop: "Wait for the conversion to finish, then add the files",
+  busyNav: "A conversion is running. Stop it or wait for it to finish, then you can leave.",
+  busyCloseTitle: "A conversion is running",
+  busyClose: "If you close now, the conversion stops. Files already done stay. Close?",
   forWhat: "What do you need it for",
   custom: "Custom",
   moreOptions: "More options",
@@ -244,6 +329,7 @@ const en: Record<Key, string> = {
   unsupported: "doesn't fit this tool",
   corrupt: "damaged file",
   analysisFailed: "couldn't be read",
+  tryAgain: "Try again",
   password: "Password",
   unlock: "Unlock",
   remove: "Remove",
@@ -256,8 +342,9 @@ const en: Record<Key, string> = {
   needUnlock: "Unlock the file to start",
   needMinFiles: "Add at least {n} files",
   start: "Start",
-  files1: "one file",
-  filesN: "{n} files",
+  fileCount_one: "one file",
+  fileCount_few: "{n} files",
+  fileCount_other: "{n} files",
   cancel: "Stop",
   cancelling: "Stopping…",
   stopAfterCurrent: "Stop after the current file",
@@ -314,13 +401,47 @@ const en: Record<Key, string> = {
   rememberLast: "Remember the last options for each tool",
   about: "About",
   version: "Version {v}",
-  freeForever: "Free forever. No ads, no account, no internet.",
+  freeLine: "Free. No ads, no account. Your files stay on your PC.",
+  skippedDup_one: "1 file was already in the list.",
+  skippedDup_few: "{n} files were already in the list.",
+  skippedDup_other: "{n} files were already in the list.",
+  skippedType_one: "1 file isn't a type this tool takes.",
+  skippedType_few: "{n} files aren't a type this tool takes.",
+  skippedType_other: "{n} files aren't a type this tool takes.",
+  skippedLimit: "This tool works on one file at a time: the first one was kept.",
+  skippedCount_one: "1 skipped",
+  skippedCount_few: "{n} skipped",
+  skippedCount_other: "{n} skipped",
+  startReading: "Reading the files…",
+  typeText: "Type or paste text…",
+  typeTextPh_txt: "Type or paste the text here.",
+  typeTextPh_md: "Type or paste Markdown here: # Title, **bold**, - lists…",
+  typeTextPh_html: "Paste the page's HTML here.",
+  typeTextAdd: "Add",
+  typeTextHint: "It's saved in Documents\\MQKit, and the result goes next to it.",
+  typeTextName: "Text",
+  otherValue: "Other value…",
+  copyDiagnostics: "Copy details for a bug report",
+  copiedDiagnostics: "Copied. Paste them into your message.",
+  diagnosticsHint: "The version, Windows, the components and the app's latest messages, without your file names.",
+  savedIn: "Saved in {path}",
+  savedInFolders_one: "Saved in one folder:",
+  savedInFolders_few: "Saved in {n} folders, next to the original files:",
+  savedInFolders_other: "Saved in {n} folders, next to the original files:",
+  startFixOption: "Fix the highlighted option above",
+  startConfirm: "Tick the confirmation above",
+  startNotHere: "Not possible on this PC",
+  engineErr_busy: "The component is in use right now. Try again once the download or conversion ends.",
+  engineErr_permission_denied: "The app's folder can't be written to. Restart the PC and try again.",
+  engineErr_unknown_engine: "The component is no longer available in this version.",
+  removeBigTitle: "Delete the component?",
+  removeBig: "{name} takes {size}. If you delete it, it downloads again when a tool needs it.",
   license: "Open source, AGPL-3.0 license.",
   dataFolder: "Data folder",
   logsFolder: "Logs",
   clearHistory: "Clear history",
   historyEmpty: "Your conversions show up here.",
-  supportTitle: "The app is free forever",
+  supportTitle: "The app is free",
   supportText: "We don't ask for money and show no ads. If it helps you, this is how you help us most:",
   supportShare: "Tell your friends and colleagues about it.",
   supportBugs: "Tell us when something doesn't work or a conversion comes out badly.",
@@ -328,7 +449,7 @@ const en: Record<Key, string> = {
   supportTranslate: "Help translate it into your language.",
   newBadge: "New",
   beta: "beta",
-  engineMissing: "FFmpeg is missing. The final version downloads it automatically; for now install it with “winget install ffmpeg”.",
+  engineMissing: "A component this tool needs is missing, and this version can't download it. Install the new version from mqkit.com.",
   wordMissing: "This tool needs Microsoft Word installed. A version without Word comes in an update.",
   heifMissing: "Windows lacks the HEIC decoder. Install the free “HEIF Image Extensions” from the Microsoft Store.",
   openStore: "Open Microsoft Store",
@@ -348,6 +469,7 @@ const en: Record<Key, string> = {
   "engineWhat_esrgan-x4plus": "a free AI model that enlarges pictures with more detail, on your PC",
   "engineWhat_whisper-small": "a free AI model that turns speech into text, on your PC",
   "engineWhat_whisper-turbo": "a free, accurate AI model that turns speech into text in almost 100 languages, on your PC",
+  engineWhat_kokoro: "a free AI model with natural voices that reads text on your PC",
   engineWhat_other: "a free program",
   engineErr_install_failed: "The installation didn't work. Try again.",
   noEntry: "This tool can't run on this computer.",
@@ -387,10 +509,23 @@ const en: Record<Key, string> = {
   removeComponent: "Delete",
 };
 
-const dicts = { ro, en };
+const dicts: Record<string, Record<string, string>> = { ro, en };
+/** The interface's texts in a language: Romanian and English here, the others from their file. */
+const uiDict = (l: string): Record<string, string> => dicts[l] ?? locales[l]?.ui ?? {};
+
+/** A count in words: `base_one`, `base_few` or `base_other` as the language's plural rules
+ *  choose (Romanian: un fișier, 2 fișiere, 20 de fișiere), with `{n}` filled in. */
+export function tn(base: string, n: number, vars?: Record<string, string | number>): string {
+  const dict = uiDict(i18n.lang);
+  const form = new Intl.PluralRules(i18n.lang).select(n);
+  const fallback = form === "one" ? "one" : "other";
+  let s = dict[`${base}_${form}`] ?? dict[`${base}_other`] ?? en[`${base}_${fallback}` as Key] ?? en[`${base}_other` as Key] ?? base;
+  for (const [k, v] of Object.entries({ n, ...vars })) s = s.replaceAll(`{${k}}`, String(v));
+  return s;
+}
 
 export function t(key: Key, vars?: Record<string, string | number>): string {
-  let s = dicts[i18n.lang][key] ?? ro[key] ?? key;
+  let s = uiDict(i18n.lang)[key] ?? en[key] ?? key;
   if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
   return s;
 }
@@ -399,10 +534,13 @@ export function t(key: Key, vars?: Record<string, string | number>): string {
 export function L(v: Loc | undefined | null, fallback = ""): string {
   if (v == null) return fallback;
   if (typeof v === "string") return v;
-  return v[i18n.lang] ?? v.en ?? v.ro ?? fallback;
+  const own = (v as Record<string, string>)[i18n.lang];
+  if (own) return own;
+  return (v.en && locales[i18n.lang]?.text?.[v.en]) || v.en || v.ro || fallback;
 }
 
-export const fileCount = (n: number) => (n === 1 ? t("files1") : t("filesN", { n }));
+/** "un fișier", "3 fișiere", "20 de fișiere": by the language's plural rules. */
+export const fileCount = (n: number) => tn("fileCount", n);
 
 /** The verb on the start button, per tool. */
 const actions: Record<string, { ro: string; en: string }> = {
@@ -453,7 +591,7 @@ const actions: Record<string, { ro: string; en: string }> = {
 };
 
 export function actionLabel(tool: string, n: number, combined: boolean): string {
-  const verb = actions[tool]?.[i18n.lang] ?? t("start");
+  const verb = actions[tool] ? L(actions[tool]) : t("start");
   if (combined) return `${verb} (${fileCount(n)})`;
   return `${verb} ${fileCount(n)}`;
 }
@@ -473,7 +611,7 @@ const stages: Record<string, { ro: string; en: string }> = {
 };
 
 export function stageText(code: string | undefined): string {
-  return (code && stages[code]?.[i18n.lang]) || t("working");
+  return (code && stages[code] && L(stages[code])) || t("working");
 }
 
 /** Messages for the common error codes (contract 13.1). */
@@ -487,6 +625,8 @@ const errors: Record<string, { ro: string; en: string }> = {
   file_too_large: { ro: "Fișierul e prea mare.", en: "The file is too large." },
   input_changed: { ro: "Fișierul s-a schimbat între timp.", en: "The file changed meanwhile." },
   engine_missing: { ro: "Lipsește o componentă necesară.", en: "A required component is missing." },
+  analysis_timeout: { ro: "Citirea a durat prea mult (fișier foarte mare, sau pe o unitate lentă).", en: "Reading it took too long (a very large file, or a slow drive)." },
+  analysis_failed: { ro: "Fișierul nu a putut fi citit.", en: "The file couldn't be read." },
   engine_failed: { ro: "Conversia a dat o eroare.", en: "The conversion failed." },
   engine_crashed: { ro: "Programul de conversie s-a oprit neașteptat.", en: "The converter stopped unexpectedly." },
   invalid_options: { ro: "Opțiunile alese nu se potrivesc.", en: "The chosen options don't fit." },
@@ -510,7 +650,7 @@ const errors: Record<string, { ro: string; en: string }> = {
 
 export function errorText(code: string | undefined, manifestErrors?: Record<string, Loc>, details?: Record<string, any> | null): string {
   if (!code) return "";
-  const s = manifestErrors?.[code] ? L(manifestErrors[code]) : (errors[code]?.[i18n.lang] ?? code);
+  const s = manifestErrors?.[code] ? L(manifestErrors[code]) : errors[code] ? L(errors[code]) : code;
   return fillDetails(s, details);
 }
 

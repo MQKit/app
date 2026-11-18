@@ -65,7 +65,7 @@
     </div>
   {/if}
   {#if app.dragging}
-    <div class="drop-overlay"><div><i class="ti ti-upload"></i>{t("dropHere")}</div></div>
+    <div class="drop-overlay"><div><i class="ti ti-upload"></i>{t(app.busy ? "busyDrop" : "dropHere")}</div></div>
   {/if}
 </div>
 

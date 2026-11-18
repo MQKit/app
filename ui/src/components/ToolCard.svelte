@@ -5,10 +5,14 @@
   import { toolNumber } from "../lib/numbers";
 
   let { tool, onclick }: { tool: Manifest; onclick: () => void } = $props();
+  // A tool in beta says so in its English name or summary ("PDF to Word (beta)"); in any
+  // language the word in brackets gives way to the badge.
   const beta = /\(?\bbeta\b\)?/i;
-  const isBeta = $derived(beta.test(L(tool.name)) || beta.test(L(tool.summary)));
-  const name = $derived(L(tool.name).replace(beta, "").trim());
-  const summary = $derived(L(tool.summary).replace(beta, "").trim());
+  const en = (v: any) => (typeof v === "object" ? (v?.en ?? "") : String(v ?? ""));
+  const isBeta = $derived(beta.test(en(tool.name)) || beta.test(en(tool.summary)));
+  const unbracket = (text: string, english: string) => (beta.test(english) ? text.replace(beta, "").replace(/\s*[(（][^()（）]*[)）]\s*$/, "").trim() : text);
+  const name = $derived(unbracket(L(tool.name), en(tool.name)));
+  const summary = $derived(unbracket(L(tool.summary), en(tool.summary)));
   const num = $derived(toolNumber(tool.id));
 </script>
 

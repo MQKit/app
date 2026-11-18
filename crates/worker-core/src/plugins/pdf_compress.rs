@@ -338,7 +338,6 @@ fn components(doc: &Document, cs: &Object) -> Option<u8> {
 }
 
 struct Job {
-    id: ObjectId,
     w: u32,
     h: u32,
     comps: u8,
@@ -384,7 +383,7 @@ fn job(doc: &Document, id: ObjectId, max_pixels: u64) -> Option<Job> {
         }
         raw
     };
-    Some(Job { id, w, h, comps, dct, data, old_len: st.content.len() })
+    Some(Job { w, h, comps, dct, data, old_len: st.content.len() })
 }
 
 fn decode(job: &Job) -> Option<DynamicImage> {
@@ -450,29 +449,34 @@ fn shrink(job: &Job, s: Settings, max_px: f64) -> Option<Shrunk> {
 fn recompress_images(ctx: &Ctx, f: &FileRef, doc: &mut Document, s: Settings, base: f64, span: f64) -> Result<(), FileError> {
     let max_px = max_page_side(doc) / 72.0 * s.dpi;
     let max_pixels = (ctx.req.limits.max_megapixels.max(1) as u64) * 1_000_000;
-    let jobs: Vec<Job> = candidates(doc).into_iter().filter_map(|id| job(doc, id, max_pixels)).collect();
-    let total = jobs.len().max(1);
+    // Each thread unpacks the next image itself, so at most one unpacked image per thread
+    // is in memory (unpacking them all first held every scan of a big PDF at once).
+    let ids = candidates(doc);
+    let total = ids.len().max(1);
+    let next = AtomicUsize::new(0);
     let done = AtomicUsize::new(0);
-    let threads = (ctx.req.limits.threads.max(1) as usize).min(8);
+    let threads = (ctx.req.limits.threads.max(1) as usize).min(8).min(ids.len().max(1));
+    let shared: &Document = doc;
     let results: Vec<(ObjectId, Option<Shrunk>)> = std::thread::scope(|sc| {
-        let chunks: Vec<&[Job]> = jobs.chunks(jobs.len().div_ceil(threads).max(1)).collect();
-        let handles: Vec<_> = chunks
-            .into_iter()
-            .map(|chunk| {
-                let done = &done;
+        let handles: Vec<_> = (0..threads)
+            .map(|_| {
+                let (ids, next, done) = (&ids, &next, &done);
                 sc.spawn(move || {
-                    chunk
-                        .iter()
-                        .map(|j| {
-                            if ctx.cancel.is_cancelled() {
-                                return (j.id, None);
-                            }
-                            let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| shrink(j, s, max_px))).ok().flatten();
-                            let n = done.fetch_add(1, Ordering::Relaxed) + 1;
-                            ctx.progress(&f.id, base + span * n as f64 / total as f64, "compress", 2, 3);
-                            (j.id, r)
-                        })
-                        .collect::<Vec<_>>()
+                    let mut out = Vec::new();
+                    while let Some(&id) = ids.get(next.fetch_add(1, Ordering::Relaxed)) {
+                        if ctx.cancel.is_cancelled() {
+                            break;
+                        }
+                        let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| job(shared, id, max_pixels).and_then(|j| shrink(&j, s, max_px))))
+                            .ok()
+                            .flatten();
+                        let n = done.fetch_add(1, Ordering::Relaxed) + 1;
+                        ctx.progress(&f.id, base + span * n as f64 / total as f64, "compress", 2, 3);
+                        if r.is_some() {
+                            out.push((id, r));
+                        }
+                    }
+                    out
                 })
             })
             .collect();

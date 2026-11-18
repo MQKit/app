@@ -56,7 +56,8 @@ impl Plugin for DesignFiles {
                 "eps_no_preview": t("EPS-ul nu are poză de previzualizare. Instalează Ghostscript (gratuit) și încearcă din nou.",
                                     "The EPS has no preview picture. Install Ghostscript (free) and try again."),
                 "ai_not_pdf": t("Fișierul Illustrator a fost salvat fără „Create PDF Compatible File”; deschide-l în Illustrator și salvează-l cu această opțiune.",
-                                "The Illustrator file was saved without “Create PDF Compatible File”; open it in Illustrator and save it with that option.")
+                                "The Illustrator file was saved without “Create PDF Compatible File”; open it in Illustrator and save it with that option."),
+                "timeout": t("Desenul din fișier nu se mai termina și a fost oprit.", "The drawing in the file never finished and was stopped.")
             }
         })
     }
@@ -318,8 +319,10 @@ pub fn psd_composite(d: &[u8]) -> Result<DynamicImage, FileError> {
         }
         2 | 3 => {
             // ZIP (with prediction for 3): one zlib stream for all channels.
+            // Only the channels used: a stream that unpacks to more is never read further.
+            let want = needed.checked_mul(plane_len).ok_or_else(|| bad("size"))?;
             let mut all = Vec::new();
-            flate2::read::ZlibDecoder::new(&d[c.i..]).read_to_end(&mut all).map_err(|_| bad("zip"))?;
+            flate2::read::ZlibDecoder::new(&d[c.i..]).take(want as u64).read_to_end(&mut all).map_err(|_| bad("zip"))?;
             for ch in 0..needed {
                 let mut p = all.get(ch * plane_len..(ch + 1) * plane_len).ok_or_else(|| bad("zip"))?.to_vec();
                 if compression == 3 && bytes == 1 {
@@ -432,14 +435,28 @@ fn ghostscript() -> Option<PathBuf> {
 
 fn eps(ctx: &Ctx, id: &str, path: &Path, dpi: f64) -> Result<DynamicImage, FileError> {
     if let Some(gs) = ghostscript() {
+        use crate::common::proc;
+        use std::time::Duration;
         let out = ctx.file_dir(id)?.join("gs.png");
-        let status = std::process::Command::new(gs)
-            .args(["-dSAFER", "-dBATCH", "-dNOPAUSE", "-dQUIET", "-dEPSCrop", "-sDEVICE=pngalpha", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4"])
+        let mut cmd = std::process::Command::new(gs);
+        cmd.args(["-dSAFER", "-dBATCH", "-dNOPAUSE", "-dQUIET", "-dEPSCrop", "-sDEVICE=pngalpha", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4"])
             .arg(format!("-r{}", dpi.round()))
             .arg(format!("-sOutputFile={}", out.display()))
             .arg(path)
-            .stdin(std::process::Stdio::null()).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null())
-            .status().map_err(|e| FileError::engine(format!("ghostscript: {e}")))?;
+            .stdin(std::process::Stdio::null()).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null());
+        #[cfg(windows)]
+        std::os::windows::process::CommandExt::creation_flags(&mut cmd, 0x0800_0000);
+        let mut child = cmd.spawn().map_err(|e| FileError::engine(format!("ghostscript: {e}")))?;
+        // PostScript is a program: a file can draw forever. Minutes, more for big files.
+        let limit = proc::limit_for(file_size(path), Duration::from_secs(180), Duration::from_secs(10), Duration::from_secs(30 * 60));
+        let status = proc::wait(&mut child, Some(&ctx.cancel), "ghostscript", limit, || {});
+        let status = match status {
+            Ok(s) => s,
+            Err(e) => {
+                let _ = std::fs::remove_file(&out);
+                return Err(e);
+            }
+        };
         if status.success() && out.is_file() {
             let im = image::open(&out).map_err(img::img_err)?;
             let _ = std::fs::remove_file(&out);

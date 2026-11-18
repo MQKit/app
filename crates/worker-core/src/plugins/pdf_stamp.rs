@@ -85,7 +85,7 @@ impl Plugin for PdfStamp {
         let total = ids.len() as u32;
         let chosen = pages::parse_set(req.str_or("pages", "all"), total)
             .map_err(|bad| FileError::with(codes::RANGE_OUT_OF_BOUNDS, json!({ "part": bad, "pageCount": total })))?;
-        let ro = req.locale.as_deref().unwrap_or("").starts_with("ro");
+        let words = crate::common::words::of(req.locale.as_deref());
         let kind = req.str_or("kind", "numbers");
         let image = if kind == "watermark" && req.str_or("markType", "text") == "image" { Some(load_mark(&mut doc, req)?) } else { None };
         let start = req.f64_or("startAt", 1.0) as i64;
@@ -94,13 +94,13 @@ impl Plugin for PdfStamp {
             let last = start + total as i64 - 1;
             match req.str_or("numberFormat", "n") {
                 "nOfTotal" => format!("{num} / {last}"),
-                "pageOf" => if ro { format!("Pagina {num} din {last}") } else { format!("Page {num} of {last}") },
+                "pageOf" => words.page_of(num, last),
                 "dash" => format!("– {num} –"),
                 _ => num.to_string(),
             }
         };
         let text = match req.str_or("text", "").trim() {
-            "" => if ro { "CONFIDENȚIAL" } else { "CONFIDENTIAL" }.to_string(),
+            "" => words.confidential.to_string(),
             t => t.to_string(),
         };
         // One font with every letter needed; its object is filled in at the end.

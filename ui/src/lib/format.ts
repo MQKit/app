@@ -1,6 +1,6 @@
-import { i18n } from "./i18n.svelte";
+import { i18n, localeOf } from "./i18n.svelte";
 
-const nf = () => new Intl.NumberFormat(i18n.lang === "ro" ? "ro-RO" : "en-US", { maximumFractionDigits: 1 });
+const nf = () => new Intl.NumberFormat(localeOf(i18n.lang), { maximumFractionDigits: 1 });
 
 /** SI units, like the contract: 1 MB = 1 000 000 bytes. */
 export function bytes(n: number | undefined | null): string {
@@ -29,7 +29,7 @@ export function percentChange(from: number, to: number): number {
 export function dateTime(iso: string): string {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  return d.toLocaleString(i18n.lang === "ro" ? "ro-RO" : "en-US", { dateStyle: "medium", timeStyle: "short" });
+  return d.toLocaleString(localeOf(i18n.lang), { dateStyle: "medium", timeStyle: "short" });
 }
 
 /** Lowercase without diacritics, for search. */

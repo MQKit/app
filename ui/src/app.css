@@ -24,7 +24,8 @@
   --surface-2: #f7f8fa;
   --text: #15181e;
   --text-2: #4c5361;
-  --text-3: #858c99;
+  /* At least 4.5:1 on the window and the panels: small help texts stay readable. */
+  --text-3: #656b76;
   --text-secondary: var(--text-2);
   --text-nav: #3b414d;
   --accent: #1559c9;
@@ -372,6 +373,10 @@ input[type="radio"] {
   color: var(--ok-text);
 }
 
+.note,
+.p-error,
+.p-warn,
+.err,
 .selectable {
   user-select: text;
 }
@@ -381,4 +386,15 @@ input[type="radio"] {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* Japanese and Chinese: Windows' UI fonts for them, with proportional widths (palt):
+   full-width characters otherwise sit far apart in a Latin-sized interface. */
+:root:lang(ja) body {
+  font-family: "Segoe UI Variable Text", "Segoe UI", "Yu Gothic UI", "Meiryo UI", sans-serif;
+  font-feature-settings: "palt";
+}
+:root:lang(zh) body {
+  font-family: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", sans-serif;
+  font-feature-settings: "palt";
 }

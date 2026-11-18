@@ -46,6 +46,8 @@ namespace OfficeWorker
                                       "This kind of file isn't supported here."),
                 "file_not_found", T("Fișierul nu mai există în locul acela. Poate a fost mutat sau șters.",
                                     "The file isn't there anymore. It may have been moved or deleted."),
+                "path_too_long", T("Calea fișierului e prea lungă pentru Office. Mută-l într-un dosar cu un nume mai scurt și încearcă din nou.",
+                                   "The file's path is too long for Office. Move it to a folder with a shorter name and try again."),
                 "file_locked", T("Fișierul e folosit de alt program. Închide-l acolo și încearcă din nou.",
                                  "Another program is using this file. Close it there and try again."),
                 "permission_denied", T("Nu ai voie să citești fișierul sau să scrii în dosarul ales.",

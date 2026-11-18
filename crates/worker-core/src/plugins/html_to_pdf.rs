@@ -37,7 +37,7 @@ impl Plugin for HtmlToPdf {
             "keywords": { "ro": ["html", "pagină web", "salvează pagina", "pdf"], "en": ["html", "web page", "save page", "pdf"] },
             "category": "document",
             "icon": "code",
-            "input": { "extensions": ["html", "htm", "xhtml", "svg"], "multiple": true, "folders": true, "mode": "perFile" },
+            "input": { "extensions": ["html", "htm", "xhtml", "svg"], "multiple": true, "folders": true, "mode": "perFile", "textEntry": "html" },
             "output": { "kind": "perInput", "extensions": ["pdf"], "replaceOriginalAllowed": false },
             "analysis": { "fast": [] },
             "ui": { "preview": "none", "estimate": false },

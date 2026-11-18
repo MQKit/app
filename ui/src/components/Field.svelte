@@ -1,6 +1,6 @@
 <script lang="ts">
   import { api, type Field, type FieldOption } from "../lib/api";
-  import { L, i18n } from "../lib/i18n.svelte";
+  import { L, t, i18n } from "../lib/i18n.svelte";
   import { evalCond, type CondCtx } from "../lib/cond";
 
   let {
@@ -98,6 +98,9 @@
   }
 
   const unitLabel = (u: string) => (u === "%" ? "%" : ` ${u}`);
+  // Names the control for screen readers (the label is a paragraph above it).
+  const uid = Math.random().toString(36).slice(2, 8);
+  const lid = $derived(`fld-${field.key}-${uid}`);
 </script>
 
 <div class="field" class:invalid>
@@ -109,38 +112,38 @@
     {#if field.help}<p class="help">{L(field.help)}</p>{/if}
     {#if field.helpLink}<button type="button" class="help-link" onclick={() => api.openUrl(field.helpLink!.url)}>{L(field.helpLink.label)} ↗</button>{/if}
   {:else}
-    {#if field.label}<p class="lbl">{L(field.label)}</p>{/if}
+    {#if field.label}<p class="lbl" id={lid}>{L(field.label)}</p>{/if}
 
     {#if field.type === "select" && isChips}
-      <div class="chips">
+      <div class="chips" role="group" aria-labelledby={lid}>
         {#each options as o}
-          <button class="chip" class:on={value === o.value} onclick={() => ((value = o.value), changed())}>{optLabel(o)}</button>
+          <button class="chip" aria-pressed={value === o.value} class:on={value === o.value} onclick={() => ((value = o.value), changed())}>{optLabel(o)}</button>
         {/each}
       </div>
     {:else if field.type === "multi"}
-      <div class="chips">
+      <div class="chips" role="group" aria-labelledby={lid}>
         {#each options as o}
-          <button class="chip" class:on={Array.isArray(value) && value.includes(o.value)} onclick={() => toggleMulti(o.value)}>{optLabel(o)}</button>
+          <button class="chip" aria-pressed={Array.isArray(value) && value.includes(o.value)} class:on={Array.isArray(value) && value.includes(o.value)} onclick={() => toggleMulti(o.value)}>{optLabel(o)}</button>
         {/each}
       </div>
     {:else if field.type === "select" || (field.type === "number" && field.suggestions)}
-      <select value={selectValue} onchange={onSelect}>
+      <select aria-labelledby={lid} value={selectValue} onchange={onSelect}>
         {#each list as o}
           <option value={String(o.value)}>{optLabel(o)}{o.detail ? ` · ${o.detail}` : ""}</option>
         {/each}
         {#if hasCustom}
-          <option value={CUSTOM}>{i18n.lang === "ro" ? "Altă valoare…" : "Other value…"}</option>
+          <option value={CUSTOM}>{t("otherValue")}</option>
         {/if}
       </select>
       {#if customMode}
         <div class="custom">
           {#if units.length}
-            <input type="number" min="0" step="any" value={shown} oninput={onNumber} />
-            <select bind:value={unitId}>
+            <input aria-labelledby={lid} type="number" min="0" step="any" value={shown} oninput={onNumber} />
+            <select aria-labelledby={lid} bind:value={unitId}>
               {#each units as u}<option value={u.id}>{u.id}</option>{/each}
             </select>
           {:else}
-            <input
+            <input aria-labelledby={lid}
               type="number"
               min={field.allowCustom?.min}
               max={field.allowCustom?.max}
@@ -157,28 +160,28 @@
     {:else if field.type === "number"}
       <div class="custom">
         {#if units.length}
-          <input type="number" min="0" step="any" value={shown} oninput={onNumber} />
-          <select bind:value={unitId}>
+          <input aria-labelledby={lid} type="number" min="0" step="any" value={shown} oninput={onNumber} />
+          <select aria-labelledby={lid} bind:value={unitId}>
             {#each units as u}<option value={u.id}>{u.id}</option>{/each}
           </select>
         {:else}
-          <input type="number" min={field.min} max={field.max} step={field.step ?? 1} bind:value oninput={changed} />
+          <input aria-labelledby={lid} type="number" min={field.min} max={field.max} step={field.step ?? 1} bind:value oninput={changed} />
           {#if field.unit}<span class="muted">{field.unit}</span>{/if}
         {/if}
       </div>
     {:else if field.type === "range"}
       <div class="range">
-        <input type="range" min={field.min ?? 0} max={field.max ?? 100} step={field.step ?? 1} bind:value oninput={changed} />
+        <input aria-labelledby={lid} type="range" min={field.min ?? 0} max={field.max ?? 100} step={field.step ?? 1} bind:value oninput={changed} />
         <span class="val">{value}{field.unit ? unitLabel(field.unit) : ""}</span>
       </div>
     {:else if field.type === "color"}
       <div class="custom">
-        <input type="color" bind:value oninput={changed} class="color" />
-        <input type="text" bind:value oninput={changed} class="hex" maxlength="9" />
+        <input aria-labelledby={lid} type="color" bind:value oninput={changed} class="color" />
+        <input aria-labelledby={lid} type="text" bind:value oninput={changed} class="hex" maxlength="9" />
       </div>
     {:else if field.type === "pages"}
       <!-- "all" is the default: shown as an empty box with "all" as the hint -->
-      <input
+      <input aria-labelledby={lid}
         type="text"
         class="text"
         value={value === "all" ? "" : value}
@@ -192,19 +195,19 @@
       />
     {:else if field.type === "file"}
       <div class="custom secret">
-        <input type="text" class="text" readonly value={value ? String(value).split(/[\/]/).pop() : ""} placeholder={L({ ro: "Niciun fișier ales", en: "No file chosen" })} title={value ?? ""} />
+        <input aria-labelledby={lid} type="text" class="text" readonly value={value ? String(value).split(/[\/]/).pop() : ""} placeholder={L({ ro: "Niciun fișier ales", en: "No file chosen" })} title={value ?? ""} />
         <button type="button" onclick={pickFile}>{L({ ro: "Alege…", en: "Choose…" })}</button>
       </div>
     {:else if field.type === "password"}
       <!-- Never remembered: ToolView leaves password fields out of the saved values. -->
       <div class="custom secret">
-        <input type={showSecret ? "text" : "password"} class="text" bind:value oninput={changed} autocomplete="new-password" spellcheck="false" />
+        <input aria-labelledby={lid} type={showSecret ? "text" : "password"} class="text" bind:value oninput={changed} autocomplete="new-password" spellcheck="false" />
         <button type="button" class="icon" title={L({ ro: "Arată parola", en: "Show password" })} onclick={() => (showSecret = !showSecret)}>
           <i class="ti {showSecret ? 'ti-eye-off' : 'ti-eye'}"></i>
         </button>
       </div>
     {:else}
-      <input
+      <input aria-labelledby={lid}
         type="text"
         class="text"
         bind:value

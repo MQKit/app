@@ -42,14 +42,19 @@ pub(crate) fn command(exe: &Path) -> Command {
 
 /// ffprobe as JSON → the media properties of the contract (section 9.5).
 pub fn probe(req: &Request, input: &Path) -> Result<Map<String, Value>, FileError> {
-    let out = command(&exe(req, "ffprobe")?)
+    let mut child = command(&exe(req, "ffprobe")?)
         .args(["-v", "error", "-print_format", "json", "-show_format", "-show_streams"])
         .arg(input)
         .stdin(Stdio::null())
-        .output()
-        .map_err(crate::plugins::io_err)?;
-    if !out.status.success() {
-        let msg = String::from_utf8_lossy(&out.stderr).trim().to_string();
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|e| FileError::with(codes::ENGINE_MISSING, json!({ "component": "ffprobe", "message": e.to_string() })))?;
+    // Reading the headers takes a second; a damaged file can make ffprobe search for long.
+    let limit = Duration::from_secs(90);
+    let (status, stdout, stderr) = crate::common::proc::output(&mut child, "ffprobe", limit)?;
+    if !status.success() {
+        let msg = String::from_utf8_lossy(&stderr).trim().to_string();
         // A recording that was cut off (the phone or camera stopped before closing the file).
         // A file named like audio or video that holds none is a damaged one.
         let ext = input.extension().map(|e| e.to_string_lossy().to_ascii_lowercase()).unwrap_or_default();
@@ -59,7 +64,7 @@ pub fn probe(req: &Request, input: &Path) -> Result<Map<String, Value>, FileErro
         let code = if garbled || msg.contains("moov atom not found") || msg.contains("partial file") { codes::CORRUPT_FILE } else { codes::UNSUPPORTED_FILE };
         return Err(FileError::with(code, json!({ "message": msg })));
     }
-    let v: Value = serde_json::from_slice(&out.stdout).map_err(FileError::engine)?;
+    let v: Value = serde_json::from_slice(&stdout).map_err(FileError::engine)?;
     let streams = v["streams"].as_array().cloned().unwrap_or_default();
     let mut p = Map::new();
     let dur = v["format"]["duration"].as_str().and_then(|s| s.parse::<f64>().ok()).unwrap_or(0.0);

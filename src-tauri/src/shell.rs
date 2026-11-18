@@ -39,6 +39,28 @@ mod reg {
         }
     }
 
+    /// The names of the subkeys of `HKCU\\<path>`.
+    pub fn subkeys(path: &str) -> Vec<String> {
+        let mut out = Vec::new();
+        unsafe {
+            let mut h = HKEY::default();
+            let p = w(path);
+            if RegOpenKeyExW(HKEY_CURRENT_USER, PCWSTR(p.as_ptr()), None, KEY_READ, &mut h).is_err() {
+                return out;
+            }
+            for i in 0.. {
+                let mut buf = [0u16; 512];
+                let mut len = buf.len() as u32;
+                if RegEnumKeyExW(h, i, Some(windows::core::PWSTR(buf.as_mut_ptr())), &mut len, None, None, None, None).is_err() {
+                    break;
+                }
+                out.push(String::from_utf16_lossy(&buf[..len as usize]));
+            }
+            let _ = RegCloseKey(h);
+        }
+        out
+    }
+
     pub fn delete_tree(path: &str) {
         unsafe {
             let p = w(path);
@@ -84,7 +106,7 @@ fn by_extension(tools: &[Value]) -> BTreeMap<String, Vec<(String, Value)>> {
 
 /// Writes the menu for every file type (replacing what was there).
 #[cfg(windows)]
-pub fn register(tools: &[Value], lang: &str) -> Result<usize, String> {
+pub fn register(tools: &[Value], lang: &str, names: &std::collections::HashMap<String, String>) -> Result<usize, String> {
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let exe = exe.to_string_lossy().to_string();
     unregister(tools);
@@ -96,7 +118,7 @@ pub fn register(tools: &[Value], lang: &str) -> Result<usize, String> {
         reg::set(&base, Some("SubCommands"), "");
         reg::set(&base, Some("MultiSelectModel"), "Player");
         for (i, (id, name)) in list.iter().enumerate() {
-            let label = name[lang].as_str().or(name["en"].as_str()).unwrap_or(id);
+            let label = names.get(id).map(String::as_str).or(name[lang].as_str()).or(name["en"].as_str()).unwrap_or(id);
             let item = format!("{base}\\shell\\{:02}{id}", i + 1);
             reg::set(&item, Some("MUIVerb"), label);
             reg::set(&format!("{item}\\command"), None, &format!("\"{exe}\" --tool {id} \"%1\""));
@@ -113,22 +135,25 @@ const ALL_EXTS: &[&str] = &[
     "wav", "m4a", "aac", "flac", "ogg", "opus", "wma", "amr", "mp3", "aiff",
 ];
 
+/// Takes the menu off every file type that has it, whatever version added it (the
+/// list of types changes from version to version; the uninstaller has none to go by).
 #[cfg(windows)]
 pub fn unregister(tools: &[Value]) {
-    let mut exts: Vec<String> = by_extension(tools).into_keys().collect();
-    exts.extend(ALL_EXTS.iter().map(|s| s.to_string()));
-    exts.sort();
-    exts.dedup();
-    for ext in exts {
-        reg::delete_tree(&format!("Software\\Classes\\SystemFileAssociations\\.{ext}\\shell\\{KEY}"));
-        for old in OLD_KEYS {
-            reg::delete_tree(&format!("Software\\Classes\\SystemFileAssociations\\.{ext}\\shell\\{old}"));
+    let base = "Software\\Classes\\SystemFileAssociations";
+    let mut types: Vec<String> = reg::subkeys(base);
+    types.extend(by_extension(tools).into_keys().map(|e| format!(".{e}")));
+    types.extend(ALL_EXTS.iter().map(|e| format!(".{e}")));
+    types.sort();
+    types.dedup();
+    for t in types {
+        for key in std::iter::once(KEY).chain(OLD_KEYS.iter().copied()) {
+            reg::delete_tree(&format!("{base}\\{t}\\shell\\{key}"));
         }
     }
 }
 
 #[cfg(not(windows))]
-pub fn register(_: &[Value], _: &str) -> Result<usize, String> {
+pub fn register(_: &[Value], _: &str, _: &std::collections::HashMap<String, String>) -> Result<usize, String> {
     Ok(0)
 }
 

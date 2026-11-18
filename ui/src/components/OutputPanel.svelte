@@ -58,13 +58,13 @@
   {#if openPanel}
     <div class="panel">
       {#if output.originals !== "replace"}
-        <p class="lbl">{t("where")}</p>
+        <p class="lbl" id="out-where">{t("where")}</p>
         <div class="radios">
           <label><input type="radio" bind:group={output.outputDir} value="sameAsInput" />{t("whereSame")}</label>
           <label>
             <input type="radio" bind:group={output.outputDir} value="subfolder" />{t("whereSub")}
             {#if output.outputDir === "subfolder"}
-              <input type="text" class="sub" bind:value={output.subfolderName} placeholder={L(manifest.name)} />
+              <input type="text" class="sub" aria-labelledby="out-where" bind:value={output.subfolderName} placeholder={L(manifest.name)} />
             {/if}
           </label>
           <label>
@@ -76,8 +76,8 @@
           {/if}
         </div>
 
-        <p class="lbl">{t("nameLabel")}</p>
-        <input type="text" class="tpl" bind:value={output.nameTemplate} spellcheck="false" />
+        <p class="lbl" id="out-name">{t("nameLabel")}</p>
+        <input type="text" class="tpl" aria-labelledby="out-name" bind:value={output.nameTemplate} spellcheck="false" />
         <div class="vars">
           {#each vars as v}
             <button class="var" onclick={() => (output.nameTemplate = (output.nameTemplate || "") + `{${v}}`)}>{`{${v}}`}</button>
@@ -85,8 +85,8 @@
         </div>
         <p class="muted small">{t("namePreview", { name: preview })}</p>
 
-        <p class="lbl">{t("ifExists")}</p>
-        <select bind:value={output.onExisting}>
+        <p class="lbl" id="out-exists">{t("ifExists")}</p>
+        <select aria-labelledby="out-exists" bind:value={output.onExisting}>
           <option value="rename">{t("existsRename")}</option>
           <option value="overwrite">{t("existsOverwrite")}</option>
           <option value="skip">{t("existsSkip")}</option>
@@ -94,8 +94,8 @@
       {/if}
 
       {#if replaceAllowed && !hide.includes("originals")}
-        <p class="lbl">{t("originalLabel")}</p>
-        <select bind:value={output.originals}>
+        <p class="lbl" id="out-orig">{t("originalLabel")}</p>
+        <select aria-labelledby="out-orig" bind:value={output.originals}>
           <option value="keep">{t("origKeep")}</option>
           <option value="replace">{t("origReplace")}</option>
         </select>
@@ -103,8 +103,8 @@
 
       <label class="check"><input type="checkbox" bind:checked={output.keepFileDate} />{t("keepDate")}</label>
 
-      <p class="lbl">{t("whenDone")}</p>
-      <select bind:value={output.whenDone}>
+      <p class="lbl" id="out-done">{t("whenDone")}</p>
+      <select aria-labelledby="out-done" bind:value={output.whenDone}>
         <option value="nothing">{t("doneNothing")}</option>
         <option value="openFolder">{t("doneFolder")}</option>
         <option value="openFile">{t("doneFile")}</option>

@@ -65,9 +65,40 @@ namespace OfficeWorker
             }
             catch (IOException ex)
             {
-                int code = ex.HResult & 0xFFFF;
-                if (code == 32 || code == 33) throw new WorkerError("file_locked", ex.Message);
-                throw new WorkerError("file_locked", ex.Message, Json.Obj("hresult", Com.Hex(ex.HResult)));
+                throw IoError(ex, path);
+            }
+        }
+
+        /// <summary>
+        /// A file system error as a protocol error: only a sharing or lock violation means
+        /// another program has the file open; a path that is too long, or a drive or network
+        /// share that went away, are said as such.
+        /// </summary>
+        public static WorkerError IoError(Exception ex, string path)
+        {
+            var details = Json.Obj("message", ex.Message, "hresult", Com.Hex(ex.HResult), "path", path ?? "");
+            if (ex is UnauthorizedAccessException) return new WorkerError("permission_denied", ex.Message, details);
+            if (ex is PathTooLongException) return new WorkerError("path_too_long", ex.Message, details);
+            if (ex is FileNotFoundException || ex is DirectoryNotFoundException || ex is DriveNotFoundException)
+                return new WorkerError("file_not_found", ex.Message, details);
+            switch (ex.HResult & 0xFFFF)
+            {
+                case 32:   // ERROR_SHARING_VIOLATION
+                case 33:   // ERROR_LOCK_VIOLATION
+                    return new WorkerError("file_locked", ex.Message, details);
+                case 206:  // ERROR_FILENAME_EXCED_RANGE
+                    return new WorkerError("path_too_long", ex.Message, details);
+                case 39:   // ERROR_HANDLE_DISK_FULL
+                case 112:  // ERROR_DISK_FULL
+                    return new WorkerError("disk_full", ex.Message, details);
+                case 2: case 3: case 15:      // not found, path not found, invalid drive
+                case 21:                      // ERROR_NOT_READY (card or disc removed)
+                case 53: case 64: case 67:    // network path or share gone
+                case 55: case 1167:           // device gone, device not connected
+                    details["reason"] = "device_gone";
+                    return new WorkerError("file_not_found", ex.Message, details);
+                default:
+                    return new WorkerError("engine_failed", ex.Message, details);
             }
         }
 
@@ -84,6 +115,14 @@ namespace OfficeWorker
             catch (UnauthorizedAccessException ex)
             {
                 throw new WorkerError("permission_denied", "cannot write output: " + ex.Message, Json.Obj("path", dir));
+            }
+            catch (IOException ex)
+            {
+                // The output folder's drive gone is "can't write there", not "the file is gone".
+                var e = IoError(ex, dir);
+                if (e.Code == "file_not_found" || e.Code == "engine_failed")
+                    throw new WorkerError("permission_denied", "cannot write output: " + ex.Message, e.Details, ex);
+                throw e;
             }
         }
 
@@ -376,7 +415,7 @@ namespace OfficeWorker
             }
             finally
             {
-                if (wb != null && !job.HardCancel && job.AbortReason == null)
+                if (wb != null && (xl.Proc == null || xl.IsAlive()))
                 {
                     try { ((dynamic)wb).Close(false); } catch (Exception ex) { Log.Info("workbook.Close: " + ex.Message); }
                 }
@@ -475,7 +514,10 @@ namespace OfficeWorker
             }
             finally
             {
-                if (pres != null && !job.HardCancel && job.AbortReason == null)
+                // Closed even after a cancel or a stop: in the user's own PowerPoint (not ours to
+                // quit) it would otherwise stay open there, hidden. Skipped only when the
+                // PowerPoint we started was stopped, as there is nothing left to close.
+                if (pres != null && (pp.Proc == null || pp.IsAlive()))
                 {
                     try { ((dynamic)pres).Close(); } catch (Exception ex) { Log.Info("presentation.Close: " + ex.Message); }
                 }

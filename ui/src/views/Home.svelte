@@ -1,6 +1,6 @@
 <script lang="ts">
   import { api, type Manifest } from "../lib/api";
-  import { L, t, fileCount } from "../lib/i18n.svelte";
+  import { L, t, fileCount, localKeywords } from "../lib/i18n.svelte";
   import { app, categories, go, orderedTools, toolsFor, TOP } from "../lib/store.svelte";
   import { numberQuery, toolNumber } from "../lib/numbers";
   import type { Key } from "../lib/i18n.svelte";
@@ -17,6 +17,9 @@
       names,
       typeof m.summary === "object" ? Object.values(m.summary).join(" ") : String(m.summary),
       ...(Object.values(m.keywords ?? {}).flat() as string[]),
+      L(m.name),
+      L(m.summary),
+      ...localKeywords(m.id),
       ...m.input.extensions,
       ...m.output.extensions,
     ];

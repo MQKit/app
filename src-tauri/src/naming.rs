@@ -76,14 +76,21 @@ pub fn safe(name: &str) -> String {
     s.chars().take(200).collect()
 }
 
-/// `name (1).ext`, `name (2).ext`… — the first one free on disk and not used in this job.
+/// How a path is compared with others in a job: Windows names ignore letter case, so
+/// `Photo.JPG` and `photo.jpg` are the same file.
+pub fn key(p: &Path) -> PathBuf {
+    PathBuf::from(p.to_string_lossy().to_lowercase())
+}
+
+/// `name (1).ext`, `name (2).ext`… — the first one free on disk and not used in this job
+/// (`used` holds `key`s).
 pub fn unique(target: &Path, used: &HashSet<PathBuf>) -> PathBuf {
     let dir = target.parent().unwrap_or(Path::new("."));
     let stem = target.file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
     let ext = target.extension().map(|s| format!(".{}", s.to_string_lossy())).unwrap_or_default();
     for i in 1..10_000 {
         let p = dir.join(format!("{stem} ({i}){ext}"));
-        if !p.exists() && !used.contains(&p) {
+        if !p.exists() && !used.contains(&key(&p)) {
             return p;
         }
     }
@@ -97,7 +104,7 @@ pub fn unique_dir(target: &Path, used: &HashSet<PathBuf>) -> PathBuf {
     let name = target.file_name().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
     for i in 1..10_000 {
         let p = dir.join(format!("{name} ({i})"));
-        if !p.exists() && !used.contains(&p) {
+        if !p.exists() && !used.contains(&key(&p)) {
             return p;
         }
     }

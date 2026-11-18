@@ -295,28 +295,56 @@ fn draw(ctx: &Ctx, f: &FileRef, dir: &Path) -> Result<(std::path::PathBuf, &'sta
     Ok((out, ext, w, h))
 }
 
+fn find_bytes(hay: &[u8], needle: &[u8]) -> Option<usize> {
+    hay.windows(needle.len()).position(|w| w == needle)
+}
+
+/// Where the first `/Artifact BMC … EMC` block starts, and its length up to `EMC`.
+fn artifact_block(content: &[u8]) -> Option<(usize, usize)> {
+    let a = find_bytes(content, b"/Artifact BMC")?;
+    let len = find_bytes(&content[a..], b"EMC")?;
+    Some((a, len))
+}
+
+fn replace_bytes(src: &[u8], from: &[u8], to: &[u8]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(src.len());
+    let mut i = 0;
+    while i < src.len() {
+        if src[i..].starts_with(from) {
+            out.extend_from_slice(to);
+            i += from.len();
+        } else {
+            out.push(src[i]);
+            i += 1;
+        }
+    }
+    out
+}
+
 /// LibreOffice puts a metafile on a whole sheet of paper (Letter or A4, by locale),
 /// shrunk to fit if large. This drops the white sheet it paints and sets the page to
 /// where the drawing really is, found by drawing the page on a transparent background.
-fn fit_page_to_drawing(ctx: &Ctx, f: &FileRef, produced: &Path, out: &Path) -> Result<(), FileError> {
+fn fit_page_to_drawing(ctx: &Ctx, _f: &FileRef, produced: &Path, out: &Path) -> Result<(), FileError> {
     use lopdf::Object;
     let mut doc = crate::common::pdf::open(produced, None)?;
     let page = *doc.get_pages().values().next().ok_or_else(|| FileError::new(codes::CORRUPT_FILE))?;
     let content = doc.get_page_content(page);
-    let text = String::from_utf8_lossy(&content).into_owned();
     // The sheet: the first artifact block, a white rectangle the size of the page. Its
-    // fills become "n" (end the path, paint nothing), so q/Q stay paired.
-    if let (Some(a), Some(len)) = (text.find("/Artifact BMC"), text.find("/Artifact BMC").and_then(|a| text[a..].find("EMC"))) {
-        let block = text[a..a + len].replace("\nf*\n", "\nn\n").replace("\nf\n", "\nn\n");
+    // fills become "n" (end the path, paint nothing), so q/Q stay paired. Searched in the
+    // bytes themselves: positions found in a lossy text copy are off after any non-UTF-8 byte.
+    if let Some((a, len)) = artifact_block(&content) {
+        let block = replace_bytes(&replace_bytes(&content[a..a + len], b"\nf*\n", b"\nn\n"), b"\nf\n", b"\nn\n");
         let mut cleaned = content[..a].to_vec();
-        cleaned.extend_from_slice(block.as_bytes());
+        cleaned.extend_from_slice(&block);
         cleaned.extend_from_slice(&content[a + len..]);
         doc.change_page_content(page, cleaned).map_err(|_| FileError::new(codes::CORRUPT_FILE))?;
     }
-    let probe = ctx.work_dir.join(format!("{}-probe.pdf", f.id));
-    crate::common::pdf::save(&mut doc, &probe, false)?;
-    let png = winrt::Pdf::open(&probe, None)?.render_png(0, 144.0, true)?;
-    let _ = std::fs::remove_file(&probe);
+    // Drawn from memory: no copy is left behind if drawing fails.
+    let mut probe = Vec::new();
+    crate::common::pdf::write(&mut doc, &mut probe, false)?;
+    let png = winrt::Pdf::open_bytes(&probe)?.render_png(0, 144.0, true)?;
+    drop(probe);
+    ctx.check_cancel()?;
     let im = image::load_from_memory_with_format(&png, image::ImageFormat::Png).map_err(img::img_err)?.to_rgba8();
     let (mut x0, mut y0, mut x1, mut y1) = (u32::MAX, u32::MAX, 0, 0);
     for (x, y, p) in im.enumerate_pixels() {
@@ -467,4 +495,20 @@ fn unused_color(im: &RgbaImage) -> Option<visioncortex::Color> {
     }
     // Skip black (0,0,0): visioncortex reads it as "no key".
     (1..seen.len()).find(|&i| !seen[i]).map(|i| visioncortex::Color::new((i >> 16) as u8, (i >> 8) as u8, i as u8))
+}
+
+#[cfg(test)]
+mod artifact_tests {
+    #[test]
+    fn the_sheet_is_found_in_the_bytes() {
+        // A non-UTF-8 byte before the block: a lossy text copy shifts positions by 2.
+        let mut c = b"q (\xE9t\xE9) Tj Q\n".to_vec();
+        let at = c.len();
+        c.extend_from_slice(b"/Artifact BMC\n0 0 612 792 re\nf\nEMC\nq 1 0 0 1 0 0 cm\nf*\nQ\n");
+        let (a, len) = super::artifact_block(&c).unwrap();
+        assert_eq!(a, at);
+        assert!(c[a + len..].starts_with(b"EMC"));
+        let block = super::replace_bytes(&super::replace_bytes(&c[a..a + len], b"\nf*\n", b"\nn\n"), b"\nf\n", b"\nn\n");
+        assert_eq!(block, b"/Artifact BMC\n0 0 612 792 re\nn\n".to_vec());
+    }
 }

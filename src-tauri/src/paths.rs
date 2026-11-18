@@ -5,12 +5,21 @@ use std::sync::OnceLock;
 use tauri::Manager;
 
 pub const APP_DIR: &str = "Convertor";
-pub const TMP_DIR: &str = ".convertor-tmp";
+/// The hidden work folder at the root of a destination drive (a result moved from there
+/// to its folder is a rename, however large). Inside it, one folder per Windows user,
+/// open to that user only.
+pub const TMP_DIR: &str = ".mqkit-tmp";
+/// The same folder of versions before 1.1 (shared by all users of the PC).
+const OLD_TMP_DIR: &str = ".convertor-tmp";
+
+/// When this run of the app started: work folders older than this are leftovers.
+static STARTED: OnceLock<std::time::SystemTime> = OnceLock::new();
 
 static RESOURCES: OnceLock<PathBuf> = OnceLock::new();
 static DATA: OnceLock<PathBuf> = OnceLock::new();
 
 pub fn init(app: &tauri::AppHandle) {
+    let _ = STARTED.set(std::time::SystemTime::now());
     let dir = app.path().resource_dir().unwrap_or_else(|_| std::env::current_exe().unwrap().parent().unwrap().to_path_buf());
     let _ = RESOURCES.set(dir);
     // Data lives in the app's own folder (%LOCALAPPDATA%\<identifier>), apart from the
@@ -32,7 +41,10 @@ fn migrate_old_data(new: &Path) {
     let Some(base) = std::env::var_os("LOCALAPPDATA").map(PathBuf::from) else { return };
     for dir in OLD_DATA_DIRS {
         let old = base.join(dir);
-        if old != new && old.is_dir() {
+        // Only a folder this app made: its state files or engines are there ("Convertor"
+        // is a name another program could use too).
+        let ours = old.join("state").join("settings.json").is_file() || old.join("state").join("history.json").is_file() || old.join("engines").join("ffmpeg").is_dir();
+        if old != new && old.is_dir() && ours {
             move_data(&old, new);
         }
     }
@@ -67,6 +79,20 @@ fn move_data(old: &Path, new: &Path) {
     let _ = std::fs::remove_dir(old);
 }
 
+/// The app's identifier (tauri.conf.json): its data folder under %LOCALAPPDATA%.
+pub const IDENTIFIER: &str = "com.mqkit.app";
+
+/// For the installer's command-line calls, without a window: resources beside the
+/// program, data where the app keeps it.
+pub fn init_cli() {
+    if let Some(dir) = std::env::current_exe().ok().and_then(|e| e.parent().map(Path::to_path_buf)) {
+        let _ = RESOURCES.set(dir);
+    }
+    if let Some(base) = std::env::var_os("LOCALAPPDATA").map(PathBuf::from) {
+        let _ = DATA.set(base.join(IDENTIFIER));
+    }
+}
+
 /// Installed, read-only: `workers\`, `plugins\`.
 pub fn resources() -> &'static Path {
     RESOURCES.get().expect("paths::init")
@@ -86,7 +112,7 @@ pub fn data_dir() -> PathBuf {
         return d.clone();
     }
     let base = std::env::var_os("LOCALAPPDATA").map(PathBuf::from).unwrap_or_else(std::env::temp_dir);
-    base.join(APP_DIR)
+    base.join(IDENTIFIER)
 }
 
 pub fn state_dir() -> PathBuf {
@@ -105,21 +131,29 @@ pub fn engines_dir() -> PathBuf {
     data_dir().join("engines")
 }
 
-/// The job work folder on the destination drive: `<root>\.convertor-tmp\<jobId>\`,
+/// The job work folder on the destination drive: `<root>\.mqkit-tmp\<user>\<jobId>\`,
 /// falling back to a hidden folder next to the destination, then to `%LOCALAPPDATA%`.
+/// The user's folder is readable by that user only: a decrypted PDF or a converted
+/// document waiting to be moved is nobody else's to read on a shared PC.
 pub fn job_dir(dest: &Path, job_id: &str) -> PathBuf {
     let mut candidates = Vec::new();
     if let Some(root) = dest.ancestors().last() {
         candidates.push(root.join(TMP_DIR));
     }
     candidates.push(dest.join(TMP_DIR));
-    candidates.push(data_dir().join("tmp"));
-    for c in candidates {
-        let d = c.join(job_id);
-        if std::fs::create_dir_all(&d).is_ok() {
-            hide(&c);
-            return d;
+    for base in candidates {
+        let mine = base.join(crate::winutil::user_sid());
+        if std::fs::create_dir_all(&base).is_ok() && crate::winutil::create_private_dir(&mine) {
+            hide(&base);
+            let d = mine.join(job_id);
+            if std::fs::create_dir_all(&d).is_ok() {
+                return d;
+            }
         }
+    }
+    let d = data_dir().join("tmp").join(job_id);
+    if std::fs::create_dir_all(&d).is_ok() {
+        return d;
     }
     std::env::temp_dir().join(APP_DIR).join(job_id)
 }
@@ -157,14 +191,38 @@ pub fn remove_tree(p: &Path) {
 }
 
 /// Removes work folders left by a crash (called at startup).
+/// Work folders left by a crash: this user's, from before this run started (a job begun
+/// a moment ago is not touched); other users' only in the old shared folder, and only
+/// after a day. Then the folders themselves, once empty.
 pub fn cleanup_stale(roots: &[PathBuf]) {
-    for r in roots {
-        let t = r.join(TMP_DIR);
-        if let Ok(rd) = std::fs::read_dir(&t) {
+    let started = STARTED.get().copied().unwrap_or_else(std::time::SystemTime::now);
+    let day_ago = std::time::SystemTime::now() - std::time::Duration::from_secs(24 * 3600);
+    let older = |p: &Path, than: std::time::SystemTime| std::fs::symlink_metadata(p).and_then(|m| m.modified()).map(|t| t < than).unwrap_or(false);
+    let clean = |dir: &Path, than: std::time::SystemTime| {
+        if let Ok(rd) = std::fs::read_dir(dir) {
             for e in rd.flatten() {
-                remove_tree(&e.path());
+                if older(&e.path(), than) {
+                    remove_tree(&e.path());
+                }
             }
         }
-        let _ = std::fs::remove_dir(&t);
+        let _ = std::fs::remove_dir(dir);
+    };
+    for r in roots {
+        let base = r.join(TMP_DIR);
+        clean(&base.join(crate::winutil::user_sid()), started);
+        let _ = std::fs::remove_dir(&base);
+        clean(&r.join(OLD_TMP_DIR), day_ago);
     }
+    clean(&data_dir().join("tmp"), started);
+}
+
+/// The roots to look at for leftovers: fixed local drives only (a disconnected network
+/// drive can take seconds to answer).
+pub fn tmp_roots() -> Vec<PathBuf> {
+    ('C'..='Z')
+        .map(|c| PathBuf::from(format!("{c}:\\")))
+        .filter(|p| crate::winutil::has_recycle_bin(p))
+        .filter(|p| p.join(TMP_DIR).exists() || p.join(OLD_TMP_DIR).exists())
+        .collect()
 }

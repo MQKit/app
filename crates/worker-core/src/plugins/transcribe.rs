@@ -7,7 +7,8 @@ use crate::common::ffmpeg;
 use contract::{codes, opt, t, FileError, FileRef, Request};
 use serde_json::{json, Value};
 use std::io::Read;
-use std::process::{Command, Stdio};
+use std::process::Stdio;
+use std::time::Duration;
 
 pub const MEDIA: &[&str] = &["mp3", "wav", "m4a", "aac", "ogg", "opus", "flac", "wma", "amr", "mp4", "mkv", "mov", "avi", "webm", "wmv", "m4v", "3gp", "mpg", "mpeg", "ts"];
 
@@ -118,18 +119,37 @@ impl Plugin for Transcribe {
 /// The sound of any audio or video as 16 kHz mono samples.
 fn samples(ctx: &Ctx, path: &std::path::Path) -> Result<Vec<f32>, FileError> {
     let exe = ffmpeg::exe(ctx.req, "ffmpeg")?;
-    let mut child = Command::new(exe)
+    let mut child = ffmpeg::command(&exe)
         .args(["-hide_banner", "-loglevel", "error", "-nostdin", "-i"]).arg(path)
         .args(["-vn", "-ac", "1", "-ar", "16000", "-f", "f32le", "-"])
         .stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::null())
         .spawn().map_err(|e| FileError::engine(format!("ffmpeg: {e}")))?;
-    let mut raw = Vec::new();
-    child.stdout.take().unwrap().read_to_end(&mut raw).map_err(super::io_err)?;
-    let _ = child.wait();
-    if raw.len() < 16000 * 4 / 10 {
+    // The samples are turned into numbers as they come (held once, not as bytes too),
+    // while this thread watches for cancel and for an FFmpeg that hangs.
+    let mut stdout = child.stdout.take().unwrap();
+    let reader = std::thread::spawn(move || -> std::io::Result<Vec<f32>> {
+        let mut out = Vec::new();
+        let mut buf = vec![0u8; 1 << 16];
+        let mut have = 0;
+        loop {
+            let n = stdout.read(&mut buf[have..])?;
+            if n == 0 {
+                return Ok(out);
+            }
+            have += n;
+            let whole = have - have % 4;
+            out.extend(buf[..whole].as_chunks::<4>().0.iter().map(|b| f32::from_le_bytes(*b)));
+            buf.copy_within(whole..have, 0);
+            have -= whole;
+        }
+    });
+    let limit = crate::common::proc::limit_for(file_size(path), Duration::from_secs(300), Duration::from_secs(2), Duration::from_secs(3 * 3600));
+    crate::common::proc::wait(&mut child, Some(&ctx.cancel), "ffmpeg", limit, || {})?;
+    let audio = reader.join().map_err(|_| FileError::engine("ffmpeg: reading the sound failed"))?.map_err(super::io_err)?;
+    if audio.len() < 16000 / 10 {
         return Err(FileError::new("no_audio"));
     }
-    Ok(raw.as_chunks::<4>().0.iter().map(|b| f32::from_le_bytes(*b)).collect())
+    Ok(audio)
 }
 
 struct Segment {

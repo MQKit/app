@@ -34,6 +34,9 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm --prefix ui run check
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          # every language complete: plurals, placeholders, the tools' texts
+          node scripts/i18n-check.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm --prefix ui run build
       # The app bundles the workers and their manifests (src-tauri/resources): built
       # first, in debug, so the app compiles.

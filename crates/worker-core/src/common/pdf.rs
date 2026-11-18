@@ -10,7 +10,17 @@ pub fn open_file(f: &FileRef, req: &Request) -> Result<Document, FileError> {
     open(f.input_path(), req.secrets.files.get(&f.id).map(String::as_str))
 }
 
+/// The largest PDF opened. The file is read whole and then held again as objects (about
+/// twice its size, more while pages are worked on); far past this the worker would run
+/// out of memory and stop for every file of the batch. Scans of hundreds of pages are
+/// a few hundred MB.
+pub const MAX_PDF_BYTES: u64 = 1200 * 1024 * 1024;
+
 pub fn open(path: &Path, password: Option<&str>) -> Result<Document, FileError> {
+    let size = std::fs::metadata(path).map_err(crate::plugins::io_err)?.len();
+    if size > MAX_PDF_BYTES {
+        return Err(FileError::with(codes::FILE_TOO_LARGE, json!({ "sizeBytes": size, "maxBytes": MAX_PDF_BYTES })));
+    }
     let res = match inline_encrypt_fixed(path) {
         // An encryption dictionary written inside the trailer (MuPDF does this).
         Some(bytes) => {
@@ -236,10 +246,11 @@ pub fn windows_reader(ctx: &crate::plugins::Ctx, f: &FileRef) -> Result<crate::c
                 return Err(first);
             }
             doc.encryption_state = None;
-            std::fs::create_dir_all(&ctx.work_dir).map_err(crate::plugins::io_err)?;
-            let plain = ctx.work_dir.join(format!("{}-open.pdf", f.id));
-            save(&mut doc, &plain, false)?;
-            crate::common::winrt::Pdf::open(&plain, None)
+            // The decrypted copy stays in memory: nothing unprotected is left on the disk.
+            let mut plain = Vec::new();
+            write(&mut doc, &mut plain, false)?;
+            drop(doc);
+            crate::common::winrt::Pdf::open_bytes(&plain)
         }
     }
 }
@@ -254,6 +265,7 @@ pub fn analyze(f: &FileRef, req: &Request) -> (&'static str, Map<String, Value>,
             p.insert("isEncrypted".into(), json!(true));
             return ("locked", p, Some(e.code));
         }
+        Err(e) if e.code == codes::FILE_TOO_LARGE => return ("failed", p, Some(e.code)),
         Err(e) => return ("corrupt", p, Some(e.code)),
     };
     let pages = doc.get_pages();
@@ -841,11 +853,18 @@ pub fn text_string(s: &str) -> Object {
 pub fn save(doc: &mut Document, path: &Path, linearize: bool) -> Result<(), FileError> {
     // A protected document opened with its password stays protected, with the same
     // passwords and permissions. (To remove them, the password tool clears the state.)
+    let file = std::fs::File::create(path).map_err(crate::plugins::io_err)?;
+    let mut w = std::io::BufWriter::new(file);
+    write(doc, &mut w, linearize)?;
+    std::io::Write::flush(&mut w).map_err(crate::plugins::io_err)?;
+    Ok(())
+}
+
+/// [`save`] into any writer.
+pub fn write(doc: &mut Document, w: &mut impl std::io::Write, linearize: bool) -> Result<(), FileError> {
     if let Some(state) = doc.encryption_state.clone() {
         doc.encrypt(&state).map_err(FileError::engine)?;
     }
-    let file = std::fs::File::create(path).map_err(crate::plugins::io_err)?;
-    let mut w = std::io::BufWriter::new(file);
     // Object streams are only compressed when given a level (lopdf's default is 0: stored).
     let opts = SaveOptions::builder()
         .use_object_streams(!linearize)
@@ -853,9 +872,8 @@ pub fn save(doc: &mut Document, path: &Path, linearize: bool) -> Result<(), File
         .linearize(linearize)
         .compression_level(9)
         .build();
-    doc.save_with_options(&mut w, opts).map_err(FileError::engine)?;
-    std::io::Write::flush(&mut w).map_err(crate::plugins::io_err)?;
-    Ok(())
+    // A full disk or a folder without rights is said as such, not as a failed conversion.
+    doc.save_with_options(w, opts).map_err(crate::plugins::io_err)
 }
 
 /// A page box (`MediaBox`, `CropBox`), looked up the page tree when the page inherits it.

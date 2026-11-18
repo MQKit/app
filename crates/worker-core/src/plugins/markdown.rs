@@ -35,7 +35,7 @@ impl Plugin for Markdown {
             "keywords": { "ro": ["markdown", "md", "text", "txt", "notițe", "readme"], "en": ["markdown", "md", "text", "txt", "notes", "readme"] },
             "category": "document",
             "icon": "code",
-            "input": { "extensions": ["md", "markdown", "txt", "text"], "multiple": true, "folders": true, "mode": "perFile" },
+            "input": { "extensions": ["md", "markdown", "txt", "text"], "multiple": true, "folders": true, "mode": "perFile", "textEntry": "md" },
             "output": { "kind": "perInput", "extensions": ["pdf", "html"], "replaceOriginalAllowed": false },
             "analysis": { "fast": [] },
             "ui": { "preview": "none", "estimate": false },

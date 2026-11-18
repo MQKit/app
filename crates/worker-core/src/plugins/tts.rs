@@ -1,5 +1,7 @@
-//! Text to speech with the voices Windows already has: a text, Markdown or Word file
-//! read aloud into WAV or MP3. Long texts are read in pieces and joined into one file.
+//! Text to speech: a text, Markdown or Word file (or typed text) read aloud into WAV or
+//! MP3, with the voices Windows already has, or with Kokoro's natural voices (an AI
+//! model run on the PC, downloaded once; workers/python/tts/kokoro_tts.py). Long texts
+//! are read in pieces and joined into one file.
 
 use super::{file_size, write_file, Analysis, Ctx, Plugin};
 use crate::common::{ffmpeg, winrt};
@@ -22,8 +24,9 @@ impl Plugin for Tts {
             "keywords": { "ro": ["citește", "voce", "audio", "carte audio", "mp3"], "en": ["read aloud", "voice", "audio", "audiobook", "mp3"] },
             "category": "audio",
             "icon": "speakerphone",
-            "requires": [ { "engine": "ffmpeg", "when": { "field": "format", "eq": "mp3" } } ],
-            "input": { "extensions": ["txt", "md", "markdown", "docx"], "multiple": true, "folders": true, "mode": "perFile" },
+            "requires": [ { "engine": "ffmpeg", "when": { "field": "format", "eq": "mp3" } },
+                          { "engine": "kokoro", "when": { "field": "engine", "eq": "natural" } } ],
+            "input": { "extensions": ["txt", "md", "markdown", "docx"], "multiple": true, "folders": true, "mode": "perFile", "textEntry": "txt" },
             "output": { "kind": "perInput", "extensions": ["mp3", "wav"], "replaceOriginalAllowed": false },
             "analysis": { "fast": ["characters"] },
             "ui": { "preview": "none", "estimate": false },
@@ -31,7 +34,30 @@ impl Plugin for Tts {
             "presets": [],
             "groups": [],
             "fields": [
+                { "key": "engine", "type": "select", "label": t("Voci", "Voices"), "default": "windows", "display": "chips",
+                  "options": [ opt("windows", "Din Windows", "From Windows"), opt("natural", "Naturale", "Natural") ],
+                  "help": t("Vocile naturale sunt un model AI care rulează pe PC-ul tău (o descărcare de 140 MB, o singură dată).",
+                            "Natural voices are an AI model that runs on your PC (a 140 MB download, once).") },
+                { "key": "naturalVoice", "type": "select", "label": t("Vocea", "Voice"), "default": "af_heart",
+                  "showIf": { "field": "engine", "eq": "natural" },
+                  "options": [
+                      opt("af_heart", "Heart · engleză (SUA), feminină", "Heart · English (US), female"),
+                      opt("af_bella", "Bella · engleză (SUA), feminină", "Bella · English (US), female"),
+                      opt("am_michael", "Michael · engleză (SUA), masculină", "Michael · English (US), male"),
+                      opt("bf_emma", "Emma · engleză (Marea Britanie), feminină", "Emma · English (UK), female"),
+                      opt("bm_george", "George · engleză (Marea Britanie), masculină", "George · English (UK), male"),
+                      opt("ef_dora", "Dora · spaniolă, feminină", "Dora · Spanish, female"),
+                      opt("em_alex", "Alex · spaniolă, masculină", "Alex · Spanish, male"),
+                      opt("ff_siwis", "Siwis · franceză, feminină", "Siwis · French, female"),
+                      opt("if_sara", "Sara · italiană, feminină", "Sara · Italian, female"),
+                      opt("im_nicola", "Nicola · italiană, masculină", "Nicola · Italian, male"),
+                      opt("pf_dora", "Dora · portugheză (Brazilia), feminină", "Dora · Portuguese (Brazil), female"),
+                      opt("pm_alex", "Alex · portugheză (Brazilia), masculină", "Alex · Portuguese (Brazil), male"),
+                      opt("hf_alpha", "Alpha · hindi, feminină", "Alpha · Hindi, female"),
+                      opt("hm_omega", "Omega · hindi, masculină", "Omega · Hindi, male")
+                  ] },
                 { "key": "voice", "type": "select", "label": t("Vocea", "Voice"), "default": "", "optionsFrom": { "env": "windows.voices" },
+                  "showIf": { "field": "engine", "ne": "natural" },
                   "help": t("Vocile vin din Windows; poți adăuga gratuit voci în alte limbi.", "Voices come from Windows; you can add voices in other languages for free."),
                   "helpLink": { "label": t("Adaugă voci în Setări", "Add voices in Settings"), "url": "ms-settings:speech" } },
                 { "key": "rate", "type": "select", "label": t("Viteză", "Speed"), "default": 1,
@@ -41,7 +67,10 @@ impl Plugin for Tts {
                   "options": [ opt("mp3", "MP3", "MP3"), opt("wav", "WAV", "WAV") ] }
             ],
             "rules": [
-                { "id": "no_own_voice", "severity": "info", "when": { "env": "windows.voiceOwnLanguage", "eq": false },
+                { "id": "natural_languages", "severity": "info", "when": { "field": "engine", "eq": "natural" },
+                  "message": t("Vocile naturale vorbesc doar engleză, spaniolă, franceză, italiană, portugheză și hindi. Alege o voce în limba textului; pentru alte limbi, folosește vocile din Windows.",
+                               "Natural voices speak only English, Spanish, French, Italian, Portuguese and Hindi. Choose a voice in the text's language; for other languages, use the voices from Windows.") },
+                { "id": "no_own_voice", "severity": "info", "when": { "all": [ { "env": "windows.voiceOwnLanguage", "eq": false }, { "field": "engine", "ne": "natural" } ] },
                   "message": t("Pe acest calculator nu e instalată o voce în limba ta. O poți adăuga gratuit din Setările Windows (Vorbire › Adaugă voci).",
                                "No voice in your language is installed on this PC. You can add one for free in Windows Settings (Speech › Add voices).") }
             ],
@@ -68,28 +97,32 @@ impl Plugin for Tts {
         if text.trim().is_empty() {
             return Err(FileError::new("empty_text"));
         }
-        let voices = winrt::voices()?;
-        if voices.is_empty() {
-            return Err(FileError::new("no_voices"));
-        }
-        let voice = match req.str_or("voice", "") {
-            "" => None,
-            v => Some(v.to_string()),
-        };
         let rate = req.f64_or("rate", 1.0);
-        let pieces = chunks(&text, 1500);
-        let n = pieces.len();
-        let mut fmt: Option<Vec<u8>> = None;
-        let mut pcm: Vec<u8> = Vec::new();
-        for (i, piece) in pieces.iter().enumerate() {
-            ctx.check_cancel()?;
-            ctx.progress(&f.id, 0.05 + 0.8 * i as f64 / n as f64, "speak", 1, 2);
-            let wav = winrt::speak(piece, voice.as_deref(), rate)?;
-            let (chunk_fmt, data) = wav_parts(&wav).ok_or_else(|| FileError::with(codes::ENGINE_FAILED, json!({ "message": "bad WAV from Windows" })))?;
-            fmt.get_or_insert_with(|| chunk_fmt.to_vec());
-            pcm.extend_from_slice(data);
-        }
-        let wav = build_wav(&fmt.unwrap_or_default(), &pcm);
+        let (wav, n) = if req.str_or("engine", "windows") == "natural" {
+            (natural(ctx, f, &text, rate)?, 1)
+        } else {
+            let voices = winrt::voices()?;
+            if voices.is_empty() {
+                return Err(FileError::new("no_voices"));
+            }
+            let voice = match req.str_or("voice", "") {
+                "" => None,
+                v => Some(v.to_string()),
+            };
+            let pieces = chunks(&text, 1500);
+            let n = pieces.len();
+            let mut fmt: Option<Vec<u8>> = None;
+            let mut pcm: Vec<u8> = Vec::new();
+            for (i, piece) in pieces.iter().enumerate() {
+                ctx.check_cancel()?;
+                ctx.progress(&f.id, 0.05 + 0.8 * i as f64 / n as f64, "speak", 1, 2);
+                let wav = winrt::speak(piece, voice.as_deref(), rate)?;
+                let (chunk_fmt, data) = wav_parts(&wav).ok_or_else(|| FileError::with(codes::ENGINE_FAILED, json!({ "message": "bad WAV from Windows" })))?;
+                fmt.get_or_insert_with(|| chunk_fmt.to_vec());
+                pcm.extend_from_slice(data);
+            }
+            (build_wav(&fmt.unwrap_or_default(), &pcm), n)
+        };
         let dir = ctx.file_dir(&f.id)?;
         let format = req.str_or("format", "mp3");
         ctx.progress(&f.id, 0.88, "encode", 2, 2);
@@ -110,6 +143,74 @@ impl Plugin for Tts {
         ctx.emit_output(&f.id, &out, format, json!({}), in_bytes);
         Ok(json!({ "pieces": n }))
     }
+}
+
+/// Kokoro's natural voice: the text read by workers/python/tts/kokoro_tts.py with the
+/// portable Python, into a WAV (the bytes returned). Progress comes from its lines on
+/// stdout; cancel and a time limit stop it.
+fn natural(ctx: &Ctx, f: &FileRef, text: &str, rate: f64) -> Result<Vec<u8>, FileError> {
+    use std::io::BufRead;
+    let req = ctx.req;
+    let engine = |name: &str| req.engines.get(name).map(|e| e.path.clone()).ok_or_else(|| FileError::new(codes::ENGINE_MISSING));
+    let python = engine("python")?.join("python.exe");
+    let model = engine("kokoro-model")?.join("kokoro-v1.0.int8.onnx");
+    let voices = engine("kokoro-voices")?.join("voices-v1.0.bin");
+    let paths = [engine("kokoro")?.join("site-packages"), engine("onnxruntime")?.join("site-packages")].map(|p| p.to_string_lossy().into_owned()).join(";");
+    // Beside the workers: <app>\plugins\tts\kokoro_tts.py.
+    let script = std::env::current_exe()
+        .ok()
+        .and_then(|e| e.parent().and_then(Path::parent).map(|d| d.join("plugins").join("tts").join("kokoro_tts.py")))
+        .filter(|p| p.is_file())
+        .ok_or_else(|| FileError::with(codes::ENGINE_MISSING, json!({ "message": "kokoro_tts.py" })))?;
+    let voice = req.str_or("naturalVoice", "af_heart");
+    std::fs::create_dir_all(&ctx.work_dir).map_err(super::io_err)?;
+    let text_file = ctx.work_dir.join(format!("speech-{}.txt", f.id));
+    write_file(&text_file, text.as_bytes())?;
+    let wav_file = ctx.work_dir.join(format!("speech-{}-natural.wav", f.id));
+    let mut cmd = std::process::Command::new(&python);
+    cmd.arg("-I").arg(&script).arg(&paths).arg(&model).arg(&voices).arg(voice).arg(format!("{rate}")).arg(&text_file).arg(&wav_file);
+    cmd.env("PYTHONUTF8", "1").stdout(std::process::Stdio::piped()).stderr(std::process::Stdio::null()).stdin(std::process::Stdio::null());
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(0x0800_0000);
+    }
+    let mut child = cmd.spawn().map_err(|e| FileError::with(codes::ENGINE_FAILED, json!({ "message": e.to_string() })))?;
+    let stdout = child.stdout.take().expect("piped");
+    let last = std::sync::Arc::new(std::sync::Mutex::new((0.0f64, String::new())));
+    let reader = {
+        let last = last.clone();
+        std::thread::spawn(move || {
+            for line in std::io::BufReader::new(stdout).lines().map_while(Result::ok) {
+                let mut l = last.lock().unwrap();
+                if let Some(p) = line.strip_prefix("progress ").and_then(|p| p.trim().parse::<f64>().ok()) {
+                    l.0 = p;
+                } else {
+                    l.1 = line;
+                }
+            }
+        })
+    };
+    // About a second per 15 characters on a slow PC, at least five minutes.
+    let limit = crate::common::proc::limit_for(text.len() as u64 * 70_000, std::time::Duration::from_secs(300), std::time::Duration::from_secs(1), std::time::Duration::from_secs(6 * 3600));
+    let status = crate::common::proc::wait(&mut child, Some(&ctx.cancel), "Kokoro", limit, || {
+        let p = last.lock().unwrap().0;
+        ctx.progress(&f.id, 0.05 + 0.8 * p, "speak", 1, 2);
+    })?;
+    let _ = reader.join();
+    let end = last.lock().unwrap().1.clone();
+    let _ = std::fs::remove_file(&text_file);
+    if !status.success() || !end.starts_with("done") {
+        let _ = std::fs::remove_file(&wav_file);
+        return Err(match end.split_whitespace().nth(1) {
+            Some("no_text") => FileError::new("empty_text"),
+            Some("bad_voice") => FileError::new(codes::INVALID_OPTIONS),
+            _ => FileError::with(codes::ENGINE_FAILED, json!({ "message": end.trim_start_matches("error ").trim_start_matches("failed ") })),
+        });
+    }
+    let wav = std::fs::read(&wav_file).map_err(super::io_err)?;
+    let _ = std::fs::remove_file(&wav_file);
+    Ok(wav)
 }
 
 /// The text of a .txt, .md (without the Markdown marks) or .docx file.

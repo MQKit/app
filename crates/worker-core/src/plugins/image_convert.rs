@@ -94,7 +94,7 @@ impl Plugin for ImageConvert {
         let format = ctx.req.str_or("format", "jpg");
         // Animated GIF/WebP to GIF or WebP: every frame is kept.
         if matches!(format, "gif" | "webp") && f.analysis.get("isAnimated").and_then(Value::as_bool) == Some(true) {
-            if let Some(frames) = img::animation_frames(path) {
+            if let Some(frames) = img::animation_frames(path, ctx.req.limits.max_megapixels)? {
                 ctx.progress(&f.id, 0.4, "encode", 2, 2);
                 let q = ctx.req.f64_or("quality", 90.0) as u8;
                 let data = if format == "gif" {

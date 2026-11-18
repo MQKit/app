@@ -13,7 +13,8 @@ export interface Item {
   state?: "waiting" | "running" | "ok" | "failed" | "skipped";
   progress?: number;
   stage?: string;
-  results?: { path: string; name: string; bytes: number; skipped?: boolean }[];
+  /** `originalKept`: the original stayed although it was to be recycled or replaced (why). */
+  results?: { path: string; name: string; bytes: number; skipped?: boolean; originalKept?: "no_recycle_bin" | "file_locked" }[];
   suggest?: Record<string, any>;
   /** Warning codes the worker sent for this file. */
   warnings?: string[];

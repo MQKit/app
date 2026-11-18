@@ -57,24 +57,24 @@
 </script>
 
 {#if !open}
-  <button class="link" onclick={() => (open = true)}><i class="ti ti-folder-search"></i>{L({ ro: "Din dosar, după un tipar…", en: "From a folder, by a pattern…" })}</button>
+  <button class="link" onclick={() => (open = true)}><i class="ti ti-folder-search"></i>{L({ ro: "Dintr-un folder, după un tipar…", en: "From a folder, by a pattern…" })}</button>
 {:else}
   <div class="panel">
     <p class="lbl">{L({ ro: "Dosarul", en: "The folder" })}</p>
     <div class="row">
       <input class="text" bind:value={folder} oninput={search} placeholder="D:\Documente\Proiect" spellcheck="false" />
-      <button onclick={browse}>{L({ ro: "Alege…", en: "Browse…" })}</button>
+      <button onclick={browse}>{L({ ro: "Alege…", en: "Choose…" })}</button>
     </div>
     <p class="lbl">{L({ ro: "Tiparul", en: "The pattern" })}</p>
     <input class="text mono" bind:value={pattern} oninput={search} spellcheck="false" />
     <p class="help">
       {L({
-        ro: "* orice nume, ** orice subdosare, {a,b} una din variante, ; între mai multe. Ex.: *.pdf · rapoarte/**/*.md · factura-2026*.{pdf,docx}",
+        ro: "* orice nume, ** orice subfoldere, {a,b} una din variante, ; între mai multe. Ex.: *.pdf · rapoarte/**/*.md · factura-2026*.{pdf,docx}",
         en: "* any name, ** any subfolders, {a,b} one of them, ; between several. E.g. *.pdf · reports/**/*.md · invoice-2026*.{pdf,docx}",
       })}
     </p>
-    <label class="toggle"><input type="checkbox" bind:checked={recursive} onchange={search} /> {L({ ro: "Și din subdosare", en: "Subfolders too" })}</label>
-    <label class="toggle"><input type="checkbox" bind:checked={hidden} onchange={search} /> {L({ ro: "Și din dosarele ascunse", en: "Hidden folders too" })}</label>
+    <label class="toggle"><input type="checkbox" bind:checked={recursive} onchange={search} /> {L({ ro: "Și din subfoldere", en: "Subfolders too" })}</label>
+    <label class="toggle"><input type="checkbox" bind:checked={hidden} onchange={search} /> {L({ ro: "Și din folderele ascunse", en: "Hidden folders too" })}</label>
     <p class="status">
       {#if busy}
         <i class="ti ti-loader-2 spin"></i> {L({ ro: "Caut…", en: "Searching…" })}
@@ -88,7 +88,7 @@
           <br /><span class="secondary">{L({ ro: `Alte ${result.matched - result.files.length} se potrivesc tiparului, dar nu sunt pentru această unealtă.`, en: `${result.matched - result.files.length} more match the pattern but aren't for this tool.` })}</span>
         {/if}
         {#if result.truncated}
-          <br /><span class="secondary">{L({ ro: "Căutarea s-a oprit (prea multe fișiere); alege un dosar sau un tipar mai strâns.", en: "The search stopped (too many files); choose a narrower folder or pattern." })}</span>
+          <br /><span class="secondary">{L({ ro: "Căutarea s-a oprit (prea multe fișiere); alege un folder sau un tipar mai strâns.", en: "The search stopped (too many files); choose a narrower folder or pattern." })}</span>
         {/if}
       {/if}
     </p>

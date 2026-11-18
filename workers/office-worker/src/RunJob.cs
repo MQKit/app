@@ -222,7 +222,7 @@ namespace OfficeWorker
                 return new WorkerError("engine_failed", _activeName + " showed a dialog and was stopped",
                     Json.Obj("reason", "blocking_dialog", "dialog", AbortDetail ?? "", "message", _activeName + " showed a dialog: " + (AbortDetail ?? "")));
             if (abort == "timeout")
-                return new WorkerError("engine_failed", _activeName + " did not finish in time",
+                return new WorkerError("timeout", _activeName + " did not finish in time",
                     Json.Obj("reason", "timeout", "message", _activeName + " did not respond for " + _opTimeoutSec + " s"));
             int hr = Com.HResult(ex);
             if (Com.IsServerGone(ex))
@@ -230,8 +230,11 @@ namespace OfficeWorker
                     Json.Obj("reason", "word_crashed", "hresult", Com.Hex(hr), "message", ex.Message));
             if (ex is UnauthorizedAccessException)
                 return new WorkerError("permission_denied", ex.Message);
-            if (ex is IOException io && ((io.HResult & 0xFFFF) == 32 || (io.HResult & 0xFFFF) == 33))
-                return new WorkerError("file_locked", ex.Message);
+            if (ex is IOException)
+            {
+                var io = Converters.IoError(ex, f.Path);
+                if (io.Code != "engine_failed") return io;
+            }
             return new WorkerError("engine_failed", ex.Message, Json.Obj("hresult", Com.Hex(hr), "message", ex.Message));
         }
 
@@ -457,6 +460,9 @@ namespace OfficeWorker
                 {
                     AbortReason = "timeout";
                     if (proc != null) ProcessRegistry.Kill(proc, "operation timeout");
+                    // The user's own PowerPoint (or a process we could not tell apart) is never
+                    // killed, so the stuck call can't be ended: the job is ended instead.
+                    else AbandonStuckCall();
                 }
             }
             catch (Exception ex)
@@ -467,6 +473,46 @@ namespace OfficeWorker
             {
                 Interlocked.Exchange(ref _tickGuard, 0);
             }
+        }
+
+        /// <summary>
+        /// A call into an Office instance we may not kill has run past the time limit. If it
+        /// does not come back within a short grace, the current file fails with "timeout",
+        /// the rest are reported skipped, the processes we started are stopped, and the
+        /// worker exits: the job ends instead of waiting forever.
+        /// </summary>
+        private void AbandonStuckCall()
+        {
+            string name = _activeName;
+            Log.Info(name + " did not answer for " + _opTimeoutSec + " s and is not ours to stop: ending the job");
+            var t = new Thread(() =>
+            {
+                var until = DateTime.UtcNow.AddSeconds(15);
+                while (DateTime.UtcNow < until)
+                {
+                    if (_finished.WaitOne(500) || !_busy) return; // the call came back after all
+                }
+                ProcessRegistry.KillAll("stuck call");
+                lock (_lock)
+                {
+                    if (!_terminated)
+                    {
+                        if (_currentFile != null && !_currentReported)
+                        {
+                            Out.Emit(Json.Obj("type", "fileDone", "file", _currentFile, "status", "failed", "code", "timeout",
+                                "details", Json.Obj("reason", "timeout", "message", name + " did not respond for " + _opTimeoutSec + " s")));
+                            _processed++;
+                            _failed++;
+                        }
+                        Out.Emit(Json.Obj("type", "done",
+                            "summary", Json.Obj("ok", _ok, "skipped", _files.Count - _processed, "failed", _failed)));
+                        _terminated = true;
+                    }
+                }
+                Log.Info("exiting: stuck call in " + name);
+                Environment.Exit(0);
+            }) { IsBackground = true, Name = "stuck-call" };
+            t.Start();
         }
 
         // ------------------------------------------------------------ stdin commands

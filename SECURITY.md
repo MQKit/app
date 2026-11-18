@@ -16,7 +16,7 @@ tested.
 ## Scope
 
 MQKit converts files on the PC it runs on. There is no MQKit server and no
-account. Three things reach the network:
+account. Four things reach the network:
 
 - **The version check.** Once a day, unless turned off in Settings, the app
   reads `https://mqkit.com/latest.json`. The request carries only the app's
@@ -29,11 +29,15 @@ account. Three things reach the network:
 - **A link the person pastes.** "From a link…" downloads that one file into
   the Downloads folder (share links of the common cloud drives are turned into
   their direct download first). Nothing is sent but the request for that link.
+- **Pictures and styles a web page links to.** HTML to PDF and Markdown to PDF
+  print with Microsoft Edge, which loads the images, styles and fonts the page
+  itself points to on the internet, as a browser would. The file is not sent
+  anywhere. Mail and e-book printing load nothing from the internet.
 
 Every tool runs in a separate worker process, apart from the app. Originals
 are never changed unless the person chooses to replace them.
 
 ## Supported versions
 
-Only the latest release receives fixes. Every release is free and complete,
-so a security fix reaches everyone the same way.
+Only the latest release receives fixes; a security fix comes as a new release,
+announced in the app by its daily version check.

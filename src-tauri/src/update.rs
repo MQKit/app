@@ -31,6 +31,7 @@ fn newer(remote: &str, local: &str) -> bool {
 pub fn check() -> Result<Value, String> {
     let local = env!("CARGO_PKG_VERSION");
     let agent: ureq::Agent = ureq::Agent::config_builder()
+        .tls_config(crate::tls())
         .timeout_global(Some(std::time::Duration::from_secs(10)))
         .user_agent(format!("MQKit/{local}"))
         .build()

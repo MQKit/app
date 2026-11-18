@@ -97,7 +97,7 @@ pub fn catalog() -> BTreeMap<String, Engine> {
         }
         match toml::from_str::<BTreeMap<String, Engine>>(&text) {
             Ok(m) => all.extend(m),
-            Err(e) => eprintln!("{name}: {e}"),
+            Err(e) => applog!("{name}: {e}"),
         }
     }
     all
@@ -231,6 +231,10 @@ pub fn cancel(name: &str) {
 
 /// Deletes every downloaded version of an engine.
 pub fn remove(name: &str) -> Result<(), String> {
+    // Only an engine of the catalog: the name becomes a folder to delete.
+    if !catalog().contains_key(name) {
+        return Err("unknown_engine".into());
+    }
     if !ACTIVE.lock().unwrap().is_empty() {
         return Err("busy".into());
     }
@@ -265,15 +269,14 @@ fn allowed_url(url: &str) -> bool {
 /// `progress(done, total)` covers all of it. Errors are codes: `unknown_engine`,
 /// `busy`, `disk_full`, `network`, `hash_mismatch`, `bad_archive`, `cancelled`,
 /// `permission_denied`, `install_failed`.
+/// One install at a time: engines share requirements (four AI models need ONNX Runtime),
+/// and two installs of the same one would undo each other's files.
+static INSTALLING: Mutex<()> = Mutex::new(());
+
 pub fn download(name: &str, progress: impl Fn(u64, u64)) -> Result<PathBuf, String> {
     let cat = catalog();
     if !cat.contains_key(name) {
         return Err("unknown_engine".into());
-    }
-    let mut todo = Vec::new();
-    plan(name, &cat, &mut todo);
-    if todo.is_empty() {
-        return installed_dir(name).ok_or_else(|| "install_failed".into());
     }
     let flag = Arc::new(AtomicBool::new(false));
     {
@@ -282,6 +285,14 @@ pub fn download(name: &str, progress: impl Fn(u64, u64)) -> Result<PathBuf, Stri
             return Err("busy".into());
         }
         a.insert(name.to_string(), flag.clone());
+    }
+    // Waits for another install to finish, then plans: what it installed is not redone.
+    let _one_at_a_time = INSTALLING.lock().unwrap_or_else(|e| e.into_inner());
+    let mut todo = Vec::new();
+    plan(name, &cat, &mut todo);
+    if todo.is_empty() {
+        ACTIVE.lock().unwrap().remove(name);
+        return installed_dir(name).ok_or_else(|| "install_failed".into());
     }
     let total: u64 = todo.iter().filter_map(|n| cat.get(n)).map(Engine::download_bytes).sum();
     let mut offset = 0u64;
@@ -359,6 +370,7 @@ fn fetch(url: &str, size: u64, sha256: &str, dest: &Path, cancel: &AtomicBool, p
     // The body timeout is a total: allow at least 100 KB/s, never less than 2 minutes.
     let body_secs = (size / 100_000).max(120);
     let agent: ureq::Agent = ureq::Agent::config_builder()
+        .tls_config(crate::tls())
         .timeout_connect(Some(std::time::Duration::from_secs(20)))
         .timeout_recv_response(Some(std::time::Duration::from_secs(60)))
         .timeout_recv_body(Some(std::time::Duration::from_secs(body_secs)))
@@ -380,7 +392,7 @@ fn fetch(url: &str, size: u64, sha256: &str, dest: &Path, cancel: &AtomicBool, p
         let mut resp = match req.call() {
             Ok(r) => r,
             Err(err) => {
-                eprintln!("download {url}: {err}");
+                applog!("download {url}: {err}");
                 if attempts < 5 && !cancel.load(Ordering::Relaxed) {
                     std::thread::sleep(std::time::Duration::from_secs(2));
                     continue;
@@ -402,7 +414,7 @@ fn fetch(url: &str, size: u64, sha256: &str, dest: &Path, cancel: &AtomicBool, p
             let n = match reader.read(&mut buf) {
                 Ok(n) => n,
                 Err(err) => {
-                    eprintln!("download {url} at {done}: {err}");
+                    applog!("download {url} at {done}: {err}");
                     if attempts < 5 {
                         continue 'outer;
                     }
@@ -423,7 +435,7 @@ fn fetch(url: &str, size: u64, sha256: &str, dest: &Path, cancel: &AtomicBool, p
     }
     let hash: String = hasher.finalize().iter().map(|b| format!("{b:02x}")).collect();
     if done != size || !hash.eq_ignore_ascii_case(sha256) {
-        eprintln!("download {url}: size {done} / {size}, sha256 {hash}");
+        applog!("download {url}: size {done} / {size}, sha256 {hash}");
         return Err("hash_mismatch".into());
     }
     progress(size);
@@ -542,17 +554,17 @@ fn install(name: &str, e: &Engine, cancel: &AtomicBool, progress: &dyn Fn(u64)) 
         }
     }
     let count = |p: &Path| std::fs::read_dir(p).map(|d| d.count()).unwrap_or(0);
-    eprintln!("engine {name}: staging has {} entries before prune", count(&staging));
+    applog!("engine {name}: staging has {} entries before prune", count(&staging));
     if !e.prune.is_empty() {
         prune(&staging, &staging, e);
     }
-    eprintln!("engine {name}: {} entries after prune, program/ has {}", count(&staging), count(&staging.join("program")));
+    applog!("engine {name}: {} entries after prune, program/ has {}", count(&staging), count(&staging.join("program")));
     if e.extract == "wheels" {
         precompile(e, &staging.join("site-packages"));
     }
     for x in expected(e) {
         if !staging.join(&x).exists() {
-            eprintln!("engine {name}: {x} missing after extraction");
+            applog!("engine {name}: {x} missing after extraction");
             return Err("bad_archive".into());
         }
     }
@@ -572,7 +584,7 @@ fn install(name: &str, e: &Engine, cancel: &AtomicBool, progress: &dyn Fn(u64)) 
         crate::paths::remove_tree(&final_dir);
     }
     std::fs::rename(&staging, &final_dir).map_err(|_| "permission_denied")?;
-    eprintln!("engine {name}: installed, {} entries in {}", count(&final_dir), final_dir.display());
+    applog!("engine {name}: installed, {} entries in {}", count(&final_dir), final_dir.display());
     if let Ok(rd) = std::fs::read_dir(&base) {
         for d in rd.flatten() {
             let p = d.path();
@@ -610,17 +622,20 @@ fn msi_admin_install(msi: &Path, target: &Path) -> Result<(), String> {
     use std::os::windows::process::CommandExt;
     let log = msi.with_extension("log");
     let mut cmd = std::process::Command::new("msiexec.exe");
-    cmd.arg("/a").arg(msi).arg("/qn").arg(format!("TARGETDIR={}", target.display())).arg("/L*").arg(&log);
+    // msiexec reads a property as NAME="value": the value quoted, not the whole argument
+    // (as Rust would quote it), or a folder with a space in it (a user name like
+    // "Ana Maria") makes the install fail.
+    cmd.arg("/a").arg(msi).arg("/qn").raw_arg(format!("TARGETDIR=\"{}\"", target.display())).arg("/L*").arg(&log);
     #[cfg(windows)]
     cmd.creation_flags(0x0800_0000);
     let status = cmd.status().map_err(|_| "install_failed")?;
     if !status.success() {
-        eprintln!("msiexec exit {:?}; log: {}", status.code(), log.display());
+        applog!("msiexec exit {:?}; log: {}", status.code(), log.display());
         return Err("install_failed".into());
     }
     // msiexec can also end with 0 and nothing unpacked; checked by the caller.
     if std::fs::read_dir(target).map(|mut d| d.next().is_none()).unwrap_or(true) {
-        eprintln!("msiexec unpacked nothing; log: {}", log.display());
+        applog!("msiexec unpacked nothing; log: {}", log.display());
         return Err("install_failed".into());
     }
     Ok(())

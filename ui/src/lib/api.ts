@@ -55,7 +55,8 @@ export interface Manifest {
   icon?: string;
   entry?: { id?: string; when?: Cond; kind: string }[];
   requires?: { engine?: string; env?: string; eq?: any; when?: Cond }[];
-  input: { extensions: string[]; anyFile?: boolean; multiple?: boolean; mode?: string; ordered?: boolean; minFiles?: number; itemFields?: Field[] };
+  /** `textEntry`: the tool also takes typed text, saved as this kind of file. */
+  input: { extensions: string[]; anyFile?: boolean; multiple?: boolean; mode?: string; ordered?: boolean; minFiles?: number; itemFields?: Field[]; textEntry?: "txt" | "md" | "html" };
   output: { kind: string; extensions: string[]; replaceOriginalAllowed?: boolean; nameVariables?: { id: string; label: Loc }[] };
   analysis?: { fast?: string[] };
   ui?: { preview?: string; estimate?: boolean; inputList?: string };
@@ -127,7 +128,13 @@ export const api = {
   engineRemove: (name: string) => invoke<void>("engine_remove", { name }),
   checkUpdate: () => invoke<any>("check_update"),
   initialFiles: () => invoke<{ tool: string | null; files: FileInfo[] }>("initial_files"),
-  shellMenu: (enable: boolean, lang: string) => invoke<number>("shell_menu", { enable, lang }),
+  diagnostics: () => invoke<string>("diagnostics"),
+  /** Typed text saved as a file in Documents\\MQKit (`ext`: txt, md or html). */
+  saveText: (text: string, ext: string, name: string) => invoke<FileInfo>("save_text", { text, ext, name }),
+  /** Files from Explorer that arrived before the interface listened (then events only). */
+  shellReady: () => invoke<{ tool: string | null; files: FileInfo[] }[]>("shell_ready"),
+  /** `names`: each tool's name in the interface's language, for the menu's labels. */
+  shellMenu: (enable: boolean, lang: string, names: Record<string, string>) => invoke<number>("shell_menu", { enable, lang, names }),
   appInfo: () => invoke<any>("app_info"),
 };
 

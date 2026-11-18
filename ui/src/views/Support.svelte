@@ -17,11 +17,13 @@
       <div class="way"><i class="ti ti-{icon}"></i><span>{t(key)}</span></div>
     {/each}
   </div>
-  <p class="muted small">{t("freeForever")}</p>
+  <p class="muted small">{t("freeLine")}</p>
 </div>
 
 <style>
-  .page { padding: 32px 32px; flex: 1; min-height: 0; max-width: 620px; }
+  .page { padding: 32px 32px; flex: 1; min-height: 0; }
+  /* The page scrolls across the whole width (its scrollbar at the window's edge); the text keeps a readable width. */
+  .page > * { max-width: 556px; }
   .hero .ti { font-size: 34px; color: #d6455d; }
   h1 { font-size: 20px; margin: 8px 0; }
   .ways { display: flex; flex-direction: column; gap: 8px; margin: 18px 0; }

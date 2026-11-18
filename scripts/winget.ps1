@@ -67,9 +67,9 @@ Author: Software Hive S.R.L.
 PackageName: MQKit
 License: AGPL-3.0-or-later
 Copyright: Copyright (C) 2026 Software Hive S.R.L.
-ShortDescription: Free file converter for Windows that works offline - PDF, Word, images, HEIC, audio.
+ShortDescription: Free file converter for Windows that works offline - 44 tools for PDF, images, video, audio and documents.
 Description: |-
-  Compress and merge PDFs, PDF to Word and Word to PDF, images to PDF and back, compress and convert images, iPhone HEIC to JPG, video to MP3. Everything runs on your PC: nothing is uploaded. Free forever, no ads in the app, open source.
+  44 tools: compress, merge and split PDFs, PDF to Word, Excel and PowerPoint, OCR, Office files to PDF, compress, convert and resize images, HEIC to JPG, AI upscale and background removal, compress and convert video and audio, video to MP3, speech to text, e-books, archives and more. Everything runs on your PC: nothing is uploaded. Free, no ads, no account, open source.
 Moniker: mqkit
 Tags:
 - converter

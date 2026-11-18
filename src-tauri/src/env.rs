@@ -177,7 +177,10 @@ pub fn system_language() -> String {
     let mut buf = [0u16; 85];
     let n = unsafe { GetUserDefaultLocaleName(&mut buf) };
     let s = String::from_utf16_lossy(&buf[..(n.max(1) - 1) as usize]);
-    if s.to_ascii_lowercase().starts_with("ro") { "ro".into() } else { "en".into() }
+    // The interface's languages (ui/src/lib/i18n.svelte.ts, LANGS); English otherwise.
+    let code = s.split(['-', '_']).next().unwrap_or("").to_ascii_lowercase();
+    const LANGS: &[&str] = &["en", "ro", "de", "es", "fr", "it", "pt", "pl", "tr", "ru", "ja", "zh"];
+    if LANGS.contains(&code.as_str()) { code } else { "en".into() }
 }
 
 #[cfg(not(windows))]

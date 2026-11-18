@@ -14,6 +14,7 @@
     onremove,
     onmove,
     onunlock,
+    onretry,
   }: {
     item: Item;
     manifest: Manifest;
@@ -23,6 +24,7 @@
     onremove: () => void;
     onmove: (delta: number) => void;
     onunlock: (password: string) => void;
+    onretry?: () => void;
   } = $props();
 
   let password = $state("");
@@ -62,7 +64,7 @@
         return { text: t("corrupt"), kind: "error" };
       case "failed":
         if (item.code === "engine_missing") return { text: t("waitingEngine"), kind: "muted" };
-        return { text: errorText(item.code, manifest.errors, item.details) || t("analysisFailed"), kind: "error" };
+        return { text: errorText(item.code, manifest.errors, item.details) || t("analysisFailed"), kind: "error", retry: true };
     }
     return null;
   });
@@ -91,7 +93,8 @@
     <div class="name" title={item.info.path}>{item.info.name}</div>
     <div class="meta">
       {meta}
-      {#if problem}<span class="p-{problem.kind}"> · {problem.text}</span>{/if}
+      {#if problem}<span class="p-{problem.kind}"> · {problem.text}</span>{#if problem.retry && editable && onretry}
+          <button class="link small retry" onclick={onretry}>{t("tryAgain")}</button>{/if}{/if}
     </div>
 
     {#if item.status === "locked" && editable}
@@ -105,10 +108,11 @@
     {#if itemFields.length && editable && item.status === "ok"}
       <div class="ifields">
         {#each itemFields as f}
-          <label>
+          <label title={f.help ? L(f.help) : undefined}>
             <span class="muted">{L(f.label)}</span>
             <input type="text" placeholder={L(f.placeholder)} bind:value={item.item[f.key]} spellcheck="false" />
           </label>
+          {#if f.help}<span class="muted ihelp">{L(f.help)}</span>{/if}
         {/each}
       </div>
     {/if}
@@ -135,6 +139,9 @@
       {#if item.results.length > 3}
         <div class="muted small">+ {item.results.length - 3}</div>
       {/if}
+      {#each item.results.filter((r) => r.originalKept) as r}
+        <div class="p-warn small wline"><i class="ti ti-info-circle"></i> {t(r.originalKept === "no_recycle_bin" ? "origKeptNoBin" : "origKeptLocked")}</div>
+      {/each}
     {/if}
     {#each item.warnings ?? [] as w}
       <div class="p-warn small wline"><i class="ti ti-alert-triangle"></i> {warnText(w)}</div>
@@ -235,8 +242,13 @@
   }
   .ifields {
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
     margin-top: 6px;
+  }
+  .ihelp {
+    font-size: 11px;
   }
   .ifields label {
     display: flex;
@@ -247,6 +259,8 @@
   .ifields input {
     height: 28px;
     width: 120px;
+    min-width: 0;
+    flex: 1 1 120px;
   }
   .bar {
     height: 4px;

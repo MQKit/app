@@ -1,6 +1,6 @@
 import { toolNumber } from "./numbers";
 import { api, type FileInfo, type Manifest } from "./api";
-import { i18n } from "./i18n.svelte";
+import { i18n, t, L, isLang, type Lang } from "./i18n.svelte";
 
 export type Route =
   | { name: "home"; category?: string }
@@ -45,6 +45,12 @@ export const app = $state({
   /** Files dropped on the home screen, waiting for a tool. */
   pending: [] as FileInfo[],
   dragging: false,
+  /** A conversion is running: the tool can't be left, its results would be lost from view. */
+  busy: false,
+  /** When leaving was refused (the tool shows why for a moment). */
+  busyRefused: 0,
+  /** The open tool takes more files (from Explorer) without starting over; false when it can't now. */
+  toolFiles: null as null | ((files: FileInfo[]) => boolean),
 });
 
 export function tool(id: string): Manifest | undefined {
@@ -52,6 +58,10 @@ export function tool(id: string): Manifest | undefined {
 }
 
 export function go(r: Route) {
+  if (app.busy) {
+    app.busyRefused = Date.now();
+    return;
+  }
   app.route = r;
 }
 
@@ -101,7 +111,7 @@ export async function saveSettings() {
 }
 
 export function applySettings() {
-  const sys = (app.env.systemLanguage as "ro" | "en") ?? "ro";
+  const sys: Lang = isLang(app.env.systemLanguage) ? app.env.systemLanguage : "en";
   i18n.lang = app.settings.language === "system" ? sys : app.settings.language;
   document.documentElement.lang = i18n.lang;
   const dark =
@@ -143,39 +153,61 @@ export async function init() {
   applySettings();
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applySettings);
   app.ready = true;
-  const initial = await api.initialFiles();
-  if (initial.files.length) openFromShell(initial.tool, initial.files);
+  // Closing the window during a conversion: asked first (it would stop).
+  import("@tauri-apps/api/window").then(({ getCurrentWindow }) =>
+    getCurrentWindow().onCloseRequested(async (e) => {
+      if (!app.busy) return;
+      const { ask } = await import("@tauri-apps/plugin-dialog");
+      if (!(await ask(t("busyClose"), { title: t("busyCloseTitle"), kind: "warning" }))) e.preventDefault();
+    }),
+  );
+  // This start's own files and those of the starts Explorer made meanwhile (one per
+  // selected file), gathered into one list.
+  await listenForShellFiles(await api.initialFiles());
   setTimeout(checkForUpdate, 4000);
   // The Explorer menu follows the setting and the language (installed builds only).
-  if (!app.env.debug && app.settings.contextMenu) api.shellMenu(true, i18n.lang).catch(() => {});
-  listenForShellFiles();
+  if (!app.env.debug && app.settings.contextMenu) api.shellMenu(true, i18n.lang, menuNames()).catch(() => {});
+}
+
+/** The tools' names in the current language, for the Explorer menu. */
+export function menuNames(): Record<string, string> {
+  return Object.fromEntries(app.tools.map((m) => [m.id, L(m.name)]));
 }
 
 /** Explorer starts one process per selected file: they arrive one by one and are gathered here. */
 let pendingShell: { tool: string | null; files: FileInfo[] } | null = null;
 let shellTimer: ReturnType<typeof setTimeout> | undefined;
-async function listenForShellFiles() {
+function gatherShellFiles(p: { tool: string | null; files: FileInfo[] }) {
+  if (!p.files.length) return;
+  if (!pendingShell || pendingShell.tool !== p.tool) pendingShell = { tool: p.tool, files: [] };
+  pendingShell.files.push(...p.files);
+  clearTimeout(shellTimer);
+  shellTimer = setTimeout(() => {
+    if (pendingShell) openFromShell(pendingShell.tool, pendingShell.files);
+    pendingShell = null;
+  }, 400);
+}
+
+/** Listening first, then what the host kept while the interface was starting: no file
+ *  from a multiple selection in Explorer is lost. */
+async function listenForShellFiles(initial: { tool: string | null; files: FileInfo[] }) {
   const { listen } = await import("@tauri-apps/api/event");
-  listen<{ tool: string | null; files: FileInfo[] }>("open-files", (e) => {
-    const p = e.payload;
-    if (!pendingShell || pendingShell.tool !== p.tool) pendingShell = { tool: p.tool, files: [] };
-    pendingShell.files.push(...p.files);
-    clearTimeout(shellTimer);
-    shellTimer = setTimeout(() => {
-      if (pendingShell) openFromShell(pendingShell.tool, pendingShell.files);
-      pendingShell = null;
-    }, 400);
-  });
+  await listen<{ tool: string | null; files: FileInfo[] }>("open-files", (e) => gatherShellFiles(e.payload));
+  gatherShellFiles(initial);
+  for (const p of await api.shellReady()) gatherShellFiles(p);
 }
 
 function openFromShell(toolId: string | null, files: FileInfo[]) {
   if (!files.length) return;
   if (toolId && tool(toolId)) {
-    // The same tool already open: add to its list instead of starting over.
+    // The same tool already open: its list grows, the options and files added by other
+    // means stay (a new route would start the screen over).
     const r = app.route;
-    const prev = r.name === "tool" && r.id === toolId ? (r.files ?? []) : [];
-    const seen = new Set(prev.map((f) => f.path.toLowerCase()));
-    go({ name: "tool", id: toolId, files: [...prev, ...files.filter((f) => !seen.has(f.path.toLowerCase()))] });
+    if (r.name === "tool" && r.id === toolId && app.toolFiles) {
+      if (!app.toolFiles(files)) app.busyRefused = Date.now();
+      return;
+    }
+    go({ name: "tool", id: toolId, files });
   } else openWithFiles(files);
 }
 

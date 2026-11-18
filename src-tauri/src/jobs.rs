@@ -194,7 +194,7 @@ fn run(job_id: &str, tool: &registry::Tool, job: &StartJob, ctl: &Control, ev: &
                                 break;
                             }
                         }
-                        Err(_) => eprintln!("protocol: {line}"),
+                        Err(_) => applog!("protocol: {line}"),
                     }
                 }
             });
@@ -203,7 +203,7 @@ fn run(job_id: &str, tool: &registry::Tool, job: &StartJob, ctl: &Control, ev: &
             let mut finished: HashSet<String> = HashSet::new();
             let mut office_pids: Vec<u32> = Vec::new();
             let mut used_names: HashSet<PathBuf> = HashSet::new();
-            let inputs: HashSet<PathBuf> = job.files.iter().map(|f| f.path.clone()).collect();
+            let inputs: HashSet<PathBuf> = job.files.iter().map(|f| naming::key(&f.path)).collect();
             let mut last = Instant::now();
             let mut cancel_sent: Option<Instant> = None;
             let mut after_sent = false;
@@ -238,12 +238,15 @@ fn run(job_id: &str, tool: &registry::Tool, job: &StartJob, ctl: &Control, ev: &
                             "childProcess" => {
                                 if let Some(p) = m["pid"].as_u64() {
                                     office_pids.push(p as u32);
+                                    if let Some(t) = crate::winutil::process_started(p as u32) {
+                                        crate::state::office_started(p as u32, t);
+                                    }
                                 }
                             }
                             "output" => {
                                 let path = PathBuf::from(m["path"].as_str().unwrap_or(""));
-                                // Results must come from outDir.
-                                if path.starts_with(&out) {
+                                // Results must come from outDir (no `..` stepping out of it).
+                                if path.starts_with(&out) && !path.components().any(|c| matches!(c, std::path::Component::ParentDir)) {
                                     outputs.entry(file).or_default().push(Out {
                                         path,
                                         ext: m["ext"].as_str().unwrap_or("").to_string(),
@@ -320,9 +323,10 @@ fn run(job_id: &str, tool: &registry::Tool, job: &StartJob, ctl: &Control, ev: &
                 std::thread::sleep(Duration::from_millis(30));
             }
             proc.kill();
-            if cancelled {
-                crate::winutil::kill_office(&office_pids);
-            }
+            // Office started for this job and still running (the worker crashed, was stopped,
+            // or ended with an error before closing it): stopped, never left holding a document.
+            crate::winutil::kill_office(&office_pids);
+            crate::state::office_gone(&office_pids);
         }
     }
     paths::remove_tree(&jdir);
@@ -351,6 +355,8 @@ fn finalize(job: &StartJob, file: &str, outs: Vec<Out>, inputs: &HashSet<PathBuf
     let replace = job.output.originals == "replace" && file != "*";
     let mut results = Vec::new();
     let mut out_bytes = 0;
+    let mut written = 0;
+    let mut original_kept: Option<&str> = None;
     for (i, o) in outs.iter().enumerate() {
         // A folder result (an unpacked archive): moved whole, never over an existing folder.
         if o.ext == "folder" {
@@ -363,7 +369,7 @@ fn finalize(job: &StartJob, file: &str, outs: Vec<Out>, inputs: &HashSet<PathBuf
             vars.entry("n".to_string()).or_insert(json!(i + 1));
             let name = naming::render(&job.output.name_template, &input.path, &vars, multi);
             let mut target = dir.join(&name);
-            if target.exists() || used.contains(&target) {
+            if target.exists() || used.contains(&naming::key(&target)) {
                 if job.output.on_existing == "skip" {
                     results.push(json!({ "skipped": true, "path": target, "reason": "exists" }));
                     continue;
@@ -371,8 +377,9 @@ fn finalize(job: &StartJob, file: &str, outs: Vec<Out>, inputs: &HashSet<PathBuf
                 target = naming::unique_dir(&target, used);
             }
             move_dir(&o.path, &target).map_err(|_| "permission_denied")?;
+            crate::winutil::copy_internet_mark(&input.path, &target);
             let size = dir_size(&target);
-            used.insert(target.clone());
+            used.insert(naming::key(&target));
             out_bytes += size;
             results.push(json!({ "path": target, "name": target.file_name().map(|n| n.to_string_lossy().to_string()), "bytes": size, "folder": true }));
             continue;
@@ -388,26 +395,43 @@ fn finalize(job: &StartJob, file: &str, outs: Vec<Out>, inputs: &HashSet<PathBuf
         vars.entry("n".to_string()).or_insert(json!(i + 1));
         let stem = naming::render(&template, &input.path, &vars, multi);
         let mut target = dir.join(format!("{stem}.{}", o.ext));
+        let mut from = o.path.clone();
 
         if replace && i == 0 {
-            // The original goes to the Recycle Bin only now that the result exists and is not empty.
-            crate::winutil::recycle(&input.path).map_err(|_| "file_locked")?;
+            // The result first goes beside the original under a temporary name, so that at
+            // no moment is neither on disk; only then does the original go to the Recycle
+            // Bin. On a drive without one (USB, network), or when Windows can't recycle it,
+            // the original stays and the result gets a name of its own.
+            let staged = dir.join(format!(".{stem}.mqkit-{}.part", std::process::id()));
+            let _ = std::fs::remove_file(&staged);
+            if !crate::winutil::move_new(&o.path, &staged).unwrap_or(false) {
+                return Err("permission_denied".into());
+            }
+            from = staged;
+            if !crate::winutil::has_recycle_bin(&input.path) {
+                original_kept = Some("no_recycle_bin");
+            } else if crate::winutil::recycle(&input.path).is_err() {
+                original_kept = Some("file_locked");
+            }
         }
-        let exists = target.exists() || used.contains(&target);
-        let is_input = inputs.contains(&target) && !(replace && target == input.path);
+        let k = naming::key(&target);
+        let exists = target.exists() || used.contains(&k);
+        // An input of this job is never overwritten, unless it is the original being
+        // replaced, already in the Recycle Bin.
+        let is_input = inputs.contains(&k) && !(replace && original_kept.is_none() && k == naming::key(&input.path));
+        let mut overwrite = false;
         if exists || is_input {
             match job.output.on_existing.as_str() {
-                "overwrite" if !is_input && !used.contains(&target) => {
-                    let _ = std::fs::remove_file(&target);
-                }
+                "overwrite" if !is_input && !used.contains(&k) => overwrite = true,
                 "skip" if !is_input => {
+                    let _ = std::fs::remove_file(&from);
                     results.push(json!({ "skipped": true, "path": target, "reason": "exists" }));
                     continue;
                 }
                 _ => target = naming::unique(&target, used),
             }
         }
-        move_file(&o.path, &target).map_err(|_| "permission_denied")?;
+        target = place(&from, target, overwrite, used).map_err(|_| "permission_denied")?;
         if job.output.keep_file_date || replace {
             if let Ok(m) = std::fs::metadata(&input.path).and_then(|m| m.modified()) {
                 if let Ok(f) = std::fs::File::options().write(true).open(&target) {
@@ -415,12 +439,28 @@ fn finalize(job: &StartJob, file: &str, outs: Vec<Out>, inputs: &HashSet<PathBuf
                 }
             }
         }
-        used.insert(target.clone());
+        used.insert(naming::key(&target));
         out_bytes += size;
-        results.push(json!({ "path": target, "name": target.file_name().map(|n| n.to_string_lossy().to_string()), "bytes": size }));
+        written += 1;
+        let mut r = json!({ "path": target, "name": target.file_name().map(|n| n.to_string_lossy().to_string()), "bytes": size });
+        if let Some(why) = original_kept.filter(|_| i == 0) {
+            r["originalKept"] = json!(why);
+        }
+        results.push(r);
     }
-    if job.output.originals == "recycle" && file != "*" && !results.is_empty() {
-        let _ = crate::winutil::recycle(&input.path);
+    // "Move originals to the Recycle Bin": only when something new was written, and never
+    // deleting for good (a drive without a bin keeps them).
+    if job.output.originals == "recycle" && file != "*" && written > 0 {
+        let why = if !crate::winutil::has_recycle_bin(&input.path) {
+            Some("no_recycle_bin")
+        } else if crate::winutil::recycle(&input.path).is_err() {
+            Some("file_locked")
+        } else {
+            None
+        };
+        if let (Some(why), Some(first)) = (why, results.iter_mut().find(|r| r["skipped"] != true)) {
+            first["originalKept"] = json!(why);
+        }
     }
     Ok((results, in_bytes, out_bytes))
 }
@@ -461,6 +501,23 @@ fn dir_size(dir: &Path) -> u64 {
                 .sum()
         })
         .unwrap_or(0)
+}
+
+/// Moves a finished result to `target`: over an existing file only when the person chose
+/// Overwrite, else to the next free name if `target` was taken meanwhile (another job,
+/// another program). Returns where it went.
+fn place(from: &Path, mut target: PathBuf, overwrite: bool, used: &HashSet<PathBuf>) -> std::io::Result<PathBuf> {
+    if overwrite {
+        move_file(from, &target)?;
+        return Ok(target);
+    }
+    for _ in 0..50 {
+        if crate::winutil::move_new(from, &target)? {
+            return Ok(target);
+        }
+        target = naming::unique(&target, used);
+    }
+    Err(std::io::Error::from(std::io::ErrorKind::AlreadyExists))
 }
 
 fn move_file(from: &Path, to: &Path) -> std::io::Result<()> {

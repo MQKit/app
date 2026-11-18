@@ -74,7 +74,11 @@ impl Plugin for OfficeToPdf {
             "errors": {
                 "office_not_ready": t("Excel sau PowerPoint nu a putut porni. Deschide-l o dată, închide orice fereastră care apare (activare, licență), apoi încearcă din nou.",
                                       "Excel or PowerPoint couldn't start. Open it once, close any window it shows (activation, license), then try again."),
-                "nothing_to_print": t("Foile de calcul sunt goale: nu e nimic de pus în PDF.", "The sheets are empty: there is nothing to put in the PDF.")
+                "nothing_to_print": t("Foile de calcul sunt goale: nu e nimic de pus în PDF.", "The sheets are empty: there is nothing to put in the PDF."),
+                "file_not_found": t("Fișierul nu mai există în locul acela. Poate a fost mutat sau șters.",
+                                    "The file isn't there anymore. It may have been moved or deleted."),
+                "path_too_long": t("Calea fișierului e prea lungă pentru Office. Mută-l într-un dosar cu un nume mai scurt și încearcă din nou.",
+                                   "The file's path is too long for Office. Move it to a folder with a shorter name and try again.")
             }
         })
     }

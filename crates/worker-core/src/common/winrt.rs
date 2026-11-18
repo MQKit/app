@@ -65,11 +65,18 @@ pub fn image_dpi(path: &Path) -> Option<f64> {
 
 /// Decodes frame `index` to RGBA8 (sRGB, straight alpha, orientation applied).
 pub fn decode_image(path: &Path, index: u32) -> Result<(u32, u32, Vec<u8>), FileError> {
+    decode_image_max(path, index, crate::common::img::DEFAULT_MAX_MEGAPIXELS)
+}
+
+/// Like [`decode_image`], with `file_too_large` before decoding a frame above
+/// `max_megapixels` (its pixels are held twice while they are copied out).
+pub fn decode_image_max(path: &Path, index: u32, max_megapixels: u32) -> Result<(u32, u32, Vec<u8>), FileError> {
     let stream = open_stream(path)?;
     let dec = BitmapDecoder::CreateAsync(&stream).and_then(|o| o.join()).map_err(win_err)?;
     let frame = dec.GetFrameAsync(index).and_then(|o| o.join()).map_err(win_err)?;
     let w = frame.OrientedPixelWidth().map_err(win_err)?;
     let h = frame.OrientedPixelHeight().map_err(win_err)?;
+    crate::common::img::check_size(w, h, max_megapixels)?;
     let t = BitmapTransform::new().map_err(win_err)?;
     let pd = frame
         .GetPixelDataTransformedAsync(
@@ -82,10 +89,12 @@ pub fn decode_image(path: &Path, index: u32) -> Result<(u32, u32, Vec<u8>), File
         .and_then(|o| o.join())
         .map_err(win_err)?;
     let data = pd.DetachPixelData().map_err(win_err)?;
-    let v = data.to_vec();
-    if v.len() as u64 != w as u64 * h as u64 * 4 {
+    drop(pd);
+    if data.len() as u64 != w as u64 * h as u64 * 4 {
         return Err(FileError::new(codes::CORRUPT_FILE));
     }
+    let v = data.to_vec();
+    drop(data);
     Ok((w, h, v))
 }
 
@@ -108,6 +117,20 @@ impl Pdf {
                 win_err(e)
             }
         })?;
+        Ok(Pdf { doc })
+    }
+
+    /// A PDF held in memory (a decrypted copy: it never touches the disk).
+    pub fn open_bytes(data: &[u8]) -> Result<Pdf, FileError> {
+        use windows::Storage::Streams::DataWriter;
+        init();
+        let mem = InMemoryRandomAccessStream::new().map_err(win_err)?;
+        let writer = DataWriter::CreateDataWriter(&mem).map_err(win_err)?;
+        writer.WriteBytes(data).map_err(win_err)?;
+        writer.StoreAsync().and_then(|o| o.join()).map_err(win_err)?;
+        writer.DetachStream().map_err(win_err)?;
+        mem.Seek(0).map_err(win_err)?;
+        let doc = PdfDocument::LoadFromStreamAsync(&mem).and_then(|o| o.join()).map_err(win_err)?;
         Ok(Pdf { doc })
     }
 

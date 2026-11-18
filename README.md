@@ -24,8 +24,9 @@ first needs them, from their official sources, and checked by SHA-256.
 
 ## Privacy
 
-Conversion happens on your PC. The app's only request of its own is a daily check for a new version
-(it sends only its version number, and can be turned off in Settings), plus engine downloads you start.
+Conversion happens on your PC, and your files are not uploaded anywhere. What the app asks of the internet,
+and when, is listed in [SECURITY.md](SECURITY.md): a daily version check (it can be turned off), the components a
+tool needs, a link you paste, and the pictures a web page you print links to.
 
 ## How it is built
 

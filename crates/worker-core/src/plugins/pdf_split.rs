@@ -203,21 +203,18 @@ fn plan(ctx: &Ctx, doc: &Document, ids: &[ObjectId], total: u32) -> Result<Vec<P
         "oddEven" => {
             let odd: Vec<u32> = all.iter().copied().filter(|p| p % 2 == 1).collect();
             let even: Vec<u32> = all.iter().copied().filter(|p| p % 2 == 0).collect();
-            let named = |pages: Vec<u32>, ro: &str, en: &str| Piece { pages, chapter: if is_ro(req) { ro.into() } else { en.into() } };
+            let w = crate::common::words::of(req.locale.as_deref());
+            let named = |pages: Vec<u32>, word: &str| Piece { pages, chapter: word.into() };
             match req.str_or("oddEven", "both") {
-                "odd" => vec![named(odd, "impare", "odd")],
-                "even" => vec![named(even, "pare", "even")],
-                _ => vec![named(odd, "impare", "odd"), named(even, "pare", "even")],
+                "odd" => vec![named(odd, w.odd)],
+                "even" => vec![named(even, w.even)],
+                _ => vec![named(odd, w.odd), named(even, w.even)],
             }
         }
         "byBookmarks" => by_bookmarks(doc, total, req.f64_or("bookmarkLevel", 1.0) as usize)?,
         "bySize" => by_size(ctx, doc, ids, req.f64_or("maxSize", 10_000_000.0) as u64)?,
         _ => all.iter().map(|p| piece(vec![*p])).collect(),
     })
-}
-
-fn is_ro(req: &Request) -> bool {
-    req.locale.as_deref().map(|l| l.starts_with("ro")).unwrap_or(false)
 }
 
 /// A file per bookmark at `level`; the pages before the first one go with it.

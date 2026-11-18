@@ -45,8 +45,7 @@ This is what CI runs. If these pass locally, CI should too.
 - The interface speaks several languages, all equal. A new text gets every
   language in `ui/src/lib/i18n.svelte.ts`, not only English.
 - Nothing leaves the PC. A change that makes the app contact a server, other
-  than the daily version check, the engine downloads and a link the person
-  pastes, will not be accepted (see SECURITY.md).
+  than the ones SECURITY.md lists, will not be accepted.
 - A new dependency must pass `cargo deny check`: permissive licences, or a
   copyleft one the AGPL can take in, named in `deny.toml`. After adding one,
   run `npm run notices` and commit `THIRD-PARTY-NOTICES.txt`.

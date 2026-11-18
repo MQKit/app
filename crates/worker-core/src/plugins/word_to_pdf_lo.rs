@@ -2,6 +2,7 @@
 //! The manifest is the one of `word-to-pdf` (office-worker); this is its `libreoffice` entry.
 
 use super::{file_size, Analysis, Ctx, Plugin};
+use crate::common::proc;
 use contract::{codes, FileError, FileRef, Request};
 use serde_json::{json, Map, Value};
 use std::io::Read;
@@ -224,6 +225,9 @@ pub(super) fn convert_with_lo_as(ctx: &Ctx, f: &FileRef, import: Option<(&Path, 
     let result = run_lo(ctx, f, &exe, input, None, filter, dir);
     if let Some(p) = &decrypted {
         let _ = std::fs::remove_file(p);
+        if let Some(dir) = p.parent() {
+            let _ = std::fs::remove_dir(dir);
+        }
     }
     result
 }
@@ -291,22 +295,13 @@ fn run_lo(ctx: &Ctx, f: &FileRef, exe: &Path, input: &Path, infilter: Option<&st
             let _ = err.read_to_string(&mut s);
             s
         });
-        let status = loop {
-            if ctx.cancel.is_cancelled() {
-                let _ = child.kill();
-                let _ = child.wait();
-                return Err(FileError::new(codes::CANCELLED));
-            }
-            match child.try_wait() {
-                Ok(Some(s)) => break s,
-                Ok(None) => {
-                    let t = started.elapsed().as_secs_f64();
-                    ctx.progress(&f.id, 0.05 + 0.85 * (1.0 - (-t / 20.0).exp()), "export", 2, 2);
-                    std::thread::sleep(Duration::from_millis(200));
-                }
-                Err(e) => return Err(super::io_err(e)),
-            }
-        };
+        // A document LibreOffice hangs on (a dialog nobody sees, an endless layout) is stopped:
+        // minutes, more for big files.
+        let limit = proc::limit_for(file_size(input), Duration::from_secs(300), Duration::from_secs(6), Duration::from_secs(45 * 60));
+        let status = proc::wait(&mut child, Some(&ctx.cancel), "libreoffice", limit, || {
+            let t = started.elapsed().as_secs_f64();
+            ctx.progress(&f.id, 0.05 + 0.85 * (1.0 - (-t / 20.0).exp()), "export", 2, 2);
+        })?;
         let log = err_thread.join().unwrap_or_default();
         // 81: the first start created the profile and asks to be started again.
         if status.code() == Some(81) && attempt < 3 {

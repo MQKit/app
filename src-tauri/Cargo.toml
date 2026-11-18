@@ -20,7 +20,9 @@ tauri-plugin-opener = "2"
 tauri-plugin-single-instance = "2"
 serde.workspace = true
 serde_json.workspace = true
-ureq = "3"
+# platform-verifier: certificates checked by Windows, which completes a chain a server
+# sends incomplete (some LibreOffice download mirrors do), as browsers do.
+ureq = { version = "3", features = ["platform-verifier"] }
 sha2 = "0.11"
 zip = { version = "9", default-features = false, features = ["deflate"] }
 toml = "1"
@@ -29,6 +31,7 @@ toml = "1"
 windows = { version = "0.62", features = [
   "Win32_Foundation",
   "Win32_Security",
+  "Win32_Security_Authorization",
   "Win32_System_JobObjects",
   "Win32_System_Threading",
   "Win32_System_Registry",
@@ -36,6 +39,7 @@ windows = { version = "0.62", features = [
   "Win32_UI_Shell",
   "Win32_Storage_FileSystem",
   "Win32_System_SystemInformation",
+  "Win32_System_LibraryLoader",
   "Win32_Globalization",
   "Win32_System_WinRT",
   "Foundation",

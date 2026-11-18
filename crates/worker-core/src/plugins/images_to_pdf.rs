@@ -131,7 +131,11 @@ pub(crate) fn embed(ctx: &Ctx, f: &FileRef) -> Result<Vec<Picture>, FileError> {
             let mut out = Vec::new();
             for i in 0..frames.max(1) {
                 ctx.check_cancel()?;
-                let Ok((w, h, rgba)) = crate::common::winrt::decode_image(path, i) else { break };
+                let (w, h, rgba) = match crate::common::winrt::decode_image_max(path, i, ctx.req.limits.max_megapixels) {
+                    Ok(d) => d,
+                    Err(e) if e.code == contract::codes::FILE_TOO_LARGE => return Err(e),
+                    Err(_) => break,
+                };
                 let Some(im) = image::RgbaImage::from_raw(w, h, rgba) else { break };
                 out.push(lossless(&image::DynamicImage::ImageRgba8(im), None)?);
             }

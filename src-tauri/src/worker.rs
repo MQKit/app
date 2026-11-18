@@ -83,6 +83,12 @@ impl Proc {
 pub fn spawn(tool: &Tool, launch: &Launch, command: &str, temp: Option<&Path>, memory_mb: u64) -> std::io::Result<(Proc, ChildStdout)> {
     let mut cmd = Command::new(&launch.exe);
     cmd.args(&launch.args).arg(command).stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
+    // Started in a folder of the app's, never in the one the app was started from (Explorer
+    // starts it in the selected file's folder, e.g. Downloads): Windows looks for DLLs in
+    // the current folder, and the workers load several.
+    let cwd = temp.map(Path::to_path_buf).unwrap_or_else(crate::paths::data_dir);
+    let _ = std::fs::create_dir_all(&cwd);
+    cmd.current_dir(cwd);
     // Clean environment: only what the workers need.
     cmd.env_clear();
     for k in ["SystemRoot", "SystemDrive", "windir", "USERPROFILE", "LOCALAPPDATA", "APPDATA", "PROGRAMDATA", "COMPUTERNAME", "NUMBER_OF_PROCESSORS", "PROCESSOR_ARCHITECTURE", "ProgramFiles", "ProgramFiles(x86)", "CommonProgramFiles", "USERNAME", "HOMEDRIVE", "HOMEPATH"] {
@@ -137,7 +143,20 @@ pub fn spawn(tool: &Tool, launch: &Launch, command: &str, temp: Option<&Path>, m
 /// A short request (`probe`, `analyze`, `preview`): sends it, collects the messages
 /// until `done`. Stops the process after `timeout`.
 pub fn request(tool: &Tool, launch: &Launch, command: &str, req: &Value, timeout: Duration) -> Result<Vec<Value>, String> {
-    let (mut proc, stdout) = spawn(tool, launch, command, None, 0).map_err(|e| e.to_string())?;
+    match request_partial(tool, launch, command, req, timeout)? {
+        (_, true) => Err("timeout".into()),
+        (out, false) => Ok(out),
+    }
+}
+
+/// Memory for analysis and previews, which run on files as soon as they are added: a
+/// file made to need far more (a decompression bomb) stops the worker, not the PC.
+const QUICK_MEMORY_MB: u64 = 3072;
+
+/// Like `request`, but on timeout returns what came until then (and `true`): the files
+/// already answered keep their answer.
+pub fn request_partial(tool: &Tool, launch: &Launch, command: &str, req: &Value, timeout: Duration) -> Result<(Vec<Value>, bool), String> {
+    let (mut proc, stdout) = spawn(tool, launch, command, None, QUICK_MEMORY_MB).map_err(|e| e.to_string())?;
     proc.send(req);
     let (tx, rx) = std::sync::mpsc::channel::<Value>();
     std::thread::spawn(move || {
@@ -163,7 +182,7 @@ pub fn request(tool: &Tool, launch: &Launch, command: &str, req: &Value, timeout
             }
             Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
                 proc.kill();
-                return Err("timeout".into());
+                return Ok((out, true));
             }
             Err(_) => break,
         }
@@ -172,10 +191,10 @@ pub fn request(tool: &Tool, launch: &Launch, command: &str, req: &Value, timeout
     let deadline = Instant::now() + Duration::from_secs(2);
     while Instant::now() < deadline {
         if let Ok(Some(_)) = proc.child.try_wait() {
-            return Ok(out);
+            return Ok((out, false));
         }
         std::thread::sleep(Duration::from_millis(20));
     }
     proc.kill();
-    Ok(out)
+    Ok((out, false))
 }

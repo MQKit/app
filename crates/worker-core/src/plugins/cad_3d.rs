@@ -6,7 +6,7 @@
 //!   ellipses, splines, text, blocks, dimensions). DWG is a closed format: save it as DXF.
 
 use super::{file_size, write_file, Analysis, Ctx, Plugin};
-use contract::{codes, opt, t, FileError, FileRef, Request};
+use contract::{codes, opt, t, Cancel, FileError, FileRef, Request};
 use serde_json::{json, Map, Value};
 use std::collections::HashMap;
 use std::fmt::Write as _;
@@ -118,7 +118,7 @@ impl Plugin for Cad3d {
             }
             _ => {
                 let format = ctx.req.str_or("model", "stl");
-                let (mut mesh, src) = read_model(path, &ext)?;
+                let (mut mesh, src) = read_model(path, &ext, &ctx.cancel)?;
                 if mesh.tri.is_empty() {
                     return Err(FileError::new("empty"));
                 }
@@ -220,12 +220,12 @@ struct Source {
     y_up: bool,
 }
 
-fn read_model(path: &Path, ext: &str) -> Result<(Mesh, Source), FileError> {
+fn read_model(path: &Path, ext: &str, cancel: &Cancel) -> Result<(Mesh, Source), FileError> {
     let mm_z = Source { unit_m: 0.001, y_up: false };
     match ext {
         "stl" => Ok((read_stl(&std::fs::read(path).map_err(super::io_err)?)?, mm_z)),
         "obj" => Ok((read_obj(&std::fs::read(path).map_err(super::io_err)?), Source { unit_m: 0.001, y_up: true })),
-        "ply" => Ok((read_ply(&std::fs::read(path).map_err(super::io_err)?)?, mm_z)),
+        "ply" => Ok((read_ply(&std::fs::read(path).map_err(super::io_err)?, cancel)?, mm_z)),
         "3mf" => read_3mf(path),
         "fbx" => read_fbx(path),
         _ => read_gltf(path),
@@ -291,7 +291,7 @@ fn read_obj(d: &[u8]) -> Mesh {
     m
 }
 
-fn read_ply(d: &[u8]) -> Result<Mesh, FileError> {
+fn read_ply(d: &[u8], cancel: &Cancel) -> Result<Mesh, FileError> {
     let end = d.windows(10).position(|w| w == b"end_header").ok_or_else(|| bad("not a PLY file"))?;
     let header = String::from_utf8_lossy(&d[..end]);
     let mut body = end + 10;
@@ -326,24 +326,53 @@ fn read_ply(d: &[u8]) -> Result<Mesh, FileError> {
         "double" | "float64" => 8,
         _ => 4,
     };
+    // The counts come from the header: a file may say two billion points and hold none.
+    // Each record takes at least its fixed part (binary) or one number and a space per
+    // property (text); a header promising more than the file holds is a broken file.
+    let ascii = format == "ascii";
+    let lied = || FileError::with(codes::CORRUPT_FILE, json!({ "message": "the header promises more than the file holds" }));
+    let short = || FileError::with(codes::CORRUPT_FILE, json!({ "message": "the file ends too soon" }));
+    let remaining = d.len().saturating_sub(body) as u128;
+    let mut needed = 0u128;
+    for (_, count, props) in &elements {
+        let rec: usize = props.iter().map(|(t, _, list)| if ascii { 2 } else { size(list.as_deref().unwrap_or(t.as_str())) }).sum();
+        needed += *count as u128 * rec.max(1) as u128;
+    }
+    // (The last number of a text file needs no space after it.)
+    if needed > remaining + ascii as u128 {
+        return Err(lied());
+    }
     let mut m = Mesh::default();
-    if format == "ascii" {
+    let mut records = 0u64;
+    let mut tick = || -> Result<(), FileError> {
+        records += 1;
+        if records.is_multiple_of(65536) && cancel.is_cancelled() {
+            return Err(FileError::new(codes::CANCELLED));
+        }
+        Ok(())
+    };
+    if ascii {
         let text = String::from_utf8_lossy(&d[body..]);
-        let mut nums = text.split_whitespace().map(|x| x.parse::<f64>().unwrap_or(0.0));
+        let mut words = text.split_whitespace().map(|x| x.parse::<f64>().unwrap_or(0.0));
+        let mut next = || words.next().ok_or_else(short);
         for (name, count, props) in &elements {
             for _ in 0..*count {
+                tick()?;
                 let mut xyz = [0f32; 3];
                 for (_, pname, list) in props {
                     if list.is_some() {
-                        let n = nums.next().unwrap_or(0.0) as usize;
-                        let idx: Vec<u32> = (0..n).map(|_| nums.next().unwrap_or(0.0) as u32).collect();
+                        let n = next()?.max(0.0) as usize;
+                        if n as u128 * 2 > remaining {
+                            return Err(lied());
+                        }
+                        let idx: Vec<u32> = (0..n).map(|_| next().map(|v| v as u32)).collect::<Result<_, _>>()?;
                         if name == "face" {
                             for k in 1..idx.len().saturating_sub(1) {
                                 m.tri.push([idx[0], idx[k], idx[k + 1]]);
                             }
                         }
                     } else {
-                        let v = nums.next().unwrap_or(0.0) as f32;
+                        let v = next()? as f32;
                         match pname.as_str() {
                             "x" => xyz[0] = v,
                             "y" => xyz[1] = v,
@@ -360,9 +389,9 @@ fn read_ply(d: &[u8]) -> Result<Mesh, FileError> {
     } else {
         let be = format.contains("big");
         let mut at = body;
-        let read = |t: &str, at: &mut usize| -> f64 {
+        let read = |t: &str, at: &mut usize| -> Result<f64, FileError> {
             let n = size(t);
-            let b = d.get(*at..*at + n).unwrap_or(&[0; 8][..n]);
+            let b = d.get(*at..*at + n).ok_or_else(short)?;
             *at += n;
             macro_rules! num {
                 ($ty:ty) => {{
@@ -370,7 +399,7 @@ fn read_ply(d: &[u8]) -> Result<Mesh, FileError> {
                     (if be { <$ty>::from_be_bytes(a) } else { <$ty>::from_le_bytes(a) }) as f64
                 }};
             }
-            match t {
+            Ok(match t {
                 "char" | "int8" => b[0] as i8 as f64,
                 "uchar" | "uint8" => b[0] as f64,
                 "short" | "int16" => num!(i16),
@@ -379,22 +408,26 @@ fn read_ply(d: &[u8]) -> Result<Mesh, FileError> {
                 "uint" | "uint32" => num!(u32),
                 "double" | "float64" => num!(f64),
                 _ => num!(f32),
-            }
+            })
         };
         for (name, count, props) in &elements {
             for _ in 0..*count {
+                tick()?;
                 let mut xyz = [0f32; 3];
                 for (t, pname, list) in props {
                     if let Some(ct) = list {
-                        let n = read(ct, &mut at) as usize;
-                        let idx: Vec<u32> = (0..n).map(|_| read(t, &mut at) as u32).collect();
+                        let n = read(ct, &mut at)?.max(0.0) as usize;
+                        if n as u128 * size(t) as u128 > d.len().saturating_sub(at) as u128 {
+                            return Err(lied());
+                        }
+                        let idx: Vec<u32> = (0..n).map(|_| read(t, &mut at).map(|v| v as u32)).collect::<Result<_, _>>()?;
                         if name == "face" {
                             for k in 1..idx.len().saturating_sub(1) {
                                 m.tri.push([idx[0], idx[k], idx[k + 1]]);
                             }
                         }
                     } else {
-                        let v = read(t, &mut at) as f32;
+                        let v = read(t, &mut at)? as f32;
                         match pname.as_str() {
                             "x" => xyz[0] = v,
                             "y" => xyz[1] = v,
@@ -1050,8 +1083,37 @@ mod tests {
         assert_eq!(back.tri.len(), 4);
         let obj = read_obj(&write_obj(&m));
         assert_eq!((obj.pos.len(), obj.tri.len()), (4, 4));
-        let ply = read_ply(&write_ply(&m)).unwrap();
+        let ply = read_ply(&write_ply(&m), &Cancel::default()).unwrap();
         assert_eq!((ply.pos.len(), ply.tri.len()), (4, 4));
+    }
+
+    #[test]
+    fn ply_headers_that_lie_are_corrupt_files() {
+        let c = Cancel::default();
+        let err = |d: &[u8]| read_ply(d, &c).err().map(|e| e.code);
+        let corrupt = Some(codes::CORRUPT_FILE.to_string());
+        // Two billion points, none there.
+        let bin = b"ply\nformat binary_little_endian 1.0\nelement vertex 2000000000\nproperty float x\nproperty float y\nproperty float z\nend_header\n\0\0\0\0";
+        assert_eq!(err(bin), corrupt);
+        let txt = b"ply\nformat ascii 1.0\nelement vertex 2000000000\nproperty float x\nproperty float y\nproperty float z\nend_header\n0 0 0\n";
+        assert_eq!(err(txt), corrupt);
+        // One face whose list says four billion corners.
+        let mut list = b"ply\nformat binary_little_endian 1.0\nelement vertex 1\nproperty float x\nproperty float y\nproperty float z\nelement face 1\nproperty list uint int vertex_indices\nend_header\n".to_vec();
+        list.extend_from_slice(&[0; 12]);
+        list.extend_from_slice(&u32::MAX.to_le_bytes());
+        list.extend_from_slice(&[0; 12]);
+        assert_eq!(err(&list), corrupt);
+        let mut list_txt = b"ply\nformat ascii 1.0\nelement vertex 3\nproperty float x\nproperty float y\nproperty float z\nelement face 1\nproperty list uchar int vertex_indices\nend_header\n".to_vec();
+        list_txt.extend_from_slice(b"0 0 0\n1 0 0\n0 1 0\n4000000000 0 1 2\n");
+        assert_eq!(err(&list_txt), corrupt);
+        // A file cut short.
+        let mut cut = b"ply\nformat binary_little_endian 1.0\nelement vertex 2\nproperty float x\nproperty float y\nproperty float z\nend_header\n".to_vec();
+        cut.extend_from_slice(&[0; 20]);
+        assert_eq!(err(&cut), corrupt);
+        // An honest text file without a final newline still reads.
+        let ok = b"ply\nformat ascii 1.0\nelement vertex 3\nproperty float x\nproperty float y\nproperty float z\nelement face 1\nproperty list uchar int vertex_indices\nend_header\n0 0 0\n1 0 0\n0 1 0\n3 0 1 2";
+        let m = read_ply(ok, &c).unwrap();
+        assert_eq!((m.pos.len(), m.tri.len()), (3, 1));
     }
 
     #[test]

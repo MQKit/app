@@ -98,8 +98,7 @@ impl Plugin for PdfToExcel {
             let doc = pdf::open_file(f, req)?;
             return Err(FileError::new(if has_text(&doc) { "no_tables" } else { "no_text" }));
         }
-        let ro = req.locale.as_deref().unwrap_or("en").starts_with("ro");
-        let sheets = sheets(tables, req.str_or("sheets", "table"), ro);
+        let sheets = sheets(tables, req.str_or("sheets", "table"), crate::common::words::of(req.locale.as_deref()));
         let dir = ctx.file_dir(&f.id)?;
         if req.str_or("format", "xlsx") == "csv" {
             for (i, s) in sheets.iter().enumerate() {
@@ -254,14 +253,13 @@ struct Sheet {
     blocks: Vec<(u32, Vec<Vec<String>>)>,
 }
 
-fn sheets(tables: Vec<Table>, how: &str, ro: bool) -> Vec<Sheet> {
-    let (table_word, page_word) = if ro { ("Tabel", "Pagina") } else { ("Table", "Page") };
+fn sheets(tables: Vec<Table>, how: &str, words: &crate::common::words::Words) -> Vec<Sheet> {
     let mut out: Vec<Sheet> = Vec::new();
     for (i, t) in tables.into_iter().enumerate() {
         let name = match how {
-            "page" => format!("{page_word} {}", t.page + 1),
-            "one" => if ro { "Tabele".into() } else { "Tables".into() },
-            _ => format!("{table_word} {}", i + 1),
+            "page" => words.page(t.page + 1),
+            "one" => words.tables.into(),
+            _ => words.table(i + 1),
         };
         match out.last_mut() {
             Some(s) if s.name == name => {

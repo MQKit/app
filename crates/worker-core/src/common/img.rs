@@ -81,6 +81,23 @@ pub fn limits(max_megapixels: u32) -> Limits {
     l
 }
 
+/// The picture size limit when a request does not give one (the contract's default).
+pub const DEFAULT_MAX_MEGAPIXELS: u32 = 250;
+
+/// `file_too_large` for a picture of `w` × `h` above `max_megapixels`, said before any
+/// pixel is decoded: a small file can declare a huge picture, and running out of memory
+/// would stop the whole worker, not just this file.
+pub fn check_size(w: u32, h: u32, max_megapixels: u32) -> Result<(), FileError> {
+    let pixels = w as u64 * h as u64;
+    if pixels > max_megapixels.max(1) as u64 * 1_000_000 {
+        return Err(FileError::with(
+            codes::FILE_TOO_LARGE,
+            json!({ "width": w, "height": h, "megapixels": pixels / 1_000_000, "maxMegapixels": max_megapixels }),
+        ));
+    }
+    Ok(())
+}
+
 pub fn load(path: &Path, req: &Request) -> Result<Loaded, FileError> {
     let max_megapixels = req.limits.max_megapixels;
     let kind = sniff(path);
@@ -88,7 +105,7 @@ pub fn load(path: &Path, req: &Request) -> Result<Loaded, FileError> {
         return load_heic(path, 0, req, &mut |_| true);
     }
     if kind == Kind::Avif {
-        return load_winrt(path, kind, 0);
+        return load_winrt(path, kind, 0, max_megapixels);
     }
     if kind == Kind::Other {
         return Err(FileError::new(codes::UNSUPPORTED_FILE));
@@ -96,7 +113,7 @@ pub fn load(path: &Path, req: &Request) -> Result<Loaded, FileError> {
     // CMYK JPEGs: the image library's plain formula gives washed or too cyan colours;
     // Windows converts them through a colour profile, like print software.
     if kind == Kind::Jpeg && jpeg_components(path) == Some(4) {
-        if let Ok(mut l) = load_winrt(path, kind, 0) {
+        if let Ok(mut l) = load_winrt(path, kind, 0, max_megapixels) {
             l.exif = ImageReader::open(path)
                 .ok()
                 .and_then(|r| r.with_guessed_format().ok())
@@ -115,9 +132,12 @@ pub fn load(path: &Path, req: &Request) -> Result<Loaded, FileError> {
     let mut dec = match reader.into_decoder() {
         Ok(d) => d,
         // A TIFF the image library can't read: Windows' decoder (first page).
-        Err(_) if kind == Kind::Tiff => return load_winrt(path, kind, 0),
+        Err(_) if kind == Kind::Tiff => return load_winrt(path, kind, 0, max_megapixels),
         Err(e) => return Err(img_err(e)),
     };
+    // `from_decoder` does not reserve against the limits the way `decode()` does.
+    let (w, h) = dec.dimensions();
+    check_size(w, h, max_megapixels)?;
     let orientation = dec.orientation().unwrap_or(image::metadata::Orientation::NoTransforms);
     let exif = dec.exif_metadata().ok().flatten().map(strip_exif_header);
     let icc = dec.icc_profile().ok().flatten();
@@ -190,8 +210,8 @@ pub fn jpeg_components(path: &Path) -> Option<u8> {
 }
 
 /// HEIC, AVIF, CMYK JPEGs and difficult TIFFs through the Windows codecs (frame `index`).
-pub fn load_winrt(path: &Path, kind: Kind, index: u32) -> Result<Loaded, FileError> {
-    let (w, h, rgba) = crate::common::winrt::decode_image(path, index)?;
+pub fn load_winrt(path: &Path, kind: Kind, index: u32, max_megapixels: u32) -> Result<Loaded, FileError> {
+    let (w, h, rgba) = crate::common::winrt::decode_image_max(path, index, max_megapixels)?;
     let img = RgbaImage::from_raw(w, h, rgba).ok_or_else(|| FileError::new(codes::CORRUPT_FILE))?;
     let exif = if kind == Kind::Heic { heic_exif(path) } else { None };
     Ok(Loaded { kind, img: DynamicImage::ImageRgba8(img), exif, icc: None })
@@ -231,7 +251,7 @@ fn heic_exif(path: &Path) -> Option<Vec<u8>> {
 /// engine from the request or PATH). `progress(0..1)` while FFmpeg decodes; `false` cancels.
 pub fn load_heic(path: &Path, index: u32, req: &Request, progress: &mut dyn FnMut(f64) -> bool) -> Result<Loaded, FileError> {
     if windows_heic() {
-        match load_winrt(path, Kind::Heic, index) {
+        match load_winrt(path, Kind::Heic, index, req.limits.max_megapixels) {
             Err(e) if e.code == codes::ENGINE_MISSING => {}
             r => return r,
         }
@@ -814,28 +834,62 @@ pub fn webp_with_meta(data: Vec<u8>, exif: Option<&[u8]>, icc: Option<&[u8]>, w:
 }
 
 /// All frames (composited, RGBA) and their delays in ms, for animated GIF and WebP.
-pub fn animation_frames(path: &Path) -> Option<Vec<(image::RgbaImage, u32)>> {
+/// `Ok(None)` when the file is not an animation (or can't be read as one: the caller
+/// falls back to the still picture). `file_too_large` when all the frames together
+/// would be more than `max_megapixels`.
+pub fn animation_frames(path: &Path, max_megapixels: u32) -> Result<Option<Vec<(image::RgbaImage, u32)>>, FileError> {
     use image::AnimationDecoder;
-    let f = std::io::BufReader::new(std::fs::File::open(path).ok()?);
-    let frames: Vec<image::Frame> = match sniff(path) {
-        Kind::Gif => image::codecs::gif::GifDecoder::new(f).ok()?.into_frames().collect_frames().ok()?,
-        Kind::Webp => image::codecs::webp::WebPDecoder::new(f).ok()?.into_frames().collect_frames().ok()?,
-        Kind::Png => image::codecs::png::PngDecoder::new(f).ok()?.apng().ok()?.into_frames().collect_frames().ok()?,
-        _ => return None,
+    let Ok(file) = std::fs::File::open(path) else { return Ok(None) };
+    let f = std::io::BufReader::new(file);
+    // Every frame is the size of the whole picture: checked before the first one is made.
+    let frames: image::Frames = match sniff(path) {
+        Kind::Gif => match image::codecs::gif::GifDecoder::new(f) {
+            Ok(d) => {
+                let (w, h) = d.dimensions();
+                check_size(w, h, max_megapixels)?;
+                d.into_frames()
+            }
+            Err(_) => return Ok(None),
+        },
+        Kind::Webp => match image::codecs::webp::WebPDecoder::new(f) {
+            Ok(d) => {
+                let (w, h) = d.dimensions();
+                check_size(w, h, max_megapixels)?;
+                d.into_frames()
+            }
+            Err(_) => return Ok(None),
+        },
+        Kind::Png => match image::codecs::png::PngDecoder::new(f) {
+            Ok(d) => {
+                let (w, h) = d.dimensions();
+                check_size(w, h, max_megapixels)?;
+                match d.apng() {
+                    Ok(a) => a.into_frames(),
+                    Err(_) => return Ok(None),
+                }
+            }
+            Err(_) => return Ok(None),
+        },
+        _ => return Ok(None),
     };
-    if frames.len() < 2 {
-        return None;
+    let budget = max_megapixels.max(1) as u64 * 1_000_000;
+    let mut total = 0u64;
+    let mut out = Vec::new();
+    for fr in frames {
+        let Ok(fr) = fr else { return Ok(None) };
+        let (w, h) = fr.buffer().dimensions();
+        total += w as u64 * h as u64;
+        if total > budget {
+            return Err(FileError::with(
+                codes::FILE_TOO_LARGE,
+                json!({ "width": w, "height": h, "frames": out.len() + 1, "maxMegapixels": max_megapixels }),
+            ));
+        }
+        let (n, d) = fr.delay().numer_denom_ms();
+        let ms = n.checked_div(d).map_or(100, |v| v.max(20));
+        out.push((fr.into_buffer(), ms));
     }
-    Some(
-        frames
-            .into_iter()
-            .map(|fr| {
-                let (n, d) = fr.delay().numer_denom_ms();
-                let ms = n.checked_div(d).map_or(100, |v| v.max(20));
-                (fr.into_buffer(), ms)
-            })
-            .collect(),
-    )
+    Ok((out.len() >= 2).then_some(out))
 }
 
 pub fn encode_gif_anim(frames: &[(image::RgbaImage, u32)]) -> Result<Vec<u8>, FileError> {
@@ -865,4 +919,50 @@ pub fn encode_webp_anim(frames: &[(image::RgbaImage, u32)], quality: u8, lossles
     }
     let data = enc.try_encode().map_err(|e| FileError::engine(format!("{e:?}")))?;
     Ok(data.to_vec())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn chunk(out: &mut Vec<u8>, ty: &[u8], body: &[u8]) {
+        out.extend_from_slice(&(body.len() as u32).to_be_bytes());
+        let mut c = flate2::Crc::new();
+        c.update(ty);
+        c.update(body);
+        out.extend_from_slice(ty);
+        out.extend_from_slice(body);
+        out.extend_from_slice(&c.sum().to_be_bytes());
+    }
+
+    /// A PNG of a few dozen bytes that says it is 100 000 × 100 000 pixels.
+    fn huge_png() -> Vec<u8> {
+        let mut d = b"\x89PNG\r\n\x1a\n".to_vec();
+        let mut ihdr = Vec::new();
+        ihdr.extend_from_slice(&100_000u32.to_be_bytes());
+        ihdr.extend_from_slice(&100_000u32.to_be_bytes());
+        ihdr.extend_from_slice(&[8, 6, 0, 0, 0]);
+        chunk(&mut d, b"IHDR", &ihdr);
+        chunk(&mut d, b"IDAT", &[0x78, 0x9C, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01]);
+        chunk(&mut d, b"IEND", &[]);
+        d
+    }
+
+    #[test]
+    fn size_check() {
+        assert!(check_size(10_000, 10_000, 250).is_ok());
+        assert_eq!(check_size(20_000, 20_000, 250).unwrap_err().code, codes::FILE_TOO_LARGE);
+        assert_eq!(check_size(u32::MAX, u32::MAX, u32::MAX).unwrap_err().code, codes::FILE_TOO_LARGE);
+    }
+
+    #[test]
+    fn a_tiny_file_declaring_a_huge_picture_is_too_large() {
+        let p = std::env::temp_dir().join(format!("mqkit-huge-{}.png", std::process::id()));
+        std::fs::write(&p, huge_png()).unwrap();
+        let res = load(&p, &Request::default());
+        let anim = animation_frames(&p, 250);
+        let _ = std::fs::remove_file(&p);
+        assert_eq!(res.err().map(|e| e.code), Some(codes::FILE_TOO_LARGE.to_string()));
+        assert_eq!(anim.err().map(|e| e.code), Some(codes::FILE_TOO_LARGE.to_string()));
+    }
 }

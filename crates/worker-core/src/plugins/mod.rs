@@ -178,7 +178,15 @@ impl<'a> Ctx<'a> {
     /// `outDir/<id>/`, created on demand.
     pub fn file_dir(&self, id: &str) -> Result<PathBuf, FileError> {
         let d = self.out_dir.join(sanitize(id));
-        std::fs::create_dir_all(&d).map_err(|e| FileError::with(codes::PERMISSION_DENIED, json!({"message": e.to_string()})))?;
+        std::fs::create_dir_all(&d).map_err(|e| {
+            // A full disk or a locked folder is said as such; a folder that can't be made
+            // (a drive that went away, a path that is a file) is "can't write there".
+            let mut err = io_err(e);
+            if err.code == codes::UNSUPPORTED_FILE || err.code == codes::ENGINE_FAILED {
+                err.code = codes::PERMISSION_DENIED.into();
+            }
+            err
+        })?;
         Ok(d)
     }
 

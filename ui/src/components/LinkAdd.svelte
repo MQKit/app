@@ -38,7 +38,7 @@
           : L({ ro: "Fișierul nu e pentru această unealtă.", en: "The file isn't for this tool." });
       case "too_big": return L({ ro: "Fișierul e prea mare.", en: "The file is too big." });
       case "disk_full": return L({ ro: "Nu e destul loc pe disc.", en: "Not enough disk space." });
-      case "permission_denied": return L({ ro: "Nu se poate scrie în dosarul Descărcări.", en: "Can't write to the Downloads folder." });
+      case "permission_denied": return L({ ro: "Nu se poate scrie în folderul Descărcări.", en: "Can't write to the Downloads folder." });
       case "empty": return L({ ro: "Fișierul e gol.", en: "The file is empty." });
       case "cancelled": return L({ ro: "Oprit.", en: "Stopped." });
       default: return code;
@@ -108,7 +108,7 @@
     <textarea class="text mono" rows={multiple ? 3 : 1} bind:value={text} placeholder="https://…" spellcheck="false"></textarea>
     <p class="help">
       {L({
-        ro: "Fișierele se descarcă în dosarul Descărcări, apoi se adaugă. Merg și linkurile de partajare Google Drive, Dropbox și GitHub. Se trimite doar cererea pentru link.",
+        ro: "Fișierele se descarcă în folderul Descărcări, apoi se adaugă. Merg și linkurile de partajare Google Drive, Dropbox și GitHub. Se trimite doar cererea pentru link.",
         en: "The files are downloaded into your Downloads folder, then added. Google Drive, Dropbox and GitHub share links work too. Only the request for the link is sent.",
       })}
     </p>

@@ -42,15 +42,26 @@ async function remoteHash(url) {
 }
 
 async function check(f, url) {
-  try {
-    const r = full ? await remoteHash(url) : await remoteSize(url);
-    if (r.status >= 400) return `HTTP ${r.status}`;
-    if (r.size !== f.size) return `size ${r.size}, expected ${f.size}`;
-    if (full && r.sha256 !== f.sha256.toLowerCase()) return `SHA-256 ${r.sha256}, expected ${f.sha256}`;
-    return null;
-  } catch (e) {
-    return `unreachable (${e.cause?.code ?? e.message})`;
+  // Some download mirrors (the LibreOffice archive picks one per request) send their
+  // certificate without the intermediate one. The app completes the chain as Windows
+  // does (src-tauri: platform verifier); Node can't, so that alone is only noted, after
+  // a few tries for a mirror that sends it whole.
+  let incomplete = false;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const r = full ? await remoteHash(url) : await remoteSize(url);
+      if (r.status >= 400) return `HTTP ${r.status}`;
+      if (r.size !== f.size) return `size ${r.size}, expected ${f.size}`;
+      if (full && r.sha256 !== f.sha256.toLowerCase()) return `SHA-256 ${r.sha256}, expected ${f.sha256}`;
+      return null;
+    } catch (e) {
+      const code = e.cause?.code ?? e.message;
+      if (code !== "UNABLE_TO_VERIFY_LEAF_SIGNATURE") return `unreachable (${code})`;
+      incomplete = true;
+    }
   }
+  if (incomplete) console.log(`note  ${url}: the server's certificate chain is incomplete (the app completes it)`);
+  return null;
 }
 
 let failed = 0;

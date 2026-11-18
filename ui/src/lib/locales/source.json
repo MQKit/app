@@ -1,0 +1,2046 @@
+{
+ "ui": {
+  "appName": {
+   "en": "MQKit",
+   "ro": "MQKit"
+  },
+  "all": {
+   "en": "All",
+   "ro": "Toate"
+  },
+  "favorites": {
+   "en": "Favorites",
+   "ro": "Favorite"
+  },
+  "cat_pdf": {
+   "en": "PDF",
+   "ro": "PDF"
+  },
+  "cat_image": {
+   "en": "Images",
+   "ro": "Imagini"
+  },
+  "cat_video": {
+   "en": "Video",
+   "ro": "Video"
+  },
+  "cat_audio": {
+   "en": "Audio",
+   "ro": "Audio"
+  },
+  "cat_document": {
+   "en": "Documents",
+   "ro": "Documente"
+  },
+  "history": {
+   "en": "History",
+   "ro": "Istoric"
+  },
+  "settings": {
+   "en": "Settings",
+   "ro": "Setări"
+  },
+  "support": {
+   "en": "Get involved",
+   "ro": "Implică-te"
+  },
+  "searchPlaceholder": {
+   "en": "What do you want to do? PDF to Word, shrink a photo",
+   "ro": "Ce vrei să faci? PDF în Word, micșorează o poză"
+  },
+  "mostUsed": {
+   "en": "Most used",
+   "ro": "Cele mai folosite"
+  },
+  "privacy": {
+   "en": "Your files stay on your computer. Nothing is uploaded.",
+   "ro": "Fișierele rămân pe calculatorul tău. Nimic nu se încarcă pe internet."
+  },
+  "privacyShort": {
+   "en": "Everything stays on this PC",
+   "ro": "Totul rămâne pe calculator"
+  },
+  "cat_other": {
+   "en": "Other",
+   "ro": "Altele"
+  },
+  "dropTitle": {
+   "en": "Drop files here",
+   "ro": "Trage fișierele aici"
+  },
+  "dropOr": {
+   "en": "or click to choose them",
+   "ro": "sau apasă ca să le alegi"
+  },
+  "accepts": {
+   "en": "Takes: {list}",
+   "ro": "Primește: {list}"
+  },
+  "toolId": {
+   "en": "ID:{n}",
+   "ro": "ID:{n}"
+  },
+  "toolIdHelp": {
+   "en": "The tool's number: use it to refer to the tool.",
+   "ro": "Numărul uneltei: îl poți folosi când vorbești despre ea."
+  },
+  "noResults": {
+   "en": "No tool matches.",
+   "ro": "Nicio unealtă nu se potrivește."
+  },
+  "noFavorites": {
+   "en": "Click the star next to a tool's name to find it here.",
+   "ro": "Apasă steaua de lângă numele unei unelte ca s-o găsești aici."
+  },
+  "forTheseFiles": {
+   "en": "For {n}",
+   "ro": "Pentru {n}"
+  },
+  "chooseTool": {
+   "en": "Choose what to do with them",
+   "ro": "Alege ce faci cu ele"
+  },
+  "clearFiles": {
+   "en": "Clear",
+   "ro": "Renunță"
+  },
+  "noToolForFiles": {
+   "en": "There's no tool for these files yet.",
+   "ro": "Încă nu am o unealtă pentru aceste fișiere."
+  },
+  "allTools": {
+   "en": "All tools",
+   "ro": "Toate uneltele"
+  },
+  "filesCount": {
+   "en": "Files ({n})",
+   "ro": "Fișiere ({n})"
+  },
+  "addFiles": {
+   "en": "Add or drop files",
+   "ro": "Adaugă sau trage fișiere"
+  },
+  "pickFiles": {
+   "en": "Choose files",
+   "ro": "Alege fișiere"
+  },
+  "originalsSafe": {
+   "en": "Your originals stay untouched. The result is a new file.",
+   "ro": "Originalele rămân neatinse. Rezultatul e un fișier nou."
+  },
+  "originalsReplace": {
+   "en": "Originals go to the Recycle Bin after the result is checked.",
+   "ro": "Originalele trec în Coșul de reciclare, după ce rezultatul e verificat."
+  },
+  "origKeptNoBin": {
+   "en": "The original was kept: this drive has no Recycle Bin, and MQKit never deletes anything for good.",
+   "ro": "Originalul a rămas: unitatea aceasta nu are Coș de reciclare, iar MQKit nu șterge nimic definitiv."
+  },
+  "origKeptLocked": {
+   "en": "The original was kept: Windows couldn't move it to the Recycle Bin (is it open in another program?).",
+   "ro": "Originalul a rămas: Windows nu l-a putut muta în Coșul de reciclare (e deschis în alt program?)."
+  },
+  "dropHere": {
+   "en": "Drop the files here",
+   "ro": "Lasă fișierele aici"
+  },
+  "busyDrop": {
+   "en": "Wait for the conversion to finish, then add the files",
+   "ro": "Așteaptă să se termine conversia, apoi adaugă fișierele"
+  },
+  "busyNav": {
+   "en": "A conversion is running. Stop it or wait for it to finish, then you can leave.",
+   "ro": "O conversie e în curs. Oprește-o sau așteapt-o să se termine, apoi poți pleca."
+  },
+  "busyCloseTitle": {
+   "en": "A conversion is running",
+   "ro": "O conversie e în curs"
+  },
+  "busyClose": {
+   "en": "If you close now, the conversion stops. Files already done stay. Close?",
+   "ro": "Dacă închizi acum, conversia se oprește. Fișierele terminate rămân. Închizi?"
+  },
+  "forWhat": {
+   "en": "What do you need it for",
+   "ro": "Pentru ce ai nevoie"
+  },
+  "custom": {
+   "en": "Custom",
+   "ro": "Personalizat"
+  },
+  "moreOptions": {
+   "en": "More options",
+   "ro": "Mai multe opțiuni"
+  },
+  "resetDefaults": {
+   "en": "Back to defaults",
+   "ro": "Revino la valorile implicite"
+  },
+  "analyzing": {
+   "en": "analyzing…",
+   "ro": "se analizează…"
+  },
+  "pages": {
+   "en": "{n} pages",
+   "ro": "{n} pagini"
+  },
+  "page1": {
+   "en": "one page",
+   "ro": "o pagină"
+  },
+  "locked": {
+   "en": "password protected",
+   "ro": "protejat cu parolă"
+  },
+  "scanned": {
+   "en": "scanned",
+   "ro": "scanat"
+  },
+  "unsupported": {
+   "en": "doesn't fit this tool",
+   "ro": "nu se potrivește cu unealta"
+  },
+  "corrupt": {
+   "en": "damaged file",
+   "ro": "fișier stricat"
+  },
+  "analysisFailed": {
+   "en": "couldn't be read",
+   "ro": "nu s-a putut citi"
+  },
+  "tryAgain": {
+   "en": "Try again",
+   "ro": "Încearcă din nou"
+  },
+  "password": {
+   "en": "Password",
+   "ro": "Parola"
+  },
+  "unlock": {
+   "en": "Unlock",
+   "ro": "Deblochează"
+  },
+  "remove": {
+   "en": "Remove",
+   "ro": "Scoate"
+  },
+  "moveUp": {
+   "en": "Move up",
+   "ro": "Mută mai sus"
+  },
+  "moveDown": {
+   "en": "Move down",
+   "ro": "Mută mai jos"
+  },
+  "approx": {
+   "en": "about",
+   "ro": "aproximativ"
+  },
+  "total": {
+   "en": "in total",
+   "ro": "în total"
+  },
+  "understood": {
+   "en": "I understand",
+   "ro": "Am înțeles"
+  },
+  "needFiles": {
+   "en": "Add files to start",
+   "ro": "Adaugă fișiere ca să începi"
+  },
+  "needUnlock": {
+   "en": "Unlock the file to start",
+   "ro": "Deblochează fișierul ca să începi"
+  },
+  "needMinFiles": {
+   "en": "Add at least {n} files",
+   "ro": "Adaugă cel puțin {n} fișiere"
+  },
+  "start": {
+   "en": "Start",
+   "ro": "Pornește"
+  },
+  "fileCount_one": {
+   "en": "one file",
+   "ro": "un fișier"
+  },
+  "fileCount_few": {
+   "en": "{n} files",
+   "ro": "{n} fișiere"
+  },
+  "fileCount_other": {
+   "en": "{n} files",
+   "ro": "{n} de fișiere"
+  },
+  "cancel": {
+   "en": "Stop",
+   "ro": "Oprește"
+  },
+  "cancelling": {
+   "en": "Stopping…",
+   "ro": "Se oprește…"
+  },
+  "stopAfterCurrent": {
+   "en": "Stop after the current file",
+   "ro": "Oprește după fișierul curent"
+  },
+  "working": {
+   "en": "Working…",
+   "ro": "Se lucrează…"
+  },
+  "waiting": {
+   "en": "waiting",
+   "ro": "în așteptare"
+  },
+  "done": {
+   "en": "Done",
+   "ro": "Gata"
+  },
+  "doneTitle": {
+   "en": "Done!",
+   "ro": "Gata!"
+  },
+  "partialTitle": {
+   "en": "Done, with some problems",
+   "ro": "Gata, cu unele probleme"
+  },
+  "failedTitle": {
+   "en": "It didn't work",
+   "ro": "Nu a mers"
+  },
+  "nothingTitle": {
+   "en": "Nothing to change",
+   "ro": "Nimic de schimbat"
+  },
+  "cancelledTitle": {
+   "en": "Stopped",
+   "ro": "Oprit"
+  },
+  "openFolder": {
+   "en": "Open folder",
+   "ro": "Deschide folderul"
+  },
+  "open": {
+   "en": "Open",
+   "ro": "Deschide"
+  },
+  "showInFolder": {
+   "en": "Show in folder",
+   "ro": "Arată în folder"
+  },
+  "again": {
+   "en": "Again",
+   "ro": "Încă o dată"
+  },
+  "newFiles": {
+   "en": "Other files",
+   "ro": "Alte fișiere"
+  },
+  "back": {
+   "en": "Back",
+   "ro": "Înapoi"
+  },
+  "retryWith": {
+   "en": "Try again with the suggested settings",
+   "ro": "Încearcă din nou cu setările sugerate"
+  },
+  "skipped": {
+   "en": "skipped",
+   "ro": "sărit"
+  },
+  "failed": {
+   "en": "failed",
+   "ro": "eșuat"
+  },
+  "saved": {
+   "en": "{p} smaller",
+   "ro": "{p} mai mic"
+  },
+  "bigger": {
+   "en": "{p} bigger",
+   "ro": "{p} mai mare"
+  },
+  "saveNextTo": {
+   "en": "Save next to the original",
+   "ro": "Salvează lângă original"
+  },
+  "saveSubfolder": {
+   "en": "Save in the “{name}” subfolder",
+   "ro": "Salvează în subfolderul „{name}”"
+  },
+  "saveIn": {
+   "en": "Save in {path}",
+   "ro": "Salvează în {path}"
+  },
+  "change": {
+   "en": "Change",
+   "ro": "Schimbă"
+  },
+  "close": {
+   "en": "Close",
+   "ro": "Închide"
+  },
+  "where": {
+   "en": "Where",
+   "ro": "Unde"
+  },
+  "whereSame": {
+   "en": "Next to the original",
+   "ro": "Lângă original"
+  },
+  "whereSub": {
+   "en": "In a subfolder",
+   "ro": "Într-un subfolder"
+  },
+  "whereCustom": {
+   "en": "In another folder",
+   "ro": "În alt folder"
+  },
+  "chooseFolder": {
+   "en": "Choose…",
+   "ro": "Alege…"
+  },
+  "nameLabel": {
+   "en": "Name",
+   "ro": "Nume"
+  },
+  "namePreview": {
+   "en": "For example: {name}",
+   "ro": "De exemplu: {name}"
+  },
+  "ifExists": {
+   "en": "If it already exists",
+   "ro": "Dacă există deja"
+  },
+  "existsRename": {
+   "en": "Keep both (add a number)",
+   "ro": "Păstrează ambele (adaugă un număr)"
+  },
+  "existsOverwrite": {
+   "en": "Replace the old file",
+   "ro": "Înlocuiește fișierul vechi"
+  },
+  "existsSkip": {
+   "en": "Skip",
+   "ro": "Sari peste"
+  },
+  "originalLabel": {
+   "en": "The original",
+   "ro": "Originalul"
+  },
+  "origKeep": {
+   "en": "Keep it",
+   "ro": "Păstrează-l"
+  },
+  "origReplace": {
+   "en": "Replace it with the result",
+   "ro": "Înlocuiește-l cu rezultatul"
+  },
+  "keepDate": {
+   "en": "Keep the original's date",
+   "ro": "Păstrează data originalului"
+  },
+  "whenDone": {
+   "en": "When done",
+   "ro": "La final"
+  },
+  "doneNothing": {
+   "en": "Nothing",
+   "ro": "Nimic"
+  },
+  "doneFolder": {
+   "en": "Open the folder",
+   "ro": "Deschide folderul"
+  },
+  "doneFile": {
+   "en": "Open the result",
+   "ro": "Deschide rezultatul"
+  },
+  "vars": {
+   "en": "Variables",
+   "ro": "Variabile"
+  },
+  "language": {
+   "en": "Language",
+   "ro": "Limba"
+  },
+  "langSystem": {
+   "en": "Same as Windows",
+   "ro": "După sistem"
+  },
+  "theme": {
+   "en": "Appearance",
+   "ro": "Aspect"
+  },
+  "themeSystem": {
+   "en": "Same as Windows",
+   "ro": "După sistem"
+  },
+  "themeLight": {
+   "en": "Light",
+   "ro": "Luminos"
+  },
+  "themeDark": {
+   "en": "Dark",
+   "ro": "Întunecat"
+  },
+  "rememberLast": {
+   "en": "Remember the last options for each tool",
+   "ro": "Ține minte ultimele opțiuni pentru fiecare unealtă"
+  },
+  "about": {
+   "en": "About",
+   "ro": "Despre"
+  },
+  "version": {
+   "en": "Version {v}",
+   "ro": "Versiunea {v}"
+  },
+  "freeLine": {
+   "en": "Free. No ads, no account. Your files stay on your PC.",
+   "ro": "Gratuit. Fără reclame, fără cont. Fișierele rămân pe PC-ul tău."
+  },
+  "skippedDup_one": {
+   "en": "1 file was already in the list.",
+   "ro": "Un fișier era deja în listă."
+  },
+  "skippedDup_few": {
+   "en": "{n} files were already in the list.",
+   "ro": "{n} fișiere erau deja în listă."
+  },
+  "skippedDup_other": {
+   "en": "{n} files were already in the list.",
+   "ro": "{n} de fișiere erau deja în listă."
+  },
+  "skippedType_one": {
+   "en": "1 file isn't a type this tool takes.",
+   "ro": "Un fișier nu e de un tip pe care unealta îl primește."
+  },
+  "skippedType_few": {
+   "en": "{n} files aren't a type this tool takes.",
+   "ro": "{n} fișiere nu sunt de un tip pe care unealta îl primește."
+  },
+  "skippedType_other": {
+   "en": "{n} files aren't a type this tool takes.",
+   "ro": "{n} de fișiere nu sunt de un tip pe care unealta îl primește."
+  },
+  "skippedLimit": {
+   "en": "This tool works on one file at a time: the first one was kept.",
+   "ro": "Unealta lucrează cu un fișier odată: l-am păstrat pe primul."
+  },
+  "skippedCount_one": {
+   "en": "1 skipped",
+   "ro": "un fișier sărit"
+  },
+  "skippedCount_few": {
+   "en": "{n} skipped",
+   "ro": "{n} fișiere sărite"
+  },
+  "skippedCount_other": {
+   "en": "{n} skipped",
+   "ro": "{n} de fișiere sărite"
+  },
+  "startReading": {
+   "en": "Reading the files…",
+   "ro": "Se citesc fișierele…"
+  },
+  "typeText": {
+   "en": "Type or paste text…",
+   "ro": "Scrie sau lipește text…"
+  },
+  "typeTextPh_txt": {
+   "en": "Type or paste the text here.",
+   "ro": "Scrie sau lipește textul aici."
+  },
+  "typeTextPh_md": {
+   "en": "Type or paste Markdown here: # Title, **bold**, - lists…",
+   "ro": "Scrie sau lipește Markdown aici: # Titlu, **aldin**, - liste…"
+  },
+  "typeTextPh_html": {
+   "en": "Paste the page's HTML here.",
+   "ro": "Lipește aici HTML-ul paginii."
+  },
+  "typeTextAdd": {
+   "en": "Add",
+   "ro": "Adaugă"
+  },
+  "typeTextHint": {
+   "en": "It's saved in Documents\\MQKit, and the result goes next to it.",
+   "ro": "Se salvează în Documente\\MQKit, iar rezultatul ajunge lângă el."
+  },
+  "typeTextName": {
+   "en": "Text",
+   "ro": "Text"
+  },
+  "otherValue": {
+   "en": "Other value…",
+   "ro": "Altă valoare…"
+  },
+  "copyDiagnostics": {
+   "en": "Copy details for a bug report",
+   "ro": "Copiază detaliile pentru o problemă"
+  },
+  "copiedDiagnostics": {
+   "en": "Copied. Paste them into your message.",
+   "ro": "Copiate. Lipește-le în mesajul tău."
+  },
+  "diagnosticsHint": {
+   "en": "The version, Windows, the components and the app's latest messages, without your file names.",
+   "ro": "Versiunea, Windows, componentele și ultimele mesaje ale aplicației, fără numele fișierelor tale."
+  },
+  "savedIn": {
+   "en": "Saved in {path}",
+   "ro": "Salvate în {path}"
+  },
+  "savedInFolders_one": {
+   "en": "Saved in one folder:",
+   "ro": "Salvate într-un folder:"
+  },
+  "savedInFolders_few": {
+   "en": "Saved in {n} folders, next to the original files:",
+   "ro": "Salvate în {n} foldere, lângă fișierele originale:"
+  },
+  "savedInFolders_other": {
+   "en": "Saved in {n} folders, next to the original files:",
+   "ro": "Salvate în {n} de foldere, lângă fișierele originale:"
+  },
+  "startFixOption": {
+   "en": "Fix the highlighted option above",
+   "ro": "Corectează opțiunea marcată mai sus"
+  },
+  "startConfirm": {
+   "en": "Tick the confirmation above",
+   "ro": "Bifează confirmarea de mai sus"
+  },
+  "startNotHere": {
+   "en": "Not possible on this PC",
+   "ro": "Nu se poate pe acest PC"
+  },
+  "engineErr_busy": {
+   "en": "The component is in use right now. Try again once the download or conversion ends.",
+   "ro": "Componenta e folosită chiar acum. Încearcă din nou după ce se termină descărcarea sau conversia."
+  },
+  "engineErr_permission_denied": {
+   "en": "The app's folder can't be written to. Restart the PC and try again.",
+   "ro": "Nu se poate scrie în folderul aplicației. Repornește calculatorul și încearcă din nou."
+  },
+  "engineErr_unknown_engine": {
+   "en": "The component is no longer available in this version.",
+   "ro": "Componenta nu mai e disponibilă în această versiune."
+  },
+  "removeBigTitle": {
+   "en": "Delete the component?",
+   "ro": "Ștergi componenta?"
+  },
+  "removeBig": {
+   "en": "{name} takes {size}. If you delete it, it downloads again when a tool needs it.",
+   "ro": "{name} ocupă {size}. Dacă o ștergi, se descarcă din nou când o unealtă are nevoie de ea."
+  },
+  "license": {
+   "en": "Open source, AGPL-3.0 license.",
+   "ro": "Cod deschis, licența AGPL-3.0."
+  },
+  "dataFolder": {
+   "en": "Data folder",
+   "ro": "Folderul de date"
+  },
+  "logsFolder": {
+   "en": "Logs",
+   "ro": "Jurnale"
+  },
+  "clearHistory": {
+   "en": "Clear history",
+   "ro": "Șterge istoricul"
+  },
+  "historyEmpty": {
+   "en": "Your conversions show up here.",
+   "ro": "Aici apar conversiile făcute."
+  },
+  "supportTitle": {
+   "en": "The app is free",
+   "ro": "Aplicația e gratuită"
+  },
+  "supportText": {
+   "en": "We don't ask for money and show no ads. If it helps you, this is how you help us most:",
+   "ro": "Nu cerem bani și nu arătăm reclame. Dacă îți e de folos, ne ajuți cel mai mult așa:"
+  },
+  "supportShare": {
+   "en": "Tell your friends and colleagues about it.",
+   "ro": "Spune-le prietenilor și colegilor de ea."
+  },
+  "supportBugs": {
+   "en": "Tell us when something doesn't work or a conversion comes out badly.",
+   "ro": "Spune-ne când ceva nu merge sau când o conversie iese prost."
+  },
+  "supportVote": {
+   "en": "Vote for the tool you want in the next update.",
+   "ro": "Votează unealta pe care o vrei în actualizarea următoare."
+  },
+  "supportTranslate": {
+   "en": "Help translate it into your language.",
+   "ro": "Ajută la traducerea în limba ta."
+  },
+  "newBadge": {
+   "en": "New",
+   "ro": "Nou"
+  },
+  "beta": {
+   "en": "beta",
+   "ro": "beta"
+  },
+  "engineMissing": {
+   "en": "A component this tool needs is missing, and this version can't download it. Install the new version from mqkit.com.",
+   "ro": "Lipsește o componentă de care unealta are nevoie, iar această versiune nu o poate descărca. Instalează versiunea nouă de pe mqkit.com."
+  },
+  "wordMissing": {
+   "en": "This tool needs Microsoft Word installed. A version without Word comes in an update.",
+   "ro": "Unealta are nevoie de Microsoft Word instalat. Varianta fără Word vine într-o actualizare."
+  },
+  "heifMissing": {
+   "en": "Windows lacks the HEIC decoder. Install the free “HEIF Image Extensions” from the Microsoft Store.",
+   "ro": "Windows nu are decodorul HEIC. Instalează gratuit „HEIF Image Extensions” din Microsoft Store."
+  },
+  "openStore": {
+   "en": "Open Microsoft Store",
+   "ro": "Deschide Microsoft Store"
+  },
+  "minimize": {
+   "en": "Minimize",
+   "ro": "Micșorează"
+  },
+  "maximize": {
+   "en": "Maximize",
+   "ro": "Mărește"
+  },
+  "favoriteAdd": {
+   "en": "Add to favorites",
+   "ro": "Adaugă la favorite"
+  },
+  "favoriteRemove": {
+   "en": "Remove from favorites",
+   "ro": "Scoate din favorite"
+  },
+  "engineNeeded": {
+   "en": "This tool needs {name}, {what}. It's downloaded once ({size}) and stays on your computer.",
+   "ro": "Unealta are nevoie de {name}, {what}. Se descarcă o singură dată ({size}) și rămâne pe calculator."
+  },
+  "engineWhat_ffmpeg": {
+   "en": "a free audio and video program",
+   "ro": "un program gratuit pentru audio și video"
+  },
+  "engineWhat_libreoffice": {
+   "en": "a free program that converts documents without Microsoft Word",
+   "ro": "un program gratuit care transformă documentele fără Microsoft Word"
+  },
+  "engineWhat_pdf2docx": {
+   "en": "a free program that turns PDFs into Word without Microsoft Word",
+   "ro": "un program gratuit care transformă PDF-urile în Word fără Microsoft Word"
+  },
+  "engineWhat_pymupdf": {
+   "en": "a free program that reads PDFs",
+   "ro": "un program gratuit care citește PDF-uri"
+  },
+  "engineWhat_onnxruntime": {
+   "en": "a free program that runs AI models on your PC",
+   "ro": "un program gratuit care rulează modele AI pe calculatorul tău"
+  },
+  "engineWhat_isnet": {
+   "en": "a free AI model that finds the subject in pictures, on your PC",
+   "ro": "un model AI gratuit care găsește subiectul din poze, pe calculatorul tău"
+  },
+  "engineWhat_birefnet-lite": {
+   "en": "a free AI model, finer with hair and edges, that runs on your PC",
+   "ro": "un model AI gratuit, mai fin la păr și margini, care rulează pe calculatorul tău"
+  },
+  "engineWhat_esrgan-general": {
+   "en": "a free AI model that enlarges pictures, on your PC",
+   "ro": "un model AI gratuit care mărește pozele, pe calculatorul tău"
+  },
+  "engineWhat_esrgan-x4plus": {
+   "en": "a free AI model that enlarges pictures with more detail, on your PC",
+   "ro": "un model AI gratuit care mărește pozele cu mai multe detalii, pe calculatorul tău"
+  },
+  "engineWhat_whisper-small": {
+   "en": "a free AI model that turns speech into text, on your PC",
+   "ro": "un model AI gratuit care transcrie vorbirea, pe calculatorul tău"
+  },
+  "engineWhat_whisper-turbo": {
+   "en": "a free, accurate AI model that turns speech into text in almost 100 languages, on your PC",
+   "ro": "un model AI gratuit și precis care transcrie vorbirea în aproape 100 de limbi, pe calculatorul tău"
+  },
+  "engineWhat_kokoro": {
+   "en": "a free AI model with natural voices that reads text on your PC",
+   "ro": "un model AI gratuit cu voci naturale, care citește textul pe PC-ul tău"
+  },
+  "engineWhat_other": {
+   "en": "a free program",
+   "ro": "un program gratuit"
+  },
+  "engineErr_install_failed": {
+   "en": "The installation didn't work. Try again.",
+   "ro": "Instalarea nu a mers. Încearcă din nou."
+  },
+  "noEntry": {
+   "en": "This tool can't run on this computer.",
+   "ro": "Unealta nu poate rula pe acest calculator."
+  },
+  "engineDownload": {
+   "en": "Download {name}",
+   "ro": "Descarcă {name}"
+  },
+  "engineDownloadAndStart": {
+   "en": "Download {name} and start",
+   "ro": "Descarcă {name} și pornește"
+  },
+  "engineDownloading": {
+   "en": "Downloading {name}: {done} of {total}",
+   "ro": "Se descarcă {name}: {done} din {total}"
+  },
+  "engineVerifying": {
+   "en": "Checking and installing…",
+   "ro": "Se verifică și se instalează…"
+  },
+  "engineReady": {
+   "en": "{name} is installed.",
+   "ro": "{name} e instalat."
+  },
+  "engineErr_network": {
+   "en": "The download didn't work. Check your internet connection and try again.",
+   "ro": "Descărcarea nu a mers. Verifică legătura la internet și încearcă din nou."
+  },
+  "engineErr_hash_mismatch": {
+   "en": "The downloaded file doesn't match the expected one and was deleted, for safety.",
+   "ro": "Fișierul descărcat nu se potrivește cu cel așteptat și a fost șters, din motive de siguranță."
+  },
+  "engineErr_disk_full": {
+   "en": "There isn't enough disk space.",
+   "ro": "Nu e destul spațiu pe disc."
+  },
+  "engineErr_bad_archive": {
+   "en": "The downloaded archive is damaged.",
+   "ro": "Arhiva descărcată e stricată."
+  },
+  "engineErr_cancelled": {
+   "en": "The download was stopped.",
+   "ro": "Descărcarea a fost oprită."
+  },
+  "engineErr_other": {
+   "en": "The download didn't work ({code}).",
+   "ro": "Descărcarea nu a mers ({code})."
+  },
+  "madeBy": {
+   "en": "Made by",
+   "ro": "Făcut de"
+  },
+  "updateTitle": {
+   "en": "Version {v} is out",
+   "ro": "A apărut versiunea {v}"
+  },
+  "updateText": {
+   "en": "It brings improvements and fixes. Get it free from the website.",
+   "ro": "Are îmbunătățiri și reparații. O descarci de pe site, gratuit."
+  },
+  "updateOpen": {
+   "en": "See what's new",
+   "ro": "Vezi ce e nou"
+  },
+  "updateLater": {
+   "en": "Later",
+   "ro": "Mai târziu"
+  },
+  "contextMenu": {
+   "en": "Show the tools in Explorer's right-click menu",
+   "ro": "Arată uneltele în meniul de click dreapta din Explorer"
+  },
+  "contextMenuHint": {
+   "en": "On Windows 11 they are under “Show more options”.",
+   "ro": "Pe Windows 11 apar la „Afișați mai multe opțiuni”."
+  },
+  "engineDownloadingShort": {
+   "en": "Downloading {name}…",
+   "ro": "Se descarcă {name}…"
+  },
+  "checkUpdates": {
+   "en": "Tell me when a new version comes out (checks once a day)",
+   "ro": "Anunță-mă când apare o versiune nouă (verifică o dată pe zi)"
+  },
+  "checkUpdatesHint": {
+   "en": "Only the version number is sent. Nothing installs by itself.",
+   "ro": "Se trimite doar numărul versiunii. Nimic nu se instalează singur."
+  },
+  "checkNow": {
+   "en": "Check now",
+   "ro": "Verifică acum"
+  },
+  "upToDate": {
+   "en": "You have the latest version.",
+   "ro": "Ai ultima versiune."
+  },
+  "checkFailed": {
+   "en": "Couldn't check right now.",
+   "ro": "Nu am putut verifica acum."
+  },
+  "previewTitle": {
+   "en": "Preview at 100%",
+   "ro": "Previzualizare la 100%"
+  },
+  "before": {
+   "en": "Before",
+   "ro": "Înainte"
+  },
+  "after": {
+   "en": "After",
+   "ro": "După"
+  },
+  "previewLoading": {
+   "en": "preparing…",
+   "ro": "se pregătește…"
+  },
+  "components": {
+   "en": "Downloaded components",
+   "ro": "Componente descărcate"
+  },
+  "waitingEngine": {
+   "en": "will be read once the component is downloaded",
+   "ro": "se citește după descărcarea componentei"
+  },
+  "componentsHint": {
+   "en": "Large programs are downloaded only when you need them. They all run on your computer.",
+   "ro": "Programele mari se descarcă doar când ai nevoie de ele. Toate rulează pe calculatorul tău."
+  },
+  "installed": {
+   "en": "installed",
+   "ro": "instalat"
+  },
+  "notInstalled": {
+   "en": "not downloaded",
+   "ro": "nedescărcat"
+  },
+  "removeComponent": {
+   "en": "Delete",
+   "ro": "Șterge"
+  }
+ },
+ "text": {
+  "No file chosen": "Niciun fișier ales",
+  "Choose…": "Alege…",
+  "Show password": "Arată parola",
+  "The folder doesn't exist.": "Dosarul nu există.",
+  "From a folder, by a pattern…": "Dintr-un folder, după un tipar…",
+  "The folder": "Dosarul",
+  "The pattern": "Tiparul",
+  "Subfolders too": "Și din subfoldere",
+  "Hidden folders too": "Și din folderele ascunse",
+  "Searching…": "Caut…",
+  "No matching files.": "Niciun fișier potrivit.",
+  "The search stopped (too many files); choose a narrower folder or pattern.": "Căutarea s-a oprit (prea multe fișiere); alege un folder sau un tipar mai strâns.",
+  "Cancel": "Renunță",
+  "Not an http(s) link.": "Nu e un link http(s).",
+  "Couldn't download (connection).": "Nu s-a putut descărca (conexiunea).",
+  "There's no file at this link (404).": "Fișierul nu există la acest link (404).",
+  "The link opens a web page, not a file. Copy the download link.": "Linkul deschide o pagină, nu un fișier. Copiază linkul de descărcare.",
+  "The file isn't for this tool.": "Fișierul nu e pentru această unealtă.",
+  "The file is too big.": "Fișierul e prea mare.",
+  "Not enough disk space.": "Nu e destul loc pe disc.",
+  "Can't write to the Downloads folder.": "Nu se poate scrie în folderul Descărcări.",
+  "The file is empty.": "Fișierul e gol.",
+  "Stopped.": "Oprit.",
+  "From a link…": "Dintr-un link…",
+  "The links, one per line": "Linkurile, câte unul pe rând",
+  "The link": "Linkul",
+  "Added": "Adăugat",
+  "Stop": "Oprește",
+  "Stop all": "Oprește tot",
+  "Close": "Închide",
+  "Download": "Descarcă",
+  "Compress": "Comprimă",
+  "Convert to Word": "Transformă în Word",
+  "Merge": "Unește",
+  "Split": "Împarte",
+  "Save": "Salvează",
+  "Make the PDF": "Fă PDF-ul",
+  "Convert to PDF": "Transformă în PDF",
+  "Export the pages": "Exportă paginile",
+  "Convert": "Convertește",
+  "Resize": "Redimensionează",
+  "Make the icons": "Fă iconițele",
+  "Extract the sound": "Extrage sunetul",
+  "Trim": "Taie",
+  "Make the GIF": "Fă GIF-ul",
+  "Clean": "Curăță",
+  "Read aloud": "Citește",
+  "Recognize the text": "Recunoaște textul",
+  "Mark": "Marchează",
+  "Make the deck": "Fă prezentarea",
+  "Start": "Pornește",
+  "Get the tables": "Scoate tabelele",
+  "Remove the background": "Elimină fundalul",
+  "Upscale": "Mărește",
+  "Transcribe": "Transcrie",
+  "analyzing": "se analizează",
+  "reading": "se citește",
+  "resizing": "se redimensionează",
+  "encoding": "se codează",
+  "compressing images": "se comprimă imaginile",
+  "rewriting the file": "se rescrie fișierul",
+  "merging": "se unesc",
+  "exporting": "se exportă",
+  "Word is opening the document": "Word deschide documentul",
+  "Word is reading the PDF": "Word citește PDF-ul",
+  "saving": "se salvează",
+  "Wrong password.": "Parola e greșită.",
+  "The file is password protected.": "Fișierul e protejat cu parolă.",
+  "The file is copy protected (DRM).": "Fișierul are protecție la copiere (DRM).",
+  "This tool doesn't support the format.": "Formatul nu e suportat de această unealtă.",
+  "The file uses something we can't read yet.": "Fișierul folosește ceva ce nu știm încă să citim.",
+  "The file seems damaged.": "Fișierul pare stricat.",
+  "The file is too large.": "Fișierul e prea mare.",
+  "The file changed meanwhile.": "Fișierul s-a schimbat între timp.",
+  "A required component is missing.": "Lipsește o componentă necesară.",
+  "Reading it took too long (a very large file, or a slow drive).": "Citirea a durat prea mult (fișier foarte mare, sau pe o unitate lentă).",
+  "The file couldn't be read.": "Fișierul nu a putut fi citit.",
+  "The conversion failed.": "Conversia a dat o eroare.",
+  "The converter stopped unexpectedly.": "Programul de conversie s-a oprit neașteptat.",
+  "The chosen options don't fit.": "Opțiunile alese nu se potrivesc.",
+  "It can't reach the requested size.": "Nu poate ajunge la mărimea cerută.",
+  "This file is a short HEIF animation, not a photo.": "Fișierul e o mică animație HEIF, nu o poză.",
+  "The result would have been larger; the original is already optimal.": "Rezultatul ar fi fost mai mare; originalul e deja optim.",
+  "The chosen range is outside the file.": "Intervalul ales e în afara fișierului.",
+  "The disk is full.": "Nu mai e spațiu pe disc.",
+  "I'm not allowed to write there.": "Nu am voie să scriu acolo.",
+  "The file is open in another program. Close it and try again.": "Fișierul e deschis în alt program. Închide-l și încearcă din nou.",
+  "Not enough memory.": "Nu ajunge memoria.",
+  "Word is installed but can't work now (it may need activation).": "Word e instalat, dar nu poate lucra acum (poate cere activare).",
+  "The conversion stopped responding and was stopped.": "Conversia nu a mai răspuns și a fost oprită.",
+  "A file with this name already exists.": "Există deja un fișier cu acest nume.",
+  "AI upscale": "Mărire cu AI",
+  "Bigger pictures, with detail": "Poze mai mari, cu detalii",
+  "Details": "Detalii",
+  "How many times bigger": "De câte ori mai mare",
+  "Model": "Model",
+  "Fast (recommended)": "Rapid (recomandat)",
+  "More detail (much slower without a graphics card)": "Mai multe detalii (mult mai lent fără placă video)",
+  "Format": "Format",
+  "Same as the original": "Ca originalul",
+  "PNG": "PNG",
+  "JPG": "JPG",
+  "WebP": "WebP",
+  "Big pictures come out huge and take long. AI upscale is made for small or old pictures.": "Pozele mari ies uriașe și durează mult. Mărirea cu AI e făcută pentru poze mici sau vechi.",
+  "{name}-upscaled": "{name}-mărit",
+  "The result would be {megapixels} megapixels, over the {limit} limit. Choose a smaller scale.": "Rezultatul ar avea {megapixels} megapixeli, peste limita de {limit}. Alege o mărire mai mică.",
+  "Archives": "Arhive",
+  "ZIP, 7Z, RAR": "ZIP, 7Z, RAR",
+  "archive name": "numele arhivei",
+  "What to do": "Ce faci",
+  "Unpack": "Dezarhivează",
+  "Pack together": "Arhivează împreună",
+  "Change the format": "Schimbă formatul",
+  "ZIP": "ZIP",
+  "7Z (smaller)": "7Z (mai mic)",
+  "TAR.GZ": "TAR.GZ",
+  "Compression": "Comprimare",
+  "None (fastest)": "Fără (cel mai rapid)",
+  "Normal": "Normală",
+  "Maximum (slower)": "Maximă (mai lent)",
+  "Password (optional)": "Parolă (opțional)",
+  "AES-256 encryption. Without a password, anyone can open it.": "Criptare AES-256. Fără parolă, oricine o poate deschide.",
+  "Hide the file names too": "Ascunde și numele fișierelor",
+  "Split into parts": "Împarte în bucăți",
+  "No": "Nu",
+  "25 MB (email)": "25 MB (e-mail)",
+  "100 MB": "100 MB",
+  "700 MB (CD)": "700 MB (CD)",
+  "4 GB (FAT32 stick)": "4 GB (stick FAT32)",
+  "A ZIP with an AES password opens with 7-Zip, WinRAR or this app; Windows Explorer can't open it.": "Un ZIP cu parolă AES se deschide cu 7-Zip, WinRAR sau cu această aplicație; Exploratorul Windows nu-l poate deschide.",
+  "The parts (.001, .002…) open with 7-Zip or this app: add the first part.": "Bucățile (.001, .002…) se deschid cu 7-Zip sau cu această aplicație: adaugă prima bucată.",
+  "Some files aren't archives; choose “Pack together” to put them in an archive.": "Unele fișiere nu sunt arhive; alege „Arhivează împreună” ca să le pui într-o arhivă.",
+  "{file}": "{file}",
+  "The file isn't an archive.": "Fișierul nu este o arhivă.",
+  "RAR archives with a password open only with WinRAR or 7-Zip.": "Arhivele RAR cu parolă se pot deschide doar cu WinRAR sau 7-Zip.",
+  "The archive is damaged or in a format Windows can't read.": "Arhiva este deteriorată sau într-un format pe care Windows nu-l poate citi.",
+  "The archive would unpack to an unnaturally large size (an archive bomb), so unpacking was stopped.": "Arhiva s-ar desface într-o mărime nefiresc de mare (o „bombă” de arhivă), așa că dezarhivarea a fost oprită.",
+  "A part of the archive is missing (for example .002). Put all the parts in the same folder.": "Lipsește o bucată din arhivă (de exemplu .002). Pune toate bucățile în același dosar.",
+  "Skipped entries that tried to write outside the folder.": "Am sărit peste intrări care încercau să scrie în afara dosarului.",
+  "Shortcuts (links) inside the archive were not created.": "Scurtăturile (legăturile) din arhivă nu au fost create.",
+  "Some files have names with letters the Windows unpacker can't write, so they were skipped. Open the archive with 7-Zip for those.": "Unele fișiere au nume cu litere pe care dezarhivatorul din Windows nu le poate scrie și au fost sărite. Deschide arhiva cu 7-Zip pentru ele.",
+  "Convert audio": "Conversie audio",
+  "MP3, WAV, FLAC, M4A": "MP3, WAV, FLAC, M4A",
+  "MP3 for any player": "MP3 pentru orice player",
+  "Lossless (FLAC)": "Fără pierderi (FLAC)",
+  "Voice, small file": "Voce, fișier mic",
+  "For iPhone (M4A)": "Pentru iPhone (M4A)",
+  "Sound": "Sunet",
+  "Only a part": "Doar o parte",
+  "New format": "Format nou",
+  "MP3": "MP3",
+  "M4A": "M4A",
+  "WAV": "WAV",
+  "FLAC": "FLAC",
+  "OGG": "OGG",
+  "Opus": "Opus",
+  "AIFF": "AIFF",
+  "WMA": "WMA",
+  "Quality": "Calitate",
+  "Voice (48 kbps)": "Voce (48 kbps)",
+  "Small (96 kbps)": "Mică (96 kbps)",
+  "Standard (128 kbps)": "Standard (128 kbps)",
+  "High (192 kbps)": "Înaltă (192 kbps)",
+  "Very high (256 kbps)": "Foarte înaltă (256 kbps)",
+  "Maximum (320 kbps)": "Maximă (320 kbps)",
+  "Channels": "Canale",
+  "As original": "Ca în original",
+  "Stereo": "Stereo",
+  "Mono": "Mono",
+  "Sample rate": "Frecvență",
+  "44.1 kHz (CD)": "44,1 kHz (CD)",
+  "48 kHz": "48 kHz",
+  "22 kHz": "22 kHz",
+  "16 kHz (voice)": "16 kHz (voce)",
+  "Even volume (normalize)": "Volum egal (normalizare)",
+  "Every track ends up at the same loudness.": "Toate piesele ajung la același volum.",
+  "Keep the title, artist and cover": "Păstrează titlul, artistul și coperta",
+  "Volume": "Volum",
+  "Fade in": "Intrare treptată",
+  "Fade out": "Ieșire treptată",
+  "Speed": "Viteză",
+  "From": "De la",
+  "start": "început",
+  "To": "Până la",
+  "end": "sfârșit",
+  "Some files have no sound and will be skipped.": "Unele fișiere nu au sunet și vor fi sărite.",
+  "An MP3 turned into FLAC or WAV doesn't sound better; it only takes more space.": "Un MP3 transformat în FLAC sau WAV nu sună mai bine; doar ocupă mai mult.",
+  "{name}": "{name}",
+  "The file has no sound.": "Fișierul nu are sunet.",
+  "AVIF and new formats": "AVIF și formate noi",
+  "Smaller at the same quality": "Mai mici la aceeași calitate",
+  "To AVIF (smaller)": "În AVIF (mai mic)",
+  "AVIF / JXL to JPG": "AVIF / JXL în JPG",
+  "AVIF": "AVIF",
+  "For AVIF, 60 looks like a JPG at 90, at a fraction of the size.": "La AVIF, 60 arată ca un JPG de 90, la o fracțiune din mărime.",
+  "Fast": "Rapid",
+  "Balanced": "Echilibrat",
+  "Slow, a little smaller": "Lent, puțin mai mic",
+  "3D models and CAD": "Modele 3D și CAD",
+  "STL, OBJ, GLB, 3MF, FBX, DXF": "STL, OBJ, GLB, 3MF, FBX, DXF",
+  "Units and orientation": "Unități și orientare",
+  "3D models to": "Modelele 3D în",
+  "STL": "STL",
+  "3MF": "3MF",
+  "OBJ": "OBJ",
+  "GLB": "GLB",
+  "PLY": "PLY",
+  "Drawings to": "Desenele în",
+  "PDF": "PDF",
+  "SVG": "SVG",
+  "The model's unit": "Unitatea modelului",
+  "As the file says": "Ca fișierul",
+  "millimetres": "milimetri",
+  "centimetres": "centimetri",
+  "metres": "metri",
+  "inches": "inch",
+  "STL, OBJ and PLY don't say their unit; it's usually millimetres.": "STL, OBJ și PLY nu-și spun unitatea; de obicei e milimetrul.",
+  "Unit of the result": "Unitatea rezultatului",
+  "Up axis": "Axa în sus",
+  "As the new format expects (Z for STL/3MF/PLY, Y for GLB/OBJ)": "Cum cere formatul nou (Z la STL/3MF/PLY, Y la GLB/OBJ)",
+  "Don't rotate": "Nu roti",
+  "The shape is kept; colours and textures are not.": "Se păstrează forma; culorile și texturile nu.",
+  "DWG is a closed format. Save the drawing as DXF from your CAD program (almost all can), then convert it here.": "DWG este un format închis. Salvează desenul ca DXF din programul de CAD (aproape toate pot), apoi convertește-l aici.",
+  "The model can't be read: {message}": "Modelul nu poate fi citit: {message}",
+  "The drawing can't be read: {message}": "Desenul nu poate fi citit: {message}",
+  "DWG is a closed format; save the drawing as DXF.": "DWG este un format închis; salvează desenul ca DXF.",
+  "The file has nothing to draw.": "Fișierul nu are nimic de desenat.",
+  "PSD and design files": "PSD și fișiere de design",
+  "Without Photoshop or Illustrator": "Fără Photoshop sau Illustrator",
+  "TIFF": "TIFF",
+  "PNG, WebP and TIFF keep the transparency.": "PNG, WebP și TIFF păstrează transparența.",
+  "Resolution (AI, EPS)": "Rezoluție (AI, EPS)",
+  "150 dpi (screen)": "150 dpi (ecran)",
+  "300 dpi (print)": "300 dpi (tipar)",
+  "600 dpi": "600 dpi",
+  "For EPS the preview picture inside the file is used (low resolution). For full quality, install Ghostscript, free, from ghostscript.com.": "Pentru EPS se folosește poza de previzualizare din fișier (rezoluție mică). Pentru calitate întreagă, instalează Ghostscript, gratuit, de pe ghostscript.com.",
+  "The Photoshop file can't be read: {message}": "Fișierul Photoshop nu poate fi citit: {message}",
+  "The EPS has no preview picture. Install Ghostscript (free) and try again.": "EPS-ul nu are poză de previzualizare. Instalează Ghostscript (gratuit) și încearcă din nou.",
+  "The Illustrator file was saved without “Create PDF Compatible File”; open it in Illustrator and save it with that option.": "Fișierul Illustrator a fost salvat fără „Create PDF Compatible File”; deschide-l în Illustrator și salvează-l cu această opțiune.",
+  "The drawing in the file never finished and was stopped.": "Desenul din fișier nu se mai termina și a fost oprit.",
+  "E-books": "Cărți electronice",
+  "EPUB, Kindle, PDF": "EPUB, Kindle, PDF",
+  "Title, author, cover": "Titlu, autor, copertă",
+  "EPUB (any reader, Kindle)": "EPUB (orice cititor, Kindle)",
+  "Word": "Word",
+  "Text": "Text",
+  "Page": "Pagina",
+  "6″ reader (Kindle, Kobo)": "Cititor de 6″ (Kindle, Kobo)",
+  "Tablet": "Tabletă",
+  "A5": "A5",
+  "A4": "A4",
+  "Text size": "Mărimea literelor",
+  "Small": "Mică",
+  "Medium": "Medie",
+  "Large": "Mare",
+  "Extra large": "Foarte mare",
+  "New title (optional)": "Titlu nou (opțional)",
+  "New author (optional)": "Autor nou (opțional)",
+  "New cover (optional)": "Copertă nouă (opțional)",
+  "For Kindle: send the EPUB with Amazon's Send to Kindle (app, website or e-mail).": "Pentru Kindle: trimite EPUB-ul cu Send to Kindle de la Amazon (din aplicație, de pe site sau pe e-mail).",
+  "A book has DRM (copy protection) and can't be converted.": "O carte are DRM (protecție la copiere) și nu poate fi convertită.",
+  "The book has DRM (copy protection) and can't be converted.": "Cartea are DRM (protecție la copiere) și nu poate fi convertită.",
+  "The file isn't a book we can read.": "Fișierul nu este o carte pe care o putem citi.",
+  "This Kindle book uses an old compression we can't read.": "Această carte Kindle folosește o comprimare veche pe care nu o putem citi.",
+  "The file is already in this format.": "Fișierul e deja în acest format.",
+  "Fonts": "Fonturi",
+  "TTF, OTF, WOFF2; smaller fonts": "TTF, OTF, WOFF2; fonturi mai mici",
+  "font name": "numele fontului",
+  "WOFF2 (web)": "WOFF2 (web)",
+  "Web kit (WOFF2 + CSS)": "Pachet web (WOFF2 + CSS)",
+  "WOFF": "WOFF",
+  "TTF / OTF (to install)": "TTF / OTF (de instalat)",
+  "Which letters to keep": "Ce litere păstrezi",
+  "All of them": "Toate",
+  "Only some writing systems": "Doar anumite alfabete",
+  "Only the letters in a text": "Doar literele dintr-un text",
+  "A font with fewer letters is much smaller, so a web page loads faster.": "Un font cu mai puține litere e mult mai mic, deci o pagină web se încarcă mai repede.",
+  "Writing systems": "Alfabete",
+  "Digits, punctuation and accents always stay.": "Cifrele, semnele de punctuație și accentele rămân mereu.",
+  "The text": "Textul",
+  "E.g. a logo's title": "Ex.: titlul unui logo",
+  "Only the letters, digits and signs in this text stay (and the space).": "Rămân doar literele, cifrele și semnele din acest text (și spațiul).",
+  "No hinting (smaller still)": "Fără hinting (încă mai mic)",
+  "Hinting helps small letters on old screens; modern browsers do fine without it.": "Hinting-ul ajută literele mici pe ecranele vechi; browserele moderne se descurcă și fără.",
+  "Choose at least one writing system.": "Alege cel puțin un alfabet.",
+  "Type the text whose letters to keep.": "Scrie textul ale cărui litere le păstrezi.",
+  "A font's licence doesn't allow putting it in documents or on websites. Check the licence before using it on the web.": "Licența unui font nu permite să fie pus în documente sau pe site-uri. Verifică licența înainte să-l folosești pe web.",
+  "This file isn't a font we can read.": "Fișierul nu este un font pe care îl putem citi.",
+  "The font has none of the chosen letters.": "Fontul nu are niciuna dintre literele alese.",
+  "The font couldn't be made smaller.": "Fontul nu a putut fi micșorat.",
+  "The font couldn't be compressed to WOFF2.": "Fontul nu a putut fi comprimat în WOFF2.",
+  "HEIC to JPG": "HEIC în JPG",
+  "iPhone photos": "Poze de pe iPhone",
+  "Keep date, camera and location": "Păstrează data, camera și locația",
+  "All images in the file (bursts)": "Toate imaginile din fișier (rafale)",
+  "HTML to PDF": "HTML în PDF",
+  "Web pages to keep": "Pagini web de păstrat",
+  "Paper": "Hârtie",
+  "Letter": "Letter",
+  "A3": "A3",
+  "Margins": "Margini",
+  "None": "Fără",
+  "Landscape": "Pagină culcată",
+  "Print background colors": "Tipărește culorile de fundal",
+  "The page is printed by Microsoft Edge, already on your PC. Your file isn't sent anywhere; pictures and styles the page takes from the internet are loaded, as in a browser.": "Pagina e tipărită de Microsoft Edge, care e deja pe calculator. Fișierul nu e trimis nicăieri; pozele și stilurile pe care pagina le ia de pe internet se încarcă, ca într-un browser.",
+  "Icons": "Iconițe",
+  "ICO and favicons": "ICO și favicon",
+  "file name": "numele fișierului",
+  "Windows icon": "Iconiță Windows",
+  "Website favicon": "Favicon pentru site",
+  "Pixel art": "Pixel art",
+  "Images out of an ICO": "Scoate imaginile din ICO",
+  "What to make": "Ce fac",
+  "ICO file (Windows)": "Fișier ICO (Windows)",
+  "Favicon pack for a website": "Pachet favicon pentru site",
+  "PNGs in several sizes": "PNG-uri la mai multe mărimi",
+  "Sizes (px)": "Mărimi (px)",
+  "From 1 to 256 for ICO, separated by commas.": "Între 1 și 256 la ICO, despărțite prin virgulă.",
+  "If the image isn't square": "Dacă imaginea nu e pătrată",
+  "Fit, with empty space": "Încape, cu spațiu gol",
+  "Cut the edges": "Taie marginile",
+  "Stretch": "Întinde",
+  "Space around": "Spațiu în jur",
+  "Background": "Fundal",
+  "Transparent": "Transparent",
+  "Color": "Culoare",
+  "Background color": "Culoarea fundalului",
+  "Site name (in the manifest)": "Numele site-ului (în manifest)",
+  "Theme color (in the manifest)": "Culoarea temei (în manifest)",
+  "Method": "Metodă",
+  "Sharp (recommended)": "Clară (recomandat)",
+  "Pixels (pixel art)": "Pixeli (pixel art)",
+  "The image is smaller than 256 px: the large sizes will be blurry.": "Imaginea e mai mică de 256 px: mărimile mari vor fi neclare.",
+  "Taking the images out only works with ICO files.": "Scoaterea imaginilor merge doar cu fișiere ICO.",
+  "Add an ICO file: the images can only be taken out of one.": "Adaugă un fișier ICO: doar din el se pot scoate imaginile.",
+  "Type at least one size, for example 16, 32, 256.": "Scrie cel puțin o mărime, de exemplu 16, 32, 256.",
+  "ICO sizes are from 1 to 256 px.": "La ICO, mărimile sunt între 1 și 256 px.",
+  "The file isn't an ICO.": "Fișierul nu e un ICO.",
+  "Compress images": "Comprimare imagini",
+  "JPG, PNG, WebP": "JPG, PNG, WebP",
+  "For the web": "Pentru web",
+  "Smallest": "Cât mai mic",
+  "Best quality": "Calitate maximă",
+  "How to compress": "Cum comprimăm",
+  "By quality": "După calitate",
+  "Under a size": "Sub o mărime",
+  "Maximum size per image": "Mărime maximă per imagine",
+  "Longest side": "Latura cea mai lungă",
+  "Unchanged": "Neschimbată",
+  "3840 px (4K)": "3840 px (4K)",
+  "2560 px": "2560 px",
+  "1920 px (Full HD)": "1920 px (Full HD)",
+  "1280 px": "1280 px",
+  "800 px": "800 px",
+  "PNG with a color palette (much smaller)": "PNG cu paletă de culori (mult mai mic)",
+  "Reduces PNGs to at most 256 colors, with differences hard to see. Off: the PNG shrinks a little but stays identical.": "Reduce PNG-urile la cel mult 256 de culori, cu diferențe greu de văzut. Oprit: PNG-ul scade puțin, dar rămâne identic.",
+  "Keep date, camera and location (JPG, WebP)": "Păstrează data, camera și locația (JPG, WebP)",
+  "Off: EXIF data, including GPS location, is removed.": "Oprit: informațiile EXIF, inclusiv locația GPS, sunt șterse.",
+  "If the result is larger": "Dacă iese mai mare",
+  "Don't write anything": "Nu scrie nimic",
+  "Write anyway": "Scrie oricum",
+  "Without a color palette, PNGs usually shrink by only 5–20%.": "Fără paletă de culori, PNG-urile scad de obicei cu doar 5–20%.",
+  "{name}_compressed": "{name}_comprimat",
+  "Convert images": "Conversie imagini",
+  "GIF": "GIF",
+  "BMP": "BMP",
+  "ICO": "ICO",
+  "Background instead of transparency": "Fundal în locul transparenței",
+  "Lossless WebP": "WebP fără pierderi",
+  "Kept for JPG and WebP.": "Se păstrează la JPG și WebP.",
+  "This format has no animation: animated images keep only the first frame. Pick GIF or WebP to keep them animated.": "Formatul ales nu are animație: imaginile animate păstrează doar primul cadru. Alege GIF sau WebP ca să rămână animate.",
+  "A multi-page TIFF is converted with its first page only. For every page, use “Images to PDF”.": "Un TIFF cu mai multe pagini se transformă doar cu prima pagină. Pentru toate paginile, folosește „Imagini în PDF”.",
+  "Icons are at most 256 × 256 px; larger images are scaled down.": "Iconițele au cel mult 256 × 256 px; imaginile mai mari se micșorează.",
+  "Resize images": "Redimensionare imagini",
+  "Width, height, crop": "Lățime, înălțime, decupare",
+  "width": "lățime",
+  "height": "înălțime",
+  "For email": "Pentru e-mail",
+  "Full HD": "Full HD",
+  "Square 1080": "Pătrat 1080",
+  "Story 1080×1920": "Poveste 1080×1920",
+  "Half": "Jumătate",
+  "Thumbnail": "Miniatură",
+  "How": "Cum",
+  "Fit inside a size": "Să încapă într-o mărime",
+  "Fill the size (crops)": "Să umple mărimea (decupează)",
+  "Fit, with borders": "Să încapă, cu margini",
+  "Exact (may stretch)": "Exact (poate deforma)",
+  "Width only": "Doar lățimea",
+  "Height only": "Doar înălțimea",
+  "Percent": "În procente",
+  "Long side": "Latura lungă",
+  "Width": "Lățime",
+  "Height": "Înălțime",
+  "Size": "Mărime",
+  "Which part to keep": "Ce parte păstrez",
+  "The middle": "Mijlocul",
+  "Top": "Sus",
+  "Bottom": "Jos",
+  "Left": "Stânga",
+  "Right": "Dreapta",
+  "Border color": "Culoarea marginilor",
+  "Don't enlarge small images": "Nu mări imaginile mici",
+  "Same": "La fel",
+  "Soft": "Moale",
+  "The part that doesn't fit is cut off.": "Partea care nu încape se taie.",
+  "If the shape differs, the image is stretched.": "Dacă forma diferă, imaginea se deformează.",
+  "{name}_{width}x{height}": "{name}_{width}x{height}",
+  "The chosen size isn't valid.": "Mărimea aleasă nu e validă.",
+  "The image would have {megapixels} megapixels, over the limit of {limit}. Choose a smaller size.": "Imaginea ar avea {megapixels} megapixeli, peste limita de {limit}. Alege o mărime mai mică.",
+  "Only the first frame of the animation was kept.": "S-a păstrat doar primul cadru al animației.",
+  "Images to PDF": "Imagini în PDF",
+  "Photos and scans into a PDF": "Poze și scanări într-un PDF",
+  "Page size": "Mărimea paginii",
+  "Same as the image": "Cât imaginea",
+  "Orientation": "Orientare",
+  "Follow the image": "După imagine",
+  "Portrait": "Portret",
+  "Small (1 cm)": "Mici (1 cm)",
+  "Large (2 cm)": "Mari (2 cm)",
+  "One PDF for each image": "Câte un PDF pentru fiecare imagine",
+  "E-mail": "E-mailuri",
+  "PST, MSG, EML, MBOX to PDF": "PST, MSG, EML, MBOX în PDF",
+  "name": "numele",
+  "EML": "EML",
+  "MBOX (Thunderbird…)": "MBOX (Thunderbird…)",
+  "HTML": "HTML",
+  "All the messages of an archive in one PDF": "Toate mesajele unei arhive într-un singur PDF",
+  "Save the attachments too": "Salvează și atașamentele",
+  "In EML and MBOX the attachments stay inside the messages.": "În EML și MBOX atașamentele rămân în mesaje.",
+  "An archive comes out as a folder with a file for each message, with its subfolders.": "O arhivă iese ca un dosar cu un fișier pentru fiecare mesaj, cu subdosarele ei.",
+  "The file isn't an e-mail or an archive we can read.": "Fișierul nu este un e-mail sau o arhivă pe care o putem citi.",
+  "This OST is in Outlook's newer format, which we can't read. Export the mailbox to PST in Outlook (File › Open & Export).": "Acest OST e în formatul nou al Outlook, pe care nu-l putem citi. Exportă căsuța în PST din Outlook (Fișier › Deschidere și export).",
+  "The archive has no messages.": "Arhiva nu are niciun mesaj.",
+  "Markdown and text": "Markdown și text",
+  "To PDF or HTML": "În PDF sau HTML",
+  "Result": "Rezultat",
+  "Web page (HTML)": "Pagină web (HTML)",
+  "Look": "Aspect",
+  "Book (serif)": "Carte (cu serife)",
+  "Compact": "Compact",
+  "Table of contents at the start": "Cuprins la început",
+  "Merge video and audio": "Unire video și audio",
+  "Many clips into one": "Mai multe clipuri într-unul",
+  "How to join": "Cum unesc",
+  "Automatic (copies when it can)": "Automat (copiază dacă se poate)",
+  "Re-encode everything (for different clips)": "Recodează tot (pentru clipuri diferite)",
+  "Format, for sound only": "Format, dacă sunt doar sunete",
+  "Files without a picture show a black screen in the video.": "Fișierele fără imagine apar pe ecran negru în video.",
+  "{name}_merged": "{name}_unit",
+  "Trim video and audio": "Tăiere video și audio",
+  "Keep just a part": "Păstrează doar o parte",
+  "Keep the chosen part": "Păstrează partea aleasă",
+  "Remove the chosen part": "Scoate partea aleasă",
+  "For example 1:30 or 0:01:30.5": "De exemplu 1:30 sau 0:01:30.5",
+  "Precision": "Precizie",
+  "Exact (re-encodes)": "Exactă (recodează)",
+  "Fast, lossless (from the nearest keyframe)": "Rapidă, fără pierderi (de la cel mai apropiat cadru-cheie)",
+  "Choose where it starts or where it ends.": "Alege de unde începe sau unde se termină.",
+  "A fast cut may start a second or two early.": "Tăierea rapidă poate începe cu o secundă-două mai devreme.",
+  "{name}_trimmed": "{name}_taiat",
+  "Choose where it starts and ends.": "Alege de unde și până unde.",
+  "The file has neither picture nor sound.": "Fișierul nu are nici imagine, nici sunet.",
+  "Remove metadata": "Ștergere metadate",
+  "Location, author, camera": "Locație, autor, cameră",
+  "Keep the color profile (photos)": "Păstrează profilul de culoare (pozele)",
+  "Without it, some photos look different. It holds no personal data.": "Fără el, unele poze arată altfel. Nu conține date personale.",
+  "Keep the orientation (photos)": "Păstrează orientarea (pozele)",
+  "Otherwise, phone photos may show up sideways.": "Altfel, pozele făcute cu telefonul pot apărea culcate.",
+  "Keep titles (music, video)": "Păstrează titlurile (muzică, video)",
+  "Removed: camera, GPS location, date, author, company, comments. The content isn't re-encoded.": "Se șterg: camera, locația GPS, data, autorul, compania, comentariile. Conținutul nu se recodează.",
+  "{name}_clean": "{name}_curat",
+  "OCR": "OCR",
+  "Text from scans": "Text din scanări",
+  "Searchable PDF": "PDF în care se poate căuta",
+  "Just the text": "Doar textul",
+  "PDF with text (looks the same)": "PDF cu text (arată la fel)",
+  "Text file": "Fișier text",
+  "Language of the text": "Limba textului",
+  "Languages come from Windows: add a language with “Optical character recognition”.": "Limbile vin din Windows: adaugă o limbă cu „Recunoaștere optică a caracterelor”.",
+  "Add languages in Settings": "Adaugă limbi în Setări",
+  "Pages": "Pagini",
+  "all": "toate",
+  "Pages that already have text too": "Și paginile care au deja text",
+  "Windows can't recognize your language yet; its own letters may come out wrong. You can add it in Settings › Time & language › Language.": "Windows nu poate recunoaște încă limba ta; literele specifice ei pot ieși greșit. O poți adăuga din Setări › Oră și limbă › Limbă.",
+  "{name}_ocr": "{name}_ocr",
+  "Windows has no language installed for text recognition.": "Windows nu are nicio limbă instalată pentru recunoașterea textului.",
+  "Excel and PowerPoint to PDF": "Excel și PowerPoint în PDF",
+  "Sheets and slides": "Tabele și prezentări",
+  "page count": "număr de pagini",
+  "For": "Pentru",
+  "Print (best quality)": "Tipar (calitate maximă)",
+  "Screen (smaller file)": "Ecran (fișier mai mic)",
+  "Each sheet on a single page": "Fiecare foaie pe o singură pagină",
+  "Large tables are no longer split across pages.": "Tabelele mari nu se mai rup pe mai multe pagini.",
+  "With the speaker notes": "Cu notițele vorbitorului",
+  "PDF/A for archiving": "PDF/A pentru arhivare",
+  "With which program": "Cu ce program",
+  "Microsoft Office (recommended)": "Microsoft Office (recomandat)",
+  "LibreOffice": "LibreOffice",
+  "LibreOffice does the conversion, downloaded once. Complex files may look slightly different than in Office.": "Conversia o face LibreOffice, descărcat o singură dată. Fișierele complicate pot arăta puțin diferit decât în Office.",
+  "Excel or PowerPoint couldn't start. Open it once, close any window it shows (activation, license), then try again.": "Excel sau PowerPoint nu a putut porni. Deschide-l o dată, închide orice fereastră care apare (activare, licență), apoi încearcă din nou.",
+  "The sheets are empty: there is nothing to put in the PDF.": "Foile de calcul sunt goale: nu e nimic de pus în PDF.",
+  "The file isn't there anymore. It may have been moved or deleted.": "Fișierul nu mai există în locul acela. Poate a fost mutat sau șters.",
+  "The file's path is too long for Office. Move it to a folder with a shorter name and try again.": "Calea fișierului e prea lungă pentru Office. Mută-l într-un dosar cu un nume mai scurt și încearcă din nou.",
+  "Compress PDF": "Comprimare PDF",
+  "Make it smaller": "Fă-l mai mic",
+  "For print": "Pentru tipar",
+  "Images": "Imagini",
+  "Document": "Document",
+  "By level": "După nivel",
+  "Custom": "Personalizat",
+  "Level": "Nivel",
+  "Recommended": "Recomandat",
+  "Strong": "Puternic",
+  "Maximum size": "Mărime maximă",
+  "25 MB (Gmail)": "25 MB (Gmail)",
+  "10 MB": "10 MB",
+  "5 MB": "5 MB",
+  "2 MB": "2 MB",
+  "Colors": "Culori",
+  "Keep colors": "Păstrează culorile",
+  "Grayscale": "Alb-negru (tonuri de gri)",
+  "Resolution": "Rezoluție",
+  "Lossless only": "Doar fără pierderi",
+  "Leaves images alone. Small gain, but everything stays identical.": "Nu atinge imaginile. Câștig mic, dar totul rămâne identic.",
+  "Remove page thumbnails": "Scoate miniaturile paginilor",
+  "Remove title, author and other information": "Șterge titlul, autorul și celelalte informații",
+  "Fast web view": "Optimizat pentru afișare pe web",
+  "Some files are digitally signed. The signature will no longer be valid in the compressed file.": "Unele fișiere sunt semnate digital. Semnătura nu va mai fi validă în fișierul comprimat.",
+  "The file will no longer be PDF/A.": "Fișierul nu va mai fi PDF/A.",
+  "The files have few images; the gain will be small.": "Fișierele au puține imagini; câștigul va fi mic.",
+  "The file can't reach the requested size; the smallest it gets is {bestBytes}.": "Fișierul nu poate ajunge la mărimea cerută; cel mai mic iese {bestBytes}.",
+  "The file has few images; the gain is small.": "Fișierul are puține imagini; câștigul e mic.",
+  "Merge PDF": "Unire PDF",
+  "Many into one": "Mai multe în unul",
+  "For example 1-3, 5, z (last)": "De exemplu 1-3, 5, z (ultima)",
+  "Bookmarks": "Semne de carte",
+  "One for each file": "Unul pentru fiecare fișier",
+  "Keep each file's own bookmarks": "Păstrează semnele de carte ale fiecărui fișier",
+  "No title and author in the new file": "Fără titlu și autor în fișierul nou",
+  "Form fields won't be fillable in the merged file.": "Câmpurile de formular nu vor mai putea fi completate în fișierul unit.",
+  "Digital signatures won't be valid in the merged file.": "Semnăturile digitale nu vor fi valide în fișierul unit.",
+  "Rotate and reorder PDF": "Rotire și ordine pagini PDF",
+  "Rotate, delete, move pages": "Rotește, șterge, mută pagini",
+  "Rotate all right": "Rotește tot la dreapta",
+  "Rotate all left": "Rotește tot la stânga",
+  "Straighten sideways pages": "Îndreaptă paginile culcate",
+  "Reverse the order": "Inversează ordinea",
+  "Scan: fronts, then backs": "Scanare: fețe, apoi versouri",
+  "Without the first page": "Fără prima pagină",
+  "Rotate": "Rotire",
+  "Upside down": "Cu susul în jos",
+  "Which pages to rotate": "Ce pagini rotesc",
+  "All": "Toate",
+  "Only some": "Doar unele",
+  "Odd": "Impare",
+  "Even": "Pare",
+  "Only sideways ones": "Doar cele culcate",
+  "Only upright ones": "Doar cele în picioare",
+  "Pages to rotate": "Pagini de rotit",
+  "for example 1-3, 7": "de exemplu 1-3, 7",
+  "Pages to delete": "Pagini de șters",
+  "for example 2, 5-7, z": "de exemplu 2, 5-7, z",
+  "z = last page; 1-z:even = every even page.": "z = ultima pagină; 1-z:even = toate paginile pare.",
+  "Page order": "Ordinea paginilor",
+  "Reversed": "Inversată",
+  "Two-sided scan (fronts, then backs)": "Scanare față-verso (fețe, apoi versouri)",
+  "My own order": "Ordinea mea",
+  "New order": "Noua ordine",
+  "for example 3, 1, 2, 4-z": "de exemplu 3, 1, 2, 4-z",
+  "Using the page numbers of the original file.": "Cu numerele paginilor din fișierul original.",
+  "Rotation adds or replaces": "Rotirea se adaugă sau înlocuiește",
+  "Adds to the current one": "Se adaugă la cea existentă",
+  "Replaces the rotation": "Înlocuiește rotirea",
+  "Choose what to change: the rotation, pages to delete or the order.": "Alege ce schimbi: rotirea, paginile de șters sau ordinea.",
+  "Digital signatures won't be valid anymore.": "Semnăturile digitale nu vor mai fi valide.",
+  "For a stack scanned on the fronts, then turned over and scanned on the backs: the backs come in reverse order.": "Pentru un teanc scanat întâi pe față, apoi întors și scanat pe verso: versourile vin în ordine inversă.",
+  "{name}_pages": "{name}_pagini",
+  "No pages are left.": "Nu rămâne nicio pagină.",
+  "PDF password": "Parolă PDF",
+  "Lock or unlock": "Pune sau scoate parola",
+  "Add a password": "Pune o parolă",
+  "Remove the password": "Scoate parola",
+  "Password to open it": "Parola pentru deschidere",
+  "Without it, the file can't be opened.": "Fără ea, fișierul nu se poate deschide.",
+  "Limit printing and copying": "Limitează tipărirea și copierea",
+  "Printing": "Tipărire",
+  "Allowed": "Permisă",
+  "Low quality only": "Doar la calitate slabă",
+  "Not allowed": "Interzisă",
+  "Allow copying text and images": "Permite copierea textului și a imaginilor",
+  "Changes": "Modificări",
+  "Comments and forms only": "Doar comentarii și formulare",
+  "Filling in forms only": "Doar completarea formularelor",
+  "Page order only": "Doar ordinea paginilor",
+  "Password to change the limits": "Parola pentru schimbarea limitelor",
+  "If left empty, a random one is used: the limits can't be changed later.": "Dacă rămâne goală, pun una aleatorie: limitele nu se mai pot schimba.",
+  "Encryption": "Criptare",
+  "AES 256 (strong)": "AES 256 (puternică)",
+  "AES 128 (old readers)": "AES 128 (cititoare vechi)",
+  "If you forget the password, the file can't be opened. The original stays as it is.": "Dacă uiți parola, fișierul nu mai poate fi deschis. Originalul rămâne neschimbat.",
+  "Print and copy limits aren't real protection: some programs ignore them. Only the open password protects the content.": "Limitele de tipărire și copiere nu sunt o protecție reală: unele programe le ignoră. Doar parola de deschidere protejează conținutul.",
+  "Type a password or choose some limits.": "Scrie o parolă sau alege limite.",
+  "The file has no password.": "Fișierul nu are parolă.",
+  "{name}_password": "{name}_parola",
+  "The password has letters AES-128 can't keep (such as ă, ș, ț). Choose AES-256 or a password without them.": "Parola are litere pe care criptarea AES-128 nu le poate păstra (de exemplu ă, ș, ț). Alege AES-256 sau o parolă fără ele.",
+  "Split PDF": "Împărțire PDF",
+  "One into many": "Unul în mai multe",
+  "from page": "de la pagina",
+  "to page": "până la pagina",
+  "chapter": "capitol",
+  "How to split": "Cum împart",
+  "Every page on its own": "Fiecare pagină separat",
+  "Every few pages": "La fiecare câteva pagini",
+  "By ranges": "După intervale",
+  "Extract some pages into one PDF": "Extrage niște pagini într-un PDF",
+  "Cut after certain pages": "Taie după anumite pagini",
+  "By chapter (bookmarks)": "Pe capitole (după cuprins)",
+  "Pieces under a size": "Bucăți sub o mărime",
+  "Odd and even pages": "Pagini pare și impare",
+  "Pages in each file": "Pagini în fiecare fișier",
+  "Ranges": "Intervale",
+  "1-3; 4-10; 11-z": "1-3; 4-10; 11-z",
+  "Each range becomes a file. Separate them with ; (z = last page).": "Fiecare interval devine un fișier. Separă-le cu ; (z = ultima pagină).",
+  "In the order written; z = last page.": "În ordinea scrisă; z = ultima pagină.",
+  "Cut after pages": "Taie după paginile",
+  "for example 3, 10, 25": "de exemplu 3, 10, 25",
+  "Bookmark level": "Nivel în cuprins",
+  "Chapters (level 1)": "Capitole (nivelul 1)",
+  "Sections (level 2)": "Subcapitole (nivelul 2)",
+  "Level 3": "Nivelul 3",
+  "What to keep": "Ce păstrez",
+  "Two files": "Două fișiere",
+  "Odd only": "Doar impare",
+  "Even only": "Doar pare",
+  "The last piece, if shorter": "Ultima bucată, dacă e mai scurtă",
+  "Stays on its own": "Rămâne separat",
+  "Joins the one before": "Se lipește de cea dinainte",
+  "Keep the title and author": "Păstrează titlul și autorul",
+  "Type the ranges, for example 1-3; 4-10.": "Scrie intervalele, de exemplu 1-3; 4-10.",
+  "Type after which pages to cut, for example 3, 10.": "Scrie după ce pagini se taie, de exemplu 3, 10.",
+  "There are no bookmarks to split by chapter.": "Nu e niciun cuprins după care să împart pe capitole.",
+  "A file has no bookmarks, so it can't be split by chapter.": "Un fișier nu are cuprins; nu am după ce să-l împart pe capitole.",
+  "The pieces keep the file's password.": "Bucățile păstrează parola fișierului.",
+  "Form fields won't be fillable in the pieces.": "Câmpurile de formular nu vor mai putea fi completate în bucăți.",
+  "{name}_{n}": "{name}_{n}",
+  "The file has no bookmarks at the chosen level.": "Fișierul nu are cuprins la nivelul ales.",
+  "No pages were chosen.": "Nu ai ales nicio pagină.",
+  "A page is larger than the limit by itself; it's in a file of its own, a little over.": "O pagină e mai mare decât limita singură; a rămas într-un fișier separat, puțin peste.",
+  "Watermark and page numbers": "Filigran și numerotare pagini",
+  "Mark every page": "Marchează fiecare pagină",
+  "Numbers at the bottom": "Numere jos, la mijloc",
+  "“Page 1 of 9”": "„Pagina 1 din 9”",
+  "CONFIDENTIAL diagonally": "CONFIDENȚIAL pe diagonală",
+  "Draft": "Ciornă",
+  "What to add": "Ce adaugi",
+  "Page numbers": "Numere de pagină",
+  "Watermark": "Filigran",
+  "Looks like": "Cum arată",
+  "Page 1 of 9": "Pagina 1 din 9",
+  "Where": "Unde",
+  "Bottom center": "Jos, la mijloc",
+  "Bottom right": "Jos, dreapta",
+  "Bottom left": "Jos, stânga",
+  "Top center": "Sus, la mijloc",
+  "Top right": "Sus, dreapta",
+  "Bottom outside (book)": "Jos, la exterior (carte)",
+  "Start at": "Începe de la",
+  "Watermark from": "Filigran din",
+  "Image": "Imagine",
+  "CONFIDENTIAL": "CONFIDENȚIAL",
+  "The image (PNG with transparency is best)": "Imaginea (PNG cu transparență e ideal)",
+  "Layout": "Așezare",
+  "Diagonal, in the middle": "Pe diagonală, la mijloc",
+  "Straight, in the middle": "Drept, la mijloc",
+  "Repeated over the page": "Repetat pe toată pagina",
+  "Small, bottom right": "Mic, jos în dreapta",
+  "Visibility": "Vizibilitate",
+  "Text size (numbers)": "Mărimea textului (numere)",
+  "On which pages": "Pe ce pagini",
+  "For example 2-z (not the first page).": "De exemplu 2-z (fără prima pagină).",
+  "{name}_marked": "{name}_marcat",
+  "Choose the image for the watermark.": "Alege imaginea pentru filigran.",
+  "PDF to Excel": "PDF în Excel",
+  "Tables into spreadsheets": "Tabelele în foi de calcul",
+  "Sheets": "Foi",
+  "A sheet per table": "O foaie pentru fiecare tabel",
+  "A sheet per page": "O foaie pentru fiecare pagină",
+  "All on one sheet": "Totul pe o foaie",
+  "Join tables that go on over the next page": "Unește tabelele care continuă pe pagina următoare",
+  "What to look for": "Ce caută",
+  "Tables (with or without lines)": "Tabele (cu sau fără linii)",
+  "All the text, in rows and columns": "Tot textul, pe rânduri și coloane",
+  "If a table isn't found, try “All the text”.": "Dacă un tabel nu e găsit, încearcă „Tot textul”.",
+  "Excel (XLSX)": "Excel (XLSX)",
+  "CSV": "CSV",
+  "Amounts and dates become numbers and dates": "Sumele și datele devin numere și date",
+  "So you can add up and sort in Excel. Numbers with leading zeros (codes, accounts) stay text.": "Ca să poți aduna și sorta în Excel. Numerele cu zerouri în față (coduri, conturi) rămân text.",
+  "A PDF looks scanned (pictures only, no text). Make it searchable first with “Text from pictures (OCR)”, then add it here.": "Un PDF pare scanat (doar imagini, fără text). Fă-l întâi căutabil cu „Text din imagini (OCR)”, apoi adaugă-l aici.",
+  "No tables found. Try “All the text, in rows and columns”.": "Nu am găsit tabele. Încearcă „Tot textul, pe rânduri și coloane”.",
+  "The PDF is scanned: it has no text. Make it searchable first with “Text from pictures (OCR)”.": "PDF-ul e scanat: nu are text. Fă-l întâi căutabil cu „Text din imagini (OCR)”.",
+  "PDF to images": "PDF în imagini",
+  "Each page an image": "Fiecare pagină o poză",
+  "page": "pagina",
+  "page total": "total pagini",
+  "Screen (72 dpi)": "Ecran (72 dpi)",
+  "Good (150 dpi)": "Bună (150 dpi)",
+  "Print (300 dpi)": "Tipar (300 dpi)",
+  "Transparent background": "Fundal transparent",
+  "A large document gives many images; you can pick only some pages.": "Un document mare dă multe imagini; poți alege doar unele pagini.",
+  "{name}-{page}": "{name}-{page}",
+  "Some pages are very large: they came out at {dpi} dpi, as much as fits in one picture.": "Unele pagini sunt foarte mari: au ieșit la {dpi} dpi, cât încape într-o imagine.",
+  "PDF to PowerPoint": "PDF în PowerPoint",
+  "Each page a slide": "Fiecare pagină un slide",
+  "slide count": "număr de slide-uri",
+  "Slide size": "Mărimea slide-urilor",
+  "Like the page": "Ca pagina",
+  "Page on the slide": "Pagina pe slide",
+  "Whole, with borders": "Întreagă, cu margini",
+  "Fill the slide (crops the edges)": "Umple slide-ul (taie marginile)",
+  "Sharpness": "Claritate",
+  "Screen (Full HD)": "Ecran (Full HD)",
+  "Sharp": "Clară",
+  "Very sharp (4K)": "Foarte clară (4K)",
+  "Page images": "Imaginile paginilor",
+  "Automatic (smallest)": "Automat (cel mai mic)",
+  "PNG (lossless)": "PNG (fără pierderi)",
+  "Pages become pictures: they look exactly as in the PDF, but the text can't be edited.": "Paginile devin imagini: arată exact ca în PDF, dar textul nu se poate edita.",
+  "A deck with many slides comes out large; you can pick only some pages.": "O prezentare cu multe slide-uri iese mare; poți alege doar unele pagini.",
+  "PDF to Word (beta)": "PDF în Word (beta)",
+  "So you can edit the text": "Ca să poți modifica textul",
+  "How it looks in Word": "Cum arată în Word",
+  "Editable text": "Text editabil",
+  "Exact look": "Aspect identic",
+  "Page quality": "Calitatea paginilor",
+  "High (larger file)": "Înaltă (fișier mai mare)",
+  "Lower (smaller file)": "Mai mică (fișier mai mic)",
+  "Save as": "Salvează ca",
+  "Word (.docx)": "Word (.docx)",
+  "RTF (opens almost anywhere)": "RTF (se deschide aproape oriunde)",
+  "OpenDocument (.odt, for LibreOffice)": "OpenDocument (.odt, pentru LibreOffice)",
+  "Microsoft Word (recommended)": "Microsoft Word (recomandat)",
+  "pdf2docx (without Word)": "pdf2docx (fără Word)",
+  "This PDF looks like a presentation or a design (coloured backgrounds, large pages). As editable text it loses its backgrounds and layout. “Exact look” keeps everything, but the pages become pictures in Word.": "Acest PDF arată ca o prezentare sau un design (fundaluri colorate, pagini mari). Ca text editabil își pierde fundalurile și așezarea. „Aspect identic” păstrează totul, dar paginile devin imagini în Word.",
+  "Each page becomes a picture in Word: it looks exactly like the PDF, but the text can't be edited.": "Fiecare pagină devine o imagine în Word: arată exact ca PDF-ul, dar textul nu se poate modifica.",
+  "The layout may come out a little different from the PDF, especially tables and columns. Check the result. Scanned pages stay as pictures.": "Aspectul poate ieși puțin diferit față de PDF, mai ales la tabele și coloane. Verifică rezultatul. Paginile scanate rămân imagini.",
+  "This PDF is password-protected. You'll need the password to convert it.": "PDF-ul e protejat cu parolă. Vei avea nevoie de parolă ca să-l transformi.",
+  "The conversion program is missing. Download it from the app and try again.": "Lipsește programul de conversie. Descarcă-l din aplicație și încearcă din nou.",
+  "Word couldn't start. Open Word once, close any window it shows (activation, license), then try again.": "Word nu a putut porni. Deschide Word o dată, închide orice fereastră care apare (activare, licență), apoi încearcă din nou.",
+  "This file is password-protected. Enter the password to continue.": "Fișierul e protejat cu parolă. Scrie parola ca să continui.",
+  "That password isn't right. Try again.": "Parola nu e corectă. Mai încearcă o dată.",
+  "This file looks damaged and can't be opened.": "Fișierul pare deteriorat și nu poate fi deschis.",
+  "This kind of file isn't supported here.": "Acest tip de fișier nu e acceptat aici.",
+  "Another program is using this file. Close it there and try again.": "Fișierul e folosit de alt program. Închide-l acolo și încearcă din nou.",
+  "You don't have permission to read this file or write to the chosen folder.": "Nu ai voie să citești fișierul sau să scrii în dosarul ales.",
+  "The conversion couldn't finish. Try again; if it still fails, check that the file opens in its own program.": "Conversia nu a reușit să termine. Încearcă din nou; dacă tot nu merge, verifică dacă fișierul se deschide în programul lui.",
+  "RAW photos": "Poze RAW",
+  "From the camera to JPG": "Din aparatul foto în JPG",
+  "16-bit TIFF": "TIFF 16 biți",
+  "The picture": "Poza",
+  "As the camera made it (its colours)": "Cum a făcut-o aparatul (culorile lui)",
+  "Developed from the sensor data": "Developată din datele senzorului",
+  "If the camera didn't store a full-size picture in the file, the picture is developed.": "Dacă aparatul n-a pus în fișier o poză la mărime întreagă, poza se developează.",
+  "This camera isn't supported yet: {message}": "Acest aparat foto nu e încă cunoscut: {message}",
+  "Remove background": "Elimină fundalul",
+  "Cuts out the subject by itself": "Decupează automat subiectul",
+  "New background": "Fundal nou",
+  "A colour": "O culoare",
+  "The background, blurred": "Fundalul, încețoșat",
+  "The colour": "Culoarea",
+  "How blurred": "Cât de încețoșat",
+  "Crop the empty space around the subject": "Taie marginile goale din jurul subiectului",
+  "Finest hair and edges (slower)": "Cel mai fin la păr și margini (mai lent)",
+  "The fine model is a separate download and takes a few seconds per picture.": "Modelul fin e o descărcare separată și durează câteva secunde pe fiecare poză.",
+  "Edges": "Margini",
+  "Fine (hair, fur)": "Fine (păr, blană)",
+  "Crisp (objects, products)": "Nete (obiecte, produse)",
+  "The fine model takes a few seconds per picture.": "Modelul fin durează câteva secunde pe fiecare poză.",
+  "{name}-no-background": "{name}-fără-fundal",
+  "No subject was found in the picture.": "Nu am găsit niciun subiect în imagine.",
+  "Subtitles": "Subtitrări",
+  "Convert, shift, fix, attach": "Convertește, decalează, repară, lipește",
+  "Fix broken letters and encoding": "Repară literele stricate și codarea",
+  "Shift (sync)": "Decalează (sincronizează)",
+  "Take out of a video": "Scoate din video",
+  "Put on a video": "Pune pe video",
+  "SRT": "SRT",
+  "WebVTT": "WebVTT",
+  "ASS": "ASS",
+  "Delay": "Decalaj",
+  "Positive = the subtitles show later. 1000 ms = one second.": "Pozitiv = subtitrarea apare mai târziu. 1000 ms = o secundă.",
+  "ş ţ (cedilla) → ș ț (comma)": "ş ţ (cu sedilă) → ș ț (cu virgulă)",
+  "As a track (can be turned off)": "Ca pistă (se poate opri)",
+  "Burned into the picture": "Arsă în imagine",
+  "Subtitle language": "Limba subtitrării",
+  "Your Windows language": "Limba Windows",
+  "Arabic": "Arabă",
+  "Bulgarian": "Bulgară",
+  "Catalan": "Catalană",
+  "Chinese": "Chineză",
+  "Croatian": "Croată",
+  "Czech": "Cehă",
+  "Danish": "Daneză",
+  "Dutch": "Olandeză",
+  "English": "Engleză",
+  "Estonian": "Estonă",
+  "Finnish": "Finlandeză",
+  "French": "Franceză",
+  "German": "Germană",
+  "Greek": "Greacă",
+  "Hebrew": "Ebraică",
+  "Hindi": "Hindi",
+  "Hungarian": "Maghiară",
+  "Indonesian": "Indoneziană",
+  "Italian": "Italiană",
+  "Japanese": "Japoneză",
+  "Korean": "Coreeană",
+  "Latvian": "Letonă",
+  "Lithuanian": "Lituaniană",
+  "Malay": "Malaeză",
+  "Norwegian": "Norvegiană",
+  "Persian": "Persană",
+  "Polish": "Poloneză",
+  "Portuguese": "Portugheză",
+  "Romanian": "Română",
+  "Russian": "Rusă",
+  "Serbian": "Sârbă",
+  "Slovak": "Slovacă",
+  "Slovenian": "Slovenă",
+  "Spanish": "Spaniolă",
+  "Swedish": "Suedeză",
+  "Thai": "Thailandeză",
+  "Turkish": "Turcă",
+  "Ukrainian": "Ucraineană",
+  "Vietnamese": "Vietnameză",
+  "Dark box behind the text": "Fundal întunecat sub text",
+  "For this, add subtitle files (SRT, VTT, ASS). For a video, choose “Take out of a video” or “Put on a video”.": "Pentru asta adaugă fișiere de subtitrare (SRT, VTT, ASS). Pentru un video alege „Scoate din video” sau „Pune pe video”.",
+  "Videos are skipped: this works on subtitle files.": "Videourile sunt sărite: acțiunea asta lucrează pe fișiere de subtitrare.",
+  "Add a video to take the subtitles out of.": "Adaugă un video din care să scot subtitrarea.",
+  "Add the video and the subtitle with the same name (film.mkv and film.srt). Each video gets its own subtitle.": "Adaugă video-ul și subtitrarea cu același nume (film.mkv și film.srt). Fiecare video primește subtitrarea lui.",
+  "The file isn't a subtitle.": "Fișierul nu e o subtitrare.",
+  "The file isn't a video.": "Fișierul nu e un video.",
+  "The video has no text subtitles.": "Video-ul nu are subtitrări text.",
+  "No subtitle with the same name was found for this video.": "Nu am găsit subtitrarea cu același nume pentru acest video.",
+  "Used for the video with the same name.": "Folosită pentru video-ul cu același nume.",
+  "SVG and vectorize": "SVG și vectorizare",
+  "Vectors both ways": "Vectori în ambele sensuri",
+  "Vector files": "Fișierele vectoriale",
+  "Pictures to trace": "Imaginile de vectorizat",
+  "Vector files to": "Fișierele vectoriale în",
+  "As in the file (1×)": "Ca în fișier (1×)",
+  "Double (2×)": "Dublă (2×)",
+  "4 times (4×)": "De 4 ori (4×)",
+  "Or a width in pixels; a vector drawing stays sharp at any size.": "Sau o lățime în pixeli; un desen vectorial rămâne clar la orice mărime.",
+  "One color": "O singură culoare",
+  "Drawing color": "Culoarea desenului",
+  "Detail": "Detalii",
+  "Few (big shapes)": "Puține (forme mari)",
+  "Many (faithful)": "Multe (fidel)",
+  "Outlines": "Contururi",
+  "Smooth curves": "Curbe netede",
+  "Straight lines": "Linii drepte",
+  "Pixels": "Pixeli",
+  "Tracing works best on logos, drawings and icons; a photo gives a large SVG.": "Vectorizarea iese cel mai bine la logo-uri, desene și pictograme; o fotografie dă un SVG mare.",
+  "EMF and WMF become PDF with LibreOffice, downloaded once; the drawing stays vector.": "EMF și WMF devin PDF cu LibreOffice, descărcat o singură dată; desenul rămâne vectorial.",
+  "This Illustrator file has no PDF inside. Save it again in Illustrator with “Create PDF Compatible File” ticked.": "Fișierul Illustrator nu are PDF în el. Salvează-l din nou în Illustrator cu „Create PDF Compatible File” bifat.",
+  "Spreadsheet data": "Date din tabele",
+  "Excel, CSV, JSON, XML": "Excel, CSV, JSON, XML",
+  "sheet": "foaia",
+  "CSV for Excel": "CSV pentru Excel",
+  "To Excel (XLSX)": "În Excel (XLSX)",
+  "JSON for apps": "JSON pentru programe",
+  "JSON": "JSON",
+  "XML": "XML",
+  "Separator": "Separator",
+  "Like Excel on this PC": "Ca Excel pe acest PC",
+  "Semicolon ;": "Punct și virgulă ;",
+  "Comma ,": "Virgulă ,",
+  "Tab": "Tab",
+  "Excel opens a CSV directly when it uses the separator from the Windows regional settings.": "Excel deschide direct un CSV cu separatorul din setările regionale Windows.",
+  "Encoding": "Codare",
+  "UTF-8 for Excel (with BOM)": "UTF-8 pentru Excel (cu BOM)",
+  "UTF-8": "UTF-8",
+  "This PC's Windows encoding (old programs)": "Codarea Windows a acestui PC (programe vechi)",
+  "Only the first": "Doar prima",
+  "The first row is the header": "Primul rând e capul de tabel",
+  "No table was found in the file.": "Nu am găsit niciun tabel în fișier.",
+  "Speech to text and subtitles": "Din vorbire în text și subtitrări",
+  "SRT subtitles": "Subtitrare SRT",
+  "VTT subtitles": "Subtitrare VTT",
+  "Spoken language": "Limba vorbită",
+  "Detect it": "Recunoaște singur",
+  "Afrikaans": "Afrikaans",
+  "አማርኛ": "አማርኛ",
+  "العربية": "العربية",
+  "অসমীয়া": "অসমীয়া",
+  "Azərbaycan": "Azərbaycan",
+  "Башҡорт": "Башҡорт",
+  "Беларуская": "Беларуская",
+  "Български": "Български",
+  "বাংলা": "বাংলা",
+  "བོད་སྐད་": "བོད་སྐད་",
+  "Brezhoneg": "Brezhoneg",
+  "Bosanski": "Bosanski",
+  "Català": "Català",
+  "Čeština": "Čeština",
+  "Cymraeg": "Cymraeg",
+  "Dansk": "Dansk",
+  "Deutsch": "Deutsch",
+  "Ελληνικά": "Ελληνικά",
+  "Español": "Español",
+  "Eesti": "Eesti",
+  "Euskara": "Euskara",
+  "فارسی": "فارسی",
+  "Suomi": "Suomi",
+  "Føroyskt": "Føroyskt",
+  "Français": "Français",
+  "Galego": "Galego",
+  "ગુજરાતી": "ગુજરાતી",
+  "Hausa": "Hausa",
+  "ʻŌlelo Hawaiʻi": "ʻŌlelo Hawaiʻi",
+  "עברית": "עברית",
+  "हिन्दी": "हिन्दी",
+  "Hrvatski": "Hrvatski",
+  "Kreyòl ayisyen": "Kreyòl ayisyen",
+  "Magyar": "Magyar",
+  "Հայերեն": "Հայերեն",
+  "Bahasa Indonesia": "Bahasa Indonesia",
+  "Íslenska": "Íslenska",
+  "Italiano": "Italiano",
+  "日本語": "日本語",
+  "Basa Jawa": "Basa Jawa",
+  "ქართული": "ქართული",
+  "Қазақ": "Қазақ",
+  "ខ្មែរ": "ខ្មែរ",
+  "ಕನ್ನಡ": "ಕನ್ನಡ",
+  "한국어": "한국어",
+  "Latina": "Latina",
+  "Lëtzebuergesch": "Lëtzebuergesch",
+  "Lingála": "Lingála",
+  "ລາວ": "ລາວ",
+  "Lietuvių": "Lietuvių",
+  "Latviešu": "Latviešu",
+  "Malagasy": "Malagasy",
+  "Māori": "Māori",
+  "Македонски": "Македонски",
+  "മലയാളം": "മലയാളം",
+  "Монгол": "Монгол",
+  "मराठी": "मराठी",
+  "Bahasa Melayu": "Bahasa Melayu",
+  "Malti": "Malti",
+  "မြန်မာ": "မြန်မာ",
+  "नेपाली": "नेपाली",
+  "Nederlands": "Nederlands",
+  "Nynorsk": "Nynorsk",
+  "Norsk": "Norsk",
+  "Occitan": "Occitan",
+  "ਪੰਜਾਬੀ": "ਪੰਜਾਬੀ",
+  "Polski": "Polski",
+  "پښتو": "پښتو",
+  "Português": "Português",
+  "Română": "Română",
+  "Русский": "Русский",
+  "संस्कृतम्": "संस्कृतम्",
+  "سنڌي": "سنڌي",
+  "සිංහල": "සිංහල",
+  "Slovenčina": "Slovenčina",
+  "Slovenščina": "Slovenščina",
+  "chiShona": "chiShona",
+  "Soomaali": "Soomaali",
+  "Shqip": "Shqip",
+  "Српски": "Српски",
+  "Basa Sunda": "Basa Sunda",
+  "Svenska": "Svenska",
+  "Kiswahili": "Kiswahili",
+  "தமிழ்": "தமிழ்",
+  "తెలుగు": "తెలుగు",
+  "Тоҷикӣ": "Тоҷикӣ",
+  "ไทย": "ไทย",
+  "Türkmen": "Türkmen",
+  "Tagalog": "Tagalog",
+  "Türkçe": "Türkçe",
+  "Татар": "Татар",
+  "Українська": "Українська",
+  "اردو": "اردو",
+  "Oʻzbek": "Oʻzbek",
+  "Tiếng Việt": "Tiếng Việt",
+  "ייִדיש": "ייִדיש",
+  "Yorùbá": "Yorùbá",
+  "粵語": "粵語",
+  "中文": "中文",
+  "Accurate (recommended)": "Precis (recomandat)",
+  "Fast, less accurate": "Rapid, mai puțin precis",
+  "Translate to English": "Tradu în engleză",
+  "The Whisper model can only translate into English.": "Modelul Whisper poate traduce doar în engleză.",
+  "Words to recognize (optional)": "Cuvinte de recunoscut (opțional)",
+  "Names, terms: Ionescu, ONNX, Cluj": "Nume, termeni: Ionescu, ONNX, Cluj",
+  "Helps the model spell names and rare terms right.": "Ajută modelul să scrie corect nume și termeni rari.",
+  "No speech was heard in the file.": "Nu am auzit vorbire în fișier.",
+  "This PC's processor is too old for transcription (it needs AVX2, from 2013 on).": "Procesorul acestui PC e prea vechi pentru transcriere (are nevoie de AVX2, din 2013 încoace).",
+  "Text to speech": "Text în voce",
+  "Listen to your texts": "Ascultă-ți textele",
+  "Voices": "Voci",
+  "From Windows": "Din Windows",
+  "Natural": "Naturale",
+  "Natural voices are an AI model that runs on your PC (a 140 MB download, once).": "Vocile naturale sunt un model AI care rulează pe PC-ul tău (o descărcare de 140 MB, o singură dată).",
+  "Voice": "Vocea",
+  "Heart · English (US), female": "Heart · engleză (SUA), feminină",
+  "Bella · English (US), female": "Bella · engleză (SUA), feminină",
+  "Michael · English (US), male": "Michael · engleză (SUA), masculină",
+  "Emma · English (UK), female": "Emma · engleză (Marea Britanie), feminină",
+  "George · English (UK), male": "George · engleză (Marea Britanie), masculină",
+  "Dora · Spanish, female": "Dora · spaniolă, feminină",
+  "Alex · Spanish, male": "Alex · spaniolă, masculină",
+  "Siwis · French, female": "Siwis · franceză, feminină",
+  "Sara · Italian, female": "Sara · italiană, feminină",
+  "Nicola · Italian, male": "Nicola · italiană, masculină",
+  "Dora · Portuguese (Brazil), female": "Dora · portugheză (Brazilia), feminină",
+  "Alex · Portuguese (Brazil), male": "Alex · portugheză (Brazilia), masculină",
+  "Alpha · Hindi, female": "Alpha · hindi, feminină",
+  "Omega · Hindi, male": "Omega · hindi, masculină",
+  "Voices come from Windows; you can add voices in other languages for free.": "Vocile vin din Windows; poți adăuga gratuit voci în alte limbi.",
+  "Add voices in Settings": "Adaugă voci în Setări",
+  "Slower": "Mai rar",
+  "A little faster": "Puțin mai repede",
+  "Natural voices speak only English, Spanish, French, Italian, Portuguese and Hindi. Choose a voice in the text's language; for other languages, use the voices from Windows.": "Vocile naturale vorbesc doar engleză, spaniolă, franceză, italiană, portugheză și hindi. Alege o voce în limba textului; pentru alte limbi, folosește vocile din Windows.",
+  "No voice in your language is installed on this PC. You can add one for free in Windows Settings (Speech › Add voices).": "Pe acest calculator nu e instalată o voce în limba ta. O poți adăuga gratuit din Setările Windows (Vorbire › Adaugă voci).",
+  "The file has no text.": "Fișierul nu conține text.",
+  "Windows has no voice installed.": "Windows nu are nicio voce instalată.",
+  "Compress video": "Comprimare video",
+  "Under a size you choose": "Sub o mărime aleasă",
+  "Small file": "Fișier mic",
+  "Discord 10 MB": "Discord 10 MB",
+  "Email 25 MB": "E-mail 25 MB",
+  "Phone 720p": "Telefon 720p",
+  "High quality": "Calitate înaltă",
+  "Lower = smaller file.": "Mai mică = fișier mai mic.",
+  "10 MB (Discord)": "10 MB (Discord)",
+  "16 MB (WhatsApp)": "16 MB (WhatsApp)",
+  "50 MB": "50 MB",
+  "Maximum resolution": "Rezoluție maximă",
+  "Keep": "Păstrează",
+  "4K (2160p)": "4K (2160p)",
+  "1440p": "1440p",
+  "Full HD (1080p)": "Full HD (1080p)",
+  "HD (720p)": "HD (720p)",
+  "480p": "480p",
+  "360p": "360p",
+  "No sound": "Fără sunet",
+  "Slow, a little better": "Lent, puțin mai bun",
+  "Codec": "Codec",
+  "H.264 (plays everywhere)": "H.264 (merge peste tot)",
+  "H.265 (smaller, newer)": "H.265 (mai mic, mai nou)",
+  "Frames per second": "Cadre pe secundă",
+  "Keep the date and location": "Păstrează data și locația",
+  "Some files have no picture and will be skipped.": "Unele fișiere nu au imagine și vor fi sărite.",
+  "H.265 doesn't play on some older computers and TVs.": "H.265 nu se redă pe unele calculatoare și televizoare mai vechi.",
+  "The file has no picture.": "Fișierul nu are imagine.",
+  "The chosen size is too small for the clip's length. Pick a larger size or trim the clip.": "Mărimea aleasă e prea mică pentru durata clipului. Alege o mărime mai mare sau taie clipul.",
+  "The file is already under the chosen size.": "Fișierul e deja sub mărimea aleasă.",
+  "The result is a little over the chosen size.": "Rezultatul e puțin peste mărimea aleasă.",
+  "Convert video": "Conversie video",
+  "MP4, MKV, WebM, MOV": "MP4, MKV, WebM, MOV",
+  "MP4 that plays everywhere": "MP4 care merge peste tot",
+  "Just change the format (instant)": "Doar schimbă formatul (instant)",
+  "For the web (WebM)": "Pentru web (WebM)",
+  "Old player (AVI)": "Player vechi (AVI)",
+  "Picture": "Imagine",
+  "MP4": "MP4",
+  "MKV": "MKV",
+  "WebM": "WebM",
+  "MOV": "MOV",
+  "AVI": "AVI",
+  "Automatic (copies what it can)": "Automat (copiază ce se poate)",
+  "Format only, no re-encoding": "Doar formatul, fără recodare",
+  "Re-encode everything": "Recodează tot",
+  "90° right": "90° la dreapta",
+  "90° left": "90° la stânga",
+  "Mirror": "Oglindire",
+  "Left-right": "Stânga-dreapta",
+  "Up-down": "Sus-jos",
+  "Without re-encoding, the cut starts at the nearest keyframe, so it may be a second early.": "Fără recodare, tăietura începe la cel mai apropiat cadru-cheie, deci poate fi cu o secundă mai devreme.",
+  "The new format can't hold this file's tracks without re-encoding. Choose “Automatic”.": "Formatul nou nu acceptă pistele acestui fișier fără recodare. Alege „Automat”.",
+  "Video to GIF": "Video în GIF",
+  "A clip that loops": "Un clip care se repetă",
+  "For chat": "Pentru chat",
+  "Sharp, WebP": "Clar, WebP",
+  "GIF to MP4": "GIF în MP4",
+  "Animated WebP": "WebP animat",
+  "MP4 (from a GIF)": "MP4 (din GIF)",
+  "240 px": "240 px",
+  "320 px": "320 px",
+  "480 px": "480 px",
+  "640 px": "640 px",
+  "720 px": "720 px",
+  "10 (small file)": "10 (fișier mic)",
+  "24 (smooth)": "24 (fluid)",
+  "Loops forever": "Se repetă la nesfârșit",
+  "A long GIF gets very large. Pick just a few seconds (Only a part).": "Un GIF lung iese foarte mare. Alege doar câteva secunde (Doar o parte).",
+  "Video to MP3": "Video în MP3",
+  "Good (128 kbps)": "Bună (128 kbps)",
+  "Very good (192 kbps)": "Foarte bună (192 kbps)",
+  "Excellent (256 kbps)": "Excelentă (256 kbps)",
+  "Audio track": "Pista audio",
+  "Brings the sound to a standard loudness.": "Aduce sunetul la un volum obișnuit, ca la radio.",
+  "Mono (smaller file)": "Mono (fișier mai mic)",
+  "Word to PDF": "Word în PDF",
+  "Ready to send": "Gata de trimis",
+  "Comments and changes": "Comentarii și modificări",
+  "Hide them (final text only)": "Nu le arăta (doar textul final)",
+  "Show them in the PDF": "Arată-le în PDF",
+  "Clickable outline in the PDF": "Cuprins clicabil în PDF",
+  "From headings": "Din titluri",
+  "From Word bookmarks": "Din semnele de carte Word",
+  "Keep author and title": "Păstrează autorul și titlul",
+  "This document has tracked changes. Use “Comments and changes” to choose whether they show in the PDF.": "Documentul are modificări urmărite. Alege la „Comentarii și modificări” dacă apar în PDF.",
+  "This document has comments. Use “Comments and changes” to choose whether they show in the PDF.": "Documentul are comentarii. Alege la „Comentarii și modificări” dacă apar în PDF.",
+  "This document contains macros. They won't run; the PDF shows the document as it was saved.": "Documentul conține macrocomenzi. Ele nu vor rula; PDF-ul arată documentul așa cum e salvat.",
+  "This document is password-protected. You'll need the password to convert it.": "Documentul e protejat cu parolă. Vei avea nevoie de parolă ca să-l transformi."
+ }
+}

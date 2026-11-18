@@ -4,6 +4,7 @@
 //! with scripts off and the internet blocked, so a mail can't tell its sender it was opened.
 
 use super::{file_size, write_file, Analysis, Ctx, Plugin};
+use crate::common::words::Words;
 use crate::common::{edge, rtf};
 use contract::{opt, t, FileError, FileRef, Request};
 use serde_json::{json, Map, Value};
@@ -122,8 +123,8 @@ fn ext_of(p: &Path) -> String {
     p.extension().map(|e| e.to_string_lossy().to_ascii_lowercase()).unwrap_or_default()
 }
 
-fn ro(req: &Request) -> bool {
-    req.locale.as_deref().unwrap_or("en").starts_with("ro")
+fn words(req: &Request) -> &'static Words {
+    crate::common::words::of(req.locale.as_deref())
 }
 
 // ------------------------------------------------------------------ reading: EML / MBOX
@@ -678,19 +679,18 @@ fn who(v: &[(String, String)]) -> String {
     }).collect::<Vec<_>>().join(", ")
 }
 
-fn local_date(ts: i64, ro: bool) -> String {
+fn local_date(ts: i64, w: &Words) -> String {
     use chrono::TimeZone;
     match chrono::Local.timestamp_opt(ts, 0).single() {
-        Some(d) if ro => d.format("%d.%m.%Y %H:%M").to_string(),
-        Some(d) => d.format("%Y-%m-%d %H:%M").to_string(),
+        Some(d) => d.format(w.date_format).to_string(),
         None => String::new(),
     }
 }
 
 /// The message as one page: a header, then its HTML (inline pictures inside, scripts
 /// out) or its text.
-fn html_section(m: &Mail, ro: bool, attachment_links: Option<&str>) -> String {
-    let (l_from, l_to, l_cc, l_date, l_att) = if ro { ("De la", "Către", "Cc", "Data", "Atașamente") } else { ("From", "To", "Cc", "Date", "Attachments") };
+fn html_section(m: &Mail, w: &Words, attachment_links: Option<&str>) -> String {
+    let (l_from, l_to, l_cc, l_date, l_att) = (w.from, w.to, w.cc, w.date, w.attachments);
     let mut rows = String::new();
     if let Some(f) = &m.from {
         rows.push_str(&format!("<tr><td class=k>{l_from}</td><td>{}</td></tr>", who(std::slice::from_ref(f))));
@@ -702,7 +702,7 @@ fn html_section(m: &Mail, ro: bool, attachment_links: Option<&str>) -> String {
         rows.push_str(&format!("<tr><td class=k>{l_cc}</td><td>{}</td></tr>", who(&m.cc)));
     }
     if let Some(d) = m.date {
-        rows.push_str(&format!("<tr><td class=k>{l_date}</td><td>{}</td></tr>", local_date(d, ro)));
+        rows.push_str(&format!("<tr><td class=k>{l_date}</td><td>{}</td></tr>", local_date(d, w)));
     }
     let listed: Vec<String> = m.attachments.iter().filter(|a| !is_inline(m, a)).map(|a| format!("{} ({})", esc(&a.name), size(a.data.len()))).collect();
     if !listed.is_empty() {
@@ -793,8 +793,22 @@ fn page(sections: &str) -> String {
 
 pub fn safe(s: &str) -> String {
     let t: String = s.chars().map(|c| if c.is_control() || "<>:\"/\\|?*".contains(c) { '_' } else { c }).collect();
-    let t: String = t.trim().trim_end_matches('.').chars().take(90).collect();
-    if t.is_empty() { "message".into() } else { t }
+    let mut t: String = t.trim().chars().take(90).collect();
+    while t.ends_with('.') || t.ends_with(' ') {
+        t.pop();
+    }
+    if t.is_empty() {
+        return "message".into();
+    }
+    // Names Windows keeps for devices ("con", "nul.txt", "COM1.pdf"): such a file can't
+    // be made, so the attachment would be lost.
+    let base = t.split('.').next().unwrap_or("").trim_end().to_ascii_uppercase();
+    let reserved = matches!(base.as_str(), "CON" | "PRN" | "AUX" | "NUL")
+        || (base.len() == 4 && (base.starts_with("COM") || base.starts_with("LPT")) && matches!(base.as_bytes()[3], b'1'..=b'9'));
+    if reserved {
+        t.insert(0, '_');
+    }
+    t
 }
 
 /// "2026-03-31 14.05 Subject", unique in `used`.
@@ -816,10 +830,10 @@ fn stem(m: &Mail, used: &mut HashSet<String>) -> String {
 fn write_message(ctx: &Ctx, m: &Mail, dir: &Path, used: &mut HashSet<String>, format: &str, key: &str) -> Result<PathBuf, FileError> {
     std::fs::create_dir_all(dir).map_err(super::io_err)?;
     let req = ctx.req;
-    let ro = ro(req);
+    let w = words(req);
     let name = stem(m, used);
     let save_atts = req.bool_or("attachments", true) && matches!(format, "pdf" | "html");
-    let att_dir_name = format!("{name} - {}", if ro { "atașamente" } else { "attachments" });
+    let att_dir_name = format!("{name} - {}", w.attachments_folder);
     let mut saved_any = false;
     if save_atts {
         let mut names = HashSet::new();
@@ -845,13 +859,13 @@ fn write_message(ctx: &Ctx, m: &Mail, dir: &Path, used: &mut HashSet<String>, fo
         }
         "html" => {
             let p = dir.join(format!("{name}.html"));
-            write_file(&p, page(&html_section(m, ro, link)).as_bytes())?;
+            write_file(&p, page(&html_section(m, w, link)).as_bytes())?;
             p
         }
         _ => {
             let p = dir.join(format!("{name}.pdf"));
             let html = ctx.work_dir.join(format!("mail-{key}.html"));
-            write_file(&html, page(&html_section(m, ro, link)).as_bytes())?;
+            write_file(&html, page(&html_section(m, w, link)).as_bytes())?;
             edge::print_with(ctx, key, &html, &p, Duration::from_secs(120), true)?;
             let _ = std::fs::remove_file(&html);
             p
@@ -909,7 +923,7 @@ fn loose_to_mbox(ctx: &Ctx, files: &[&FileRef]) -> Result<Value, FileError> {
     }
     let dest = ctx.file_dir("mbox")?.join("mail.mbox");
     write_file(&dest, &out)?;
-    let name = if files.len() == 1 { files[0].input_path().file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default() } else if ro(ctx.req) { "mesaje".into() } else { "messages".into() };
+    let name = if files.len() == 1 { files[0].input_path().file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default() } else { words(ctx.req).messages.into() };
     ctx.progress("*", 1.0, "write", 1, 1);
     ctx.emit_output("*", &dest, "mbox", json!({ "file": name }), in_bytes);
     Ok(Value::Null)
@@ -927,7 +941,7 @@ fn archive(ctx: &Ctx, f: &FileRef) -> Result<Value, FileError> {
     let stem = path.file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
     let one_pdf = format == "pdf" && ctx.req.bool_or("onePdf", false);
     let root = ctx.file_dir(&f.id)?.join("out");
-    let ro = ro(ctx.req);
+    let w = words(ctx.req);
     ctx.progress(&f.id, 0.0, "read", 1, 2);
     let total = std::cell::Cell::new(0usize);
     let mut done = 0usize;
@@ -941,7 +955,7 @@ fn archive(ctx: &Ctx, f: &FileRef) -> Result<Value, FileError> {
         ctx.progress(&f.id, 0.02 + 0.9 * frac, "write", 2, 2);
         match format {
             "mbox" => mbox_entry(&m, mbox.entry(folders.to_vec()).or_default())?,
-            _ if one_pdf => sections.push_str(&html_section(&m, ro, None)),
+            _ if one_pdf => sections.push_str(&html_section(&m, w, None)),
             _ => {
                 let dir = folders.iter().fold(root.clone(), |d, n| d.join(safe(n)));
                 let u = used.entry(folders.to_vec()).or_default();
@@ -1024,3 +1038,19 @@ mod tests {
     }
 }
 
+#[cfg(test)]
+mod safe_tests {
+    #[test]
+    fn reserved_windows_names_are_renamed() {
+        assert_eq!(super::safe("con"), "_con");
+        assert_eq!(super::safe("NUL.txt"), "_NUL.txt");
+        assert_eq!(super::safe("com1.pdf"), "_com1.pdf");
+        assert_eq!(super::safe("Lpt9"), "_Lpt9");
+        assert_eq!(super::safe("aux .doc"), "_aux .doc");
+        assert_eq!(super::safe("console.txt"), "console.txt");
+        assert_eq!(super::safe("com10.txt"), "com10.txt");
+        assert_eq!(super::safe("report. ."), "report");
+        assert_eq!(super::safe("a/b:c"), "a_b_c");
+        assert_eq!(super::safe(" . "), "message");
+    }
+}

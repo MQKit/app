@@ -53,6 +53,7 @@ pub fn download(id: &str, url: &str, extensions: &[String], progress: &dyn Fn(u6
 fn fetch(url: &str, extensions: &[String], cancel: &AtomicBool, progress: &dyn Fn(u64, u64)) -> Result<FileInfo, Error> {
     let url = direct(url.trim()).ok_or_else(|| err("bad_link"))?;
     let agent: ureq::Agent = ureq::Agent::config_builder()
+        .tls_config(crate::tls())
         .timeout_connect(Some(Duration::from_secs(20)))
         .timeout_recv_response(Some(Duration::from_secs(60)))
         .timeout_recv_body(Some(Duration::from_secs(6 * 3600)))
@@ -62,7 +63,7 @@ fn fetch(url: &str, extensions: &[String], cancel: &AtomicBool, progress: &dyn F
         .build()
         .into();
     let mut resp = agent.get(&url).call().map_err(|e| {
-        eprintln!("link {url}: {e}");
+        applog!("link {url}: {e}");
         err("network")
     })?;
     let status = resp.status().as_u16();
@@ -102,7 +103,7 @@ fn fetch(url: &str, extensions: &[String], cancel: &AtomicBool, progress: &dyn F
                 return Err(err("cancelled"));
             }
             let n = reader.read(&mut buf).map_err(|e| {
-                eprintln!("link {url} at {done}: {e}");
+                applog!("link {url} at {done}: {e}");
                 if done > MAX_BYTES { err("too_big") } else { err("network") }
             })?;
             if n == 0 {
@@ -123,15 +124,28 @@ fn fetch(url: &str, extensions: &[String], cancel: &AtomicBool, progress: &dyn F
         }
         file.flush().map_err(|_| err("permission_denied"))?;
         drop(file);
-        std::fs::rename(&part, &dest).map_err(|_| err("permission_denied"))?;
-        progress(done, done);
-        Ok(())
+        // Never over a file that appeared under that name meanwhile (the browser, another
+        // download): the next free name instead.
+        let mut to = dest.clone();
+        for _ in 0..50 {
+            if crate::winutil::move_new(&part, &to).map_err(|_| err("permission_denied"))? {
+                progress(done, done);
+                return Ok(to);
+            }
+            to = unique(&dir, &name);
+        }
+        Err(err("permission_denied"))
     })();
-    if let Err(e) = res {
-        let _ = std::fs::remove_file(&part);
-        return Err(e);
+    match res {
+        Ok(saved) => {
+            crate::winutil::mark_from_internet(&saved, &url);
+            crate::file_info(&saved, None).ok_or_else(|| err("permission_denied"))
+        }
+        Err(e) => {
+            let _ = std::fs::remove_file(&part);
+            Err(e)
+        }
     }
-    crate::file_info(&dest, None).ok_or_else(|| err("permission_denied"))
 }
 
 /// The direct download for a link: only http(s); share pages of Google Drive,

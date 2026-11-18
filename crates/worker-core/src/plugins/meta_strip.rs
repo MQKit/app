@@ -138,12 +138,16 @@ impl Plugin for MetaStrip {
 
 fn title_of(req: &Request, path: &Path) -> Option<String> {
     let exe = ffmpeg::exe(req, "ffprobe").ok()?;
-    let out = std::process::Command::new(exe)
+    let mut child = ffmpeg::command(&exe)
         .args(["-v", "error", "-show_entries", "format_tags=title", "-of", "default=nw=1:nk=1"])
         .arg(path)
-        .output()
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
         .ok()?;
-    let s = String::from_utf8_lossy(&out.stdout).trim().to_string();
+    let (_, stdout, _) = crate::common::proc::output(&mut child, "ffprobe", std::time::Duration::from_secs(90)).ok()?;
+    let s = String::from_utf8_lossy(&stdout).trim().to_string();
     (!s.is_empty()).then_some(s)
 }
 
@@ -161,11 +165,25 @@ fn strip_jpeg(d: &[u8], keep_icc: bool, keep_orientation: bool) -> Result<(Vec<u
     let mut removed = 0;
     let mut orientation = None;
     let mut i = 2;
-    while i + 4 <= d.len() {
+    while i + 2 <= d.len() {
         if d[i] != 0xFF {
             return Err(bad("broken JPEG marker"));
         }
         let m = d[i + 1];
+        // Fill bytes: any number of 0xFF may come before a marker.
+        if m == 0xFF {
+            i += 1;
+            continue;
+        }
+        // Markers without a length: TEM and the restart markers (and a repeated SOI).
+        if m == 0x01 || m == 0xD8 || (0xD0..=0xD7).contains(&m) {
+            out.extend_from_slice(&d[i..i + 2]);
+            i += 2;
+            continue;
+        }
+        if m == 0xD9 || m == 0x00 {
+            return Err(bad("no picture data"));
+        }
         if m == 0xDA {
             // Start of scan: the rest is picture data.
             if let (true, Some(o)) = (keep_orientation, orientation) {
@@ -176,7 +194,12 @@ fn strip_jpeg(d: &[u8], keep_icc: bool, keep_orientation: bool) -> Result<(Vec<u
             out.extend_from_slice(&d[i..]);
             return Ok((out, removed));
         }
-        let len = u16::from_be_bytes([d[i + 2], d[i + 3]]) as usize;
+        let len_bytes = d.get(i + 2..i + 4).ok_or_else(|| bad("truncated JPEG"))?;
+        let len = u16::from_be_bytes([len_bytes[0], len_bytes[1]]) as usize;
+        // The length counts its own two bytes: less is a broken file, not an empty segment.
+        if len < 2 {
+            return Err(bad("broken JPEG segment"));
+        }
         let seg = d.get(i..i + 2 + len).ok_or_else(|| bad("truncated JPEG"))?;
         let body = &seg[4..];
         let drop = match m {
@@ -482,11 +505,26 @@ fn strip_office(src: &Path, dst: &Path) -> Result<(), FileError> {
     let out = std::fs::File::create(dst).map_err(super::io_err)?;
     let mut zout = zip::ZipWriter::new(out);
     let opts = zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+    // The parts that hold names are rewritten; everything else (pictures, a video in a
+    // presentation) is copied as it is stored, without unpacking it into memory.
+    const XML_LIMIT: u64 = 256 * 1024 * 1024;
     for k in 0..zin.len() {
-        let mut entry = zin.by_index(k).map_err(|e| bad(&e.to_string()))?;
-        let name = entry.name().map_err(|e| bad(&e.to_string()))?.to_string();
+        let name = zin.by_index_raw(k).map_err(|e| bad(&e.to_string()))?.name().map_err(|e| bad(&e.to_string()))?.to_string();
+        if !(name.starts_with("docProps/") || people_part(&name)) {
+            let raw = zin.by_index_raw(k).map_err(|e| bad(&e.to_string()))?;
+            zout.raw_copy_file(raw).map_err(|e| match e {
+                zip::result::ZipError::Io(io) => super::io_err(io),
+                e => bad(&e.to_string()),
+            })?;
+            continue;
+        }
+        let entry = zin.by_index(k).map_err(|e| bad(&e.to_string()))?;
         let mut data = Vec::new();
-        entry.read_to_end(&mut data).map_err(super::io_err)?;
+        entry.take(XML_LIMIT + 1).read_to_end(&mut data).map_err(super::io_err)?;
+        // A part this big is not a real document part (a zip bomb).
+        if data.len() as u64 > XML_LIMIT {
+            return Err(FileError::with(codes::FILE_TOO_LARGE, json!({ "part": name })));
+        }
         let data = match name.as_str() {
             "docProps/core.xml" => br#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></cp:coreProperties>"#
@@ -508,6 +546,16 @@ fn strip_office(src: &Path, dst: &Path) -> Result<(), FileError> {
 /// The people in a document: who wrote each comment and each tracked change, and the
 /// lists of them (with their account IDs and e-mail addresses). Everyone becomes
 /// "Author", as Office's own "Remove personal information" does.
+/// The XML parts [`anonymize_people`] changes.
+fn people_part(name: &str) -> bool {
+    name.ends_with(".xml")
+        && (name.starts_with("word/")
+            || name.starts_with("xl/persons/")
+            || name == "ppt/commentAuthors.xml"
+            || name == "ppt/authors.xml"
+            || name.starts_with("xl/comments"))
+}
+
 fn anonymize_people(name: &str, data: Vec<u8>) -> Vec<u8> {
     let attrs: &[(&str, &str)] = if name.starts_with("word/") {
         &[("w:author", "Author"), ("w:initials", "A"), ("w15:author", "Author"), ("w15:userId", ""), ("w15:providerId", "None")]
@@ -584,6 +632,60 @@ mod people_tests {
         assert_eq!(String::from_utf8(super::anonymize_people("xl/comments1.xml", x)).unwrap(), "<comments><authors><author>Author</author><author>Author</author></authors></comments>");
         let x = br#"<p:cNvPr id="2" name="Title 1"/>"#.to_vec();
         assert_eq!(super::anonymize_people("ppt/slides/slide1.xml", x.clone()), x);
+    }
+}
+
+#[cfg(test)]
+mod jpeg_tests {
+    use super::strip_jpeg;
+
+    fn seg(m: u8, body: &[u8]) -> Vec<u8> {
+        let mut v = vec![0xFF, m];
+        v.extend_from_slice(&((body.len() + 2) as u16).to_be_bytes());
+        v.extend_from_slice(body);
+        v
+    }
+
+    fn has(d: &[u8], w: &[u8]) -> bool {
+        d.windows(w.len()).any(|x| x == w)
+    }
+
+    const SCAN: &[u8] = &[0xFF, 0xDA, 0x00, 0x02, 0x11, 0x22, 0xFF, 0xD9];
+
+    #[test]
+    fn exif_after_fill_bytes_is_removed() {
+        let mut d = vec![0xFF, 0xD8];
+        d.extend(seg(0xE0, b"JFIF\0"));
+        d.extend_from_slice(&[0xFF, 0xFF, 0xFF]);
+        d.extend(seg(0xE1, b"Exif\0\0SECRETGPS"));
+        d.extend(seg(0xFE, b"a comment"));
+        d.extend_from_slice(SCAN);
+        let (out, removed) = strip_jpeg(&d, true, false).unwrap();
+        assert_eq!(removed, 2);
+        assert!(!has(&out, b"SECRETGPS") && !has(&out, b"a comment"));
+        assert!(has(&out, b"JFIF") && out.ends_with(SCAN));
+    }
+
+    #[test]
+    fn markers_without_length_are_kept() {
+        let mut d = vec![0xFF, 0xD8, 0xFF, 0x01, 0xFF, 0xD0];
+        d.extend(seg(0xE1, b"Exif\0\0SECRET"));
+        d.extend_from_slice(SCAN);
+        let (out, removed) = strip_jpeg(&d, true, false).unwrap();
+        assert_eq!(removed, 1);
+        assert!(out.starts_with(&[0xFF, 0xD8, 0xFF, 0x01, 0xFF, 0xD0]) && !has(&out, b"SECRET"));
+    }
+
+    #[test]
+    fn broken_lengths_are_errors_not_panics() {
+        for len in [0u8, 1] {
+            let mut d = vec![0xFF, 0xD8, 0xFF, 0xE1, 0x00, len];
+            d.extend_from_slice(SCAN);
+            assert!(strip_jpeg(&d, true, false).is_err());
+        }
+        assert!(strip_jpeg(&[0xFF, 0xD8, 0xFF, 0xE1, 0x00], true, false).is_err());
+        assert!(strip_jpeg(&[0xFF, 0xD8, 0xFF, 0xE1, 0xFF, 0xFF, 1, 2], true, false).is_err());
+        assert!(strip_jpeg(&[0xFF, 0xD8, 0xFF, 0xD9], true, false).is_err());
     }
 }
 

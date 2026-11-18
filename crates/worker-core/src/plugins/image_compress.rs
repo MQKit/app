@@ -144,7 +144,7 @@ impl Plugin for ImageCompress {
             None
         };
         let frames: Option<Vec<(image::RgbaImage, u32)>> = if loaded.kind == Kind::Webp {
-            img::animation_frames(path).map(|fs| {
+            img::animation_frames(path, ctx.req.limits.max_megapixels)?.map(|fs| {
                 fs.into_iter()
                     .map(|(f, d)| match max_dim {
                         0 => (f, d),

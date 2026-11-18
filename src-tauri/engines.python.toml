@@ -85,3 +85,117 @@ url = "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0
 size = 45571
 sha256 = "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
 license = "PSF-2.0"
+
+# Kokoro: natural-sounding voices for Text to speech, run on the PC (the model with ONNX
+# Runtime, words turned into sounds by eSpeak NG). English, Spanish, French, Italian,
+# Portuguese and Hindi. The model is the 8-bit one (92 MB): it reads as clearly as the
+# 325 MB one (both transcribed word for word by the app's own speech to text).
+[kokoro-model]
+version = "1.0-int8"
+url = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.int8.onnx"
+size = 92361271
+sha256 = "6e742170d309016e5891a994e1ce1559c702a2ccd0075e67ef7157974f6406cb"
+license = "Apache-2.0 (Kokoro-82M), MIT (kokoro-onnx export)"
+source = "https://huggingface.co/hexgrad/Kokoro-82M"
+extract = "file"
+files = ["kokoro-v1.0.int8.onnx"]
+
+[kokoro-voices]
+version = "1.0"
+url = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
+size = 28214398
+sha256 = "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+license = "Apache-2.0"
+source = "https://huggingface.co/hexgrad/Kokoro-82M"
+extract = "file"
+files = ["voices-v1.0.bin"]
+
+[kokoro]
+version = "0.6.1"
+requires = ["python", "onnxruntime", "kokoro-model", "kokoro-voices"]
+license = "MIT (kokoro-onnx), GPL-3.0-or-later (phonemizer, eSpeak NG), others BSD/MIT/Apache/PSF"
+source = "https://github.com/thewh1teagle/kokoro-onnx"
+extract = "wheels"
+files = ["site-packages/kokoro_onnx/__init__.py"]
+# eSpeak NG and phonemizer are GPL: copying them to MQKit/engines would mean hosting
+# their source too (see scripts/mirror-engines.mjs).
+mirror = false
+
+[[kokoro.wheels]]
+name = "kokoro_onnx-0.6.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/60/e1/a27e5a70a525a5ee1fd5357596f07b724d02ff317f134e86cb6e3d9db968/kokoro_onnx-0.6.1-py3-none-any.whl"
+size = 26084
+sha256 = "50c8de4950d601df41428ee5462a48c8a78bef441bf671f2492e070ef44d8a32"
+license = "MIT"
+
+[[kokoro.wheels]]
+name = "phonemizer-3.6.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/9b/70/681cea1684270c8d70b4e0fd7f17aaeb4e97fa9fc17b7bc2a6dee6a74e96/phonemizer-3.6.0-py3-none-any.whl"
+size = 125087
+sha256 = "efb0703d3204f334756cafc9c97390c588446469c69214af4092836ca128cbab"
+license = "GPL-3.0-or-later"
+
+[[kokoro.wheels]]
+name = "espeakng_loader-0.2.4-py3-none-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/9d/ed/a3d872fbad4f3a3f3db0e8c31768ab14e77cd77306de16b8b20b1e1df7ea/espeakng_loader-0.2.4-py3-none-win_amd64.whl"
+size = 9437292
+sha256 = "41f1e08ac9deda2efd1ea9de0b81dab9f5ae3c4b24284f76533d0a7b1dd7abd7"
+license = "GPL-3.0-or-later (eSpeak NG)"
+
+[[kokoro.wheels]]
+name = "attrs-26.1.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl"
+size = 67548
+sha256 = "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309"
+license = "MIT"
+
+[[kokoro.wheels]]
+name = "dlinfo-2.0.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/da/90/022c79d6e5e6f843268c10b84d4a021ee3afba0621d3c176d3ff2024bfc8/dlinfo-2.0.0-py3-none-any.whl"
+size = 3654
+sha256 = "b32cc18e3ea67c0ca9ca409e5b41eed863bd1363dbc9dd3de90fedf11b61e7bc"
+license = "MIT"
+
+[[kokoro.wheels]]
+name = "joblib-1.6.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/18/53/84099323c2ec4be98d935f63c033ac4151ee83836ca1050ede3b3aadf155/joblib-1.6.0-py3-none-any.whl"
+size = 306115
+sha256 = "3dbbf9f6e4b592a2357b854608e980fe6390d131d7a82f011a377ef2ebef7aba"
+license = "BSD-3-Clause"
+
+[[kokoro.wheels]]
+name = "numpy-2.5.5-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/45/74/bb9161943fb65caf24e4bb04c788f5c7815e6cb78ac595e7f46781033c82/numpy-2.5.5-cp313-cp313-win_amd64.whl"
+size = 12573354
+sha256 = "e0608d1585557b68dcb6a70a41654f7536567960afad79d91752d2863b242b68"
+license = "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0"
+
+[[kokoro.wheels]]
+name = "typing_extensions-4.16.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl"
+size = 45571
+sha256 = "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+license = "PSF-2.0"
+
+[[kokoro.wheels]]
+name = "flatbuffers-25.12.19-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/e8/2d/d2a548598be01649e2d46231d151a6c56d10b964d94043a335ae56ea2d92/flatbuffers-25.12.19-py2.py3-none-any.whl"
+size = 26661
+sha256 = "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4"
+license = "Apache-2.0"
+
+[[kokoro.wheels]]
+name = "protobuf-7.36.2-cp310-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/8a/55/b77bda4e5e5f5971fb51b07663694690e9afdb9402136c16a522bd621cad/protobuf-7.36.2-cp310-abi3-win_amd64.whl"
+size = 456514
+sha256 = "a300819d441e078a5608c0d3c709796bb548136058fda017ae51d425b44fd353"
+license = "BSD-3-Clause"
+
+[[kokoro.wheels]]
+name = "packaging-26.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl"
+size = 129956
+sha256 = "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+license = "Apache-2.0 OR BSD-2-Clause"
+
+# 11 wheels, 23197836 bytes in all, for CPython 3.13 on 64-bit Windows; ONNX Runtime is its own engine.

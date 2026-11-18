@@ -3,7 +3,7 @@
   import { onMount, untrack } from "svelte";
   import { open } from "@tauri-apps/plugin-dialog";
   import { api, type Field, type FileInfo, type OutputBlock } from "../lib/api";
-  import { L, t, actionLabel, errorText, fileCount, i18n } from "../lib/i18n.svelte";
+  import { L, t, tn, actionLabel, errorText, fileCount, i18n, localeOf } from "../lib/i18n.svelte";
   import { app, go, tool, toggleFavorite, rememberValues, toolColor } from "../lib/store.svelte";
   import { evalCond, resolveDefault, type CondCtx } from "../lib/cond";
   import { bytes, percentChange } from "../lib/format";
@@ -14,6 +14,7 @@
   import EngineNotice from "../components/EngineNotice.svelte";
   import FolderAdd from "../components/FolderAdd.svelte";
   import LinkAdd from "../components/LinkAdd.svelte";
+  import TextAdd from "../components/TextAdd.svelte";
   import BeforeAfter from "../components/BeforeAfter.svelte";
   import { downloads, downloadEngine, ENGINE_NAMES } from "../lib/engines.svelte";
 
@@ -110,7 +111,13 @@
     const last = app.settings.rememberLast ? app.lastValues[id] : null;
     resetDefaults();
     if (last?.values) {
-      for (const f of fields) if (f.key in last.values) values[f.key] = last.values[f.key];
+      // What the person chose last time stays, even where the files' analysis would
+      // suggest another default (a remembered PNG output is not turned into JPG).
+      for (const f of fields)
+        if (f.key in last.values) {
+          values[f.key] = last.values[f.key];
+          touched.add(f.key);
+        }
     }
     if (last?.output) {
       // A name that is only some language's default follows the current language
@@ -125,19 +132,47 @@
     if (initialFiles.length) addFiles(initialFiles);
     api.engines().then((l) => (engineInfo = l));
     onDrop = async (paths: string[]) => {
-      if (phase === "running") return;
+      if (phase === "running") {
+        app.busyRefused = Date.now();
+        return;
+      }
       if (phase === "done") resetRun(true);
       addFiles(await api.expand(paths));
     };
+    app.toolFiles = (files) => {
+      if (phase === "running") return false;
+      if (phase === "done") resetRun(true);
+      addFiles(files);
+      return true;
+    };
     const key = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && phase !== "running") go({ name: "home" });
+      // Escape leaves the tool, but not from a text field, an open list or a dialog, and
+      // never throws away files still to convert.
+      const t = e.target as HTMLElement | null;
+      const typing = !!t?.closest("input, textarea, select, [contenteditable], dialog, [role=dialog]");
+      if (e.key === "Escape" && !typing && !e.defaultPrevented && (phase === "done" || (phase === "edit" && items.length === 0))) go({ name: "home" });
       if (e.key === "o" && e.ctrlKey && phase === "edit") pick();
     };
     window.addEventListener("keydown", key);
     return () => {
       onDrop = null;
+      app.toolFiles = null;
+      app.busy = false;
       window.removeEventListener("keydown", key);
     };
+  });
+
+  // While a conversion runs, the tool can't be left (its progress and results would be lost).
+  $effect(() => {
+    app.busy = phase === "running";
+  });
+  // "Can't leave now", for a few seconds after a refused click or drop.
+  let busyNotice = $state(false);
+  $effect(() => {
+    if (!app.busyRefused) return;
+    busyNotice = true;
+    const timer = setTimeout(() => (busyNotice = false), 6000);
+    return () => clearTimeout(timer);
   });
 
   // Conditional defaults follow the analysis, for fields the user did not touch.
@@ -160,23 +195,36 @@
   // ---------- files ----------
   async function addFiles(list: FileInfo[]) {
     const exts = m.input.extensions;
+    const fits = list.filter((f) => m.input.anyFile || exts.includes(f.ext));
+    // A tool for one file: a new one takes the place of the one in the list.
+    if (!m.input.multiple && fits.length && items.length && !items.some((i) => i.info.path.toLowerCase() === fits[0].path.toLowerCase())) items = [];
     const known = new Set(items.map((i) => i.info.path.toLowerCase()));
     const fresh: Item[] = [];
-    for (const f of list) {
-      if (known.has(f.path.toLowerCase())) continue;
-      if (!m.input.anyFile && !exts.includes(f.ext)) continue;
-      if (!m.input.multiple && items.length + fresh.length >= 1) break;
+    const skip = { dup: 0, type: list.length - fits.length, limit: 0 };
+    for (const f of fits) {
+      if (known.has(f.path.toLowerCase())) {
+        skip.dup++;
+        continue;
+      }
+      if (!m.input.multiple && items.length + fresh.length >= 1) {
+        skip.limit++;
+        continue;
+      }
+      known.add(f.path.toLowerCase());
       const itemDefaults: Record<string, any> = {};
       for (const fld of m.input.itemFields ?? []) itemDefaults[fld.key] = fld.default === "all" ? "" : (fld.default ?? "");
       fresh.push({ id: newId(), info: f, status: "analyzing", props: {}, item: itemDefaults });
     }
-    const skippedCount = list.length - fresh.length;
-    skippedNotice = skippedCount > 0 && list.length > 0 ? skippedCount : 0;
+    skipped = skip;
     if (!fresh.length) return;
     items = [...items, ...fresh];
     await analyze(fresh.map((f) => f.id));
   }
-  let skippedNotice = $state(0);
+  /** Why files of the last drop or pick were not added, each reason counted. */
+  let skipped = $state({ dup: 0, type: 0, limit: 0 });
+  const skippedText = $derived(
+    [skipped.dup ? tn("skippedDup", skipped.dup) : "", skipped.type ? tn("skippedType", skipped.type) : "", skipped.limit ? t("skippedLimit") : ""].filter(Boolean).join(" "),
+  );
 
   async function analyze(ids: string[]) {
     const targets = items.filter((i) => ids.includes(i.id));
@@ -196,11 +244,19 @@
         it.code = r.code;
       }
     } catch (e) {
+      // Only a missing component waits for its download; anything else is said as it is,
+      // with a way to try again.
       for (const it of targets) {
         it.status = "failed";
-        it.code = "engine_missing";
+        it.code = e === "engine_missing" ? "engine_missing" : "analysis_failed";
       }
     }
+  }
+
+  function retryAnalysis(it: Item) {
+    it.status = "analyzing";
+    it.code = undefined;
+    analyze([it.id]);
   }
 
   async function unlock(it: Item, pw: string) {
@@ -300,12 +356,23 @@
   /** Files that failed only because the engine is missing still count for the button. */
   const waitingForEngine = $derived(engineMissing && !engineUnavailable && items.length > 0 && !engineBusy);
 
+  // The button says what it does, or what is still needed before it can.
   const startLabel = $derived(
-    okItems.length === 0
-      ? t(items.some((i) => i.status === "locked") ? "needUnlock" : "needFiles")
-      : okItems.length < minFiles
-        ? t("needMinFiles", { n: minFiles })
-        : actionLabel(id, okItems.length, combined && !values.onePdfPerImage),
+    analyzing && okItems.length === 0
+      ? t("startReading")
+      : okItems.length === 0
+        ? t(items.some((i) => i.status === "locked") ? "needUnlock" : "needFiles")
+        : okItems.length < minFiles
+          ? t("needMinFiles", { n: minFiles })
+          : wordMissing
+            ? t("startNotHere")
+            : errorsActive
+              ? t("startFixOption")
+              : !needsConfirm.every((r) => confirmed[r.id])
+                ? t("startConfirm")
+                : analyzing
+                  ? t("startReading")
+                  : actionLabel(id, okItems.length, combined && !values.onePdfPerImage),
   );
 
   // ---------- estimate ----------
@@ -357,7 +424,7 @@
     const job = {
       tool: id,
       toolName: L(m.name),
-      locale: i18n.lang === "ro" ? "ro-RO" : "en-US",
+      locale: localeOf(i18n.lang),
       files: run.map((i) => ({ id: i.id, path: i.info.path, analysis: $state.snapshot(i.props), item: cleanItem(i.item), base: i.info.base ?? null })),
       options: finalOptions(),
       output: $state.snapshot(output),
@@ -428,6 +495,19 @@
   function allResults() {
     return [...combinedResults, ...items.flatMap((i) => i.results ?? [])].filter((r) => !r.skipped);
   }
+
+  /** The folders the results went to, in order, each with its first result (to show it
+   *  selected in Explorer). */
+  const resultFolders = $derived.by(() => {
+    if (phase !== "done") return [];
+    const seen = new Map<string, string>();
+    for (const r of allResults()) {
+      const i = Math.max(r.path.lastIndexOf("\\"), r.path.lastIndexOf("/"));
+      const dir = i > 0 ? r.path.slice(0, i) : r.path;
+      if (!seen.has(dir.toLowerCase())) seen.set(dir.toLowerCase(), r.path);
+    }
+    return [...seen.values()].map((first) => ({ first, dir: first.slice(0, Math.max(first.lastIndexOf("\\"), first.lastIndexOf("/"))) }));
+  });
 
   function afterDone(e: any) {
     const res = allResults();
@@ -525,6 +605,7 @@
           onremove={() => remove(it)}
           onmove={(d) => move(idx, d)}
           onunlock={(pw) => unlock(it, pw)}
+          onretry={() => retryAnalysis(it)}
         />
       {/each}
       {#if phase === "edit"}
@@ -548,9 +629,12 @@
           {#if m.input.multiple !== false || !items.length}
             <LinkAdd extensions={m.input.extensions} anyFile={!!m.input.anyFile} multiple={m.input.multiple !== false} onadd={addFiles} />
           {/if}
+          {#if m.input.textEntry}
+            <TextAdd ext={m.input.textEntry} onadd={addFiles} />
+          {/if}
         </div>
-        {#if skippedNotice}
-          <div class="note info"><i class="ti ti-info-circle"></i><span>{i18n.lang === "ro" ? `${skippedNotice} fișiere nu se potrivesc cu unealta și nu au fost adăugate.` : `${skippedNotice} files don't fit this tool and were not added.`}</span></div>
+        {#if skippedText}
+          <div class="note info"><i class="ti ti-info-circle"></i><span>{skippedText}</span></div>
         {/if}
       {/if}
       {#if output.originals === "replace"}
@@ -567,7 +651,7 @@
           <div class="big {summary?.ok || allSkipped ? 'ok' : 'bad'}">
             <i class="ti {summary?.ok || allSkipped ? 'ti-circle-check' : 'ti-alert-triangle'}"></i>
           </div>
-          <h2>{doneTitle}</h2>
+          <h2 aria-live="polite">{doneTitle}</h2>
           {#if summary?.ok}
             <p class="secondary">
               {fileCount(combinedResults.length ? items.filter((i) => i.state === "ok").length : summary.ok)} · {bytes(summary.inputBytes)} → <b>{bytes(summary.outputBytes)}</b>
@@ -579,6 +663,17 @@
           {#if jobError}
             <div class="note error"><i class="ti ti-alert-circle"></i><span>{errorText(jobError.code, m.errors, jobError.details)}</span></div>
           {/if}
+          {#if resultFolders.length === 1}
+            <p class="muted small where selectable"><i class="ti ti-folder"></i> {t("savedIn", { path: resultFolders[0].dir })}</p>
+          {:else if resultFolders.length > 1}
+            <p class="muted small where">{tn("savedInFolders", resultFolders.length)}</p>
+            <div class="folders">
+              {#each resultFolders.slice(0, 6) as f}
+                <button class="link small selectable" title={f.dir} onclick={() => api.reveal(f.first)}><i class="ti ti-folder"></i> {f.dir}</button>
+              {/each}
+              {#if resultFolders.length > 6}<span class="muted small">+ {resultFolders.length - 6}</span>{/if}
+            </div>
+          {/if}
           {#if combinedResults.length}
             {#each combinedResults.filter((r) => !r.skipped) as r}
               <div class="cres">
@@ -589,7 +684,7 @@
             {/each}
           {/if}
           <div class="actions">
-            {#if allResults().length}
+            {#if allResults().length && resultFolders.length <= 1}
               <button class="primary" onclick={() => api.reveal(allResults()[0].path)}><i class="ti ti-folder-open"></i> {t("openFolder")}</button>
               {#if allResults().length === 1}
                 <button onclick={() => api.openPath(allResults()[0].path)}><i class="ti ti-external-link"></i> {t("open")}</button>
@@ -641,7 +736,7 @@
           </div>
 
           {#if advancedGroups.length}
-            <button class="adv-btn" class:open={advOpen} onclick={() => (advOpen = !advOpen)}>
+            <button class="adv-btn" class:open={advOpen} aria-expanded={advOpen} onclick={() => (advOpen = !advOpen)}>
               <span><i class="ti ti-adjustments"></i>{t("moreOptions")}</span>
               <i class="ti {advOpen ? 'ti-chevron-up' : 'ti-chevron-down'}"></i>
             </button>
@@ -687,9 +782,12 @@
   </div>
 
   <footer class="foot">
+    {#if busyNotice && phase === "running"}
+      <div class="note warn busy" role="status"><i class="ti ti-info-circle"></i> {t("busyNav")}</div>
+    {/if}
     {#if phase === "running"}
       <div class="prog">
-        <div class="pbar"><div style="width:{Math.round(overall * 100)}%"></div></div>
+        <div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(overall * 100)}><div style="width:{Math.round(overall * 100)}%"></div></div>
         <span class="secondary">{cancelling ? t("cancelling") : `${t("working")} ${Math.round(overall * 100)}%`}</span>
       </div>
       <button onclick={cancel} disabled={cancelling}><i class="ti ti-player-stop"></i> {t("cancel")}</button>
@@ -704,7 +802,7 @@
             {t("total")}
           {/if}
           {#if notOk.length}
-            <span class="warn-text"> · {i18n.lang === "ro" ? `${notOk.length} sărite` : `${notOk.length} skipped`}</span>
+            <span class="warn-text"> · {tn("skippedCount", notOk.length)}</span>
           {/if}
         {/if}
       </div>
@@ -1040,6 +1138,9 @@
     text-align: left;
     margin: 10px 0;
   }
+  .where { margin: 2px 0 0; display: flex; gap: 6px; align-items: center; justify-content: center; max-width: 100%; overflow-wrap: anywhere; }
+  .folders { display: flex; flex-direction: column; align-items: center; gap: 2px; max-width: 100%; }
+  .folders .link { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cres {
     display: flex;
     align-items: center;

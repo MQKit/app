@@ -121,7 +121,7 @@ impl Plugin for ImageResize {
 
         // Animated GIF/WebP kept as GIF/WebP: every frame resized.
         if matches!(format, "gif" | "webp") && f.analysis.get("isAnimated").and_then(Value::as_bool) == Some(true) {
-            if let Some(frames) = img::animation_frames(path) {
+            if let Some(frames) = img::animation_frames(path, req.limits.max_megapixels)? {
                 let (w0, h0) = frames.first().map(|(f, _)| f.dimensions()).unwrap_or((1, 1));
                 let plan = plan(req, w0, h0)?;
                 too_big(req, &plan)?;

@@ -14,36 +14,58 @@ export const ENGINE_NAMES: Record<string, string> = {
   "whisper-small": "Whisper small",
   "whisper-turbo": "Whisper large-v3-turbo",
   python: "Python",
+  kokoro: "Kokoro",
+  "kokoro-model": "Kokoro (model)",
+  "kokoro-voices": "Kokoro (voices)",
 };
 
-/** Download state per engine, shared by every screen. */
-export const downloads = $state<Record<string, { done: number; total: number; error?: string; running: boolean }>>({});
+/** Download state per engine, shared by every screen. `installed` stays true after a
+ *  download finishes, until the engine is removed: screens that still hold an older list
+ *  show it installed instead of offering the download again. */
+export const downloads = $state<Record<string, { done: number; total: number; error?: string; running: boolean; installed?: boolean }>>({});
+
+/** Counts finished downloads (and removals): screens that list engines reload when it
+ *  changes, so an engine installed from another screen, or as another's requirement,
+ *  shows up without leaving the page. */
+export const engineEvents = $state({ changed: 0 });
+
+/** Everyone waiting for a download already running (another screen started it). */
+const waiting: Record<string, ((ok: boolean) => void)[]> = {};
 
 export async function refreshEnv() {
   app.env = await api.env();
 }
 
-/** Starts (or joins) a download; resolves true when installed. */
+/** Starts a download, or joins the one running; resolves true when installed. */
 export function downloadEngine(name: string): Promise<boolean> {
   return new Promise((resolve) => {
-    const cur = downloads[name];
-    if (cur?.running) return resolve(false);
+    (waiting[name] ??= []).push(resolve);
+    if (downloads[name]?.running) return;
     downloads[name] = { done: 0, total: 0, running: true };
-    api.engineDownload(name, async (e) => {
+    const finish = async (ok: boolean, code?: string) => {
       const d = downloads[name];
+      d.installed = ok;
+      d.error = code;
+      d.running = false;
+      await refreshEnv();
+      engineEvents.changed++;
+      for (const r of waiting[name].splice(0)) r(ok);
+    };
+    api.engineDownload(name, (e) => {
       if (e.type === "progress") {
-        d.done = e.done;
-        d.total = e.total;
+        downloads[name].done = e.done;
+        downloads[name].total = e.total;
       } else if (e.type === "done") {
-        d.running = false;
-        await refreshEnv();
-        resolve(true);
+        finish(true);
       } else if (e.type === "error") {
-        d.running = false;
-        d.error = e.code;
-        await refreshEnv();
-        resolve(false);
+        finish(false, e.code);
       }
     });
   });
+}
+
+/** After an engine was removed: no longer shown as installed anywhere. */
+export function engineRemoved(name: string) {
+  if (downloads[name]) downloads[name].installed = false;
+  engineEvents.changed++;
 }

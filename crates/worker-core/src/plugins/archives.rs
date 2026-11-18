@@ -82,6 +82,8 @@ impl Plugin for Archives {
                 "not_archive": t("Fișierul nu este o arhivă.", "The file isn't an archive."),
                 "rar_encrypted": t("Arhivele RAR cu parolă se pot deschide doar cu WinRAR sau 7-Zip.", "RAR archives with a password open only with WinRAR or 7-Zip."),
                 "unpack_failed": t("Arhiva este deteriorată sau într-un format pe care Windows nu-l poate citi.", "The archive is damaged or in a format Windows can't read."),
+                "archive_bomb": t("Arhiva s-ar desface într-o mărime nefiresc de mare (o „bombă” de arhivă), așa că dezarhivarea a fost oprită.",
+                                  "The archive would unpack to an unnaturally large size (an archive bomb), so unpacking was stopped."),
                 "missing_part": t("Lipsește o bucată din arhivă (de exemplu .002). Pune toate bucățile în același dosar.", "A part of the archive is missing (for example .002). Put all the parts in the same folder."),
                 "unsafe_entries": t("Am sărit peste intrări care încercau să scrie în afara dosarului.", "Skipped entries that tried to write outside the folder."),
                 "links_skipped": t("Scurtăturile (legăturile) din arhivă nu au fost create.", "Shortcuts (links) inside the archive were not created."),
@@ -221,12 +223,13 @@ fn unpack(ctx: &Ctx, f: &FileRef, dest: &Path) -> Result<Vec<&'static str>, File
         return Err(FileError::new(codes::DISK_FULL));
     }
     let password = password_of(ctx, f);
-    let mut guard = Guard::new(dest);
+    let limit = unpack_limit(file_size(&path));
+    let mut guard = Guard::new(dest, limit);
     let mut notes = Vec::new();
     let res = match format {
         "zip" => unzip(ctx, f, &path, dest, password.as_deref(), &mut guard),
         "7z" => un7z(ctx, f, &path, dest, password.as_deref(), &mut guard),
-        "rar" | "iso" | "cab" => untar(ctx, f, &path, dest).map(|(refused, unnamed)| {
+        "rar" | "iso" | "cab" => untar(ctx, f, &path, dest, limit).map(|(refused, unnamed)| {
             if refused {
                 guard.unsafe_skipped += 1;
             }
@@ -278,11 +281,24 @@ fn join_parts(ctx: &Ctx, f: &FileRef) -> Result<PathBuf, FileError> {
     Ok(joined)
 }
 
+/// How much an archive may unpack to: a thousand times its size, at least 4 GB. Real
+/// archives stay far below (text packs 5 to 20 times); a "zip bomb" of a few KB unpacks
+/// to terabytes and would fill the disk.
+fn unpack_limit(archive_bytes: u64) -> u64 {
+    archive_bytes.saturating_mul(1000).max(4 << 30)
+}
+
+fn bomb(limit: u64) -> FileError {
+    FileError::with("archive_bomb", json!({ "limitBytes": limit }))
+}
+
 /// Where unpacked entries may go, and how much room is left.
 struct Guard {
     root: PathBuf,
     written: u64,
     next_check: u64,
+    /// Stop (`archive_bomb`) past this many bytes written.
+    limit: u64,
     unsafe_skipped: usize,
     links_skipped: usize,
     /// Places given so far, by their name as Windows compares it (case ignored).
@@ -290,8 +306,16 @@ struct Guard {
 }
 
 impl Guard {
-    fn new(root: &Path) -> Guard {
-        Guard { root: root.to_path_buf(), written: 0, next_check: 0, unsafe_skipped: 0, links_skipped: 0, placed: Default::default() }
+    fn new(root: &Path, limit: u64) -> Guard {
+        Guard { root: root.to_path_buf(), written: 0, next_check: 0, limit, unsafe_skipped: 0, links_skipped: 0, placed: Default::default() }
+    }
+
+    /// Refuses at once an archive whose listed sizes are already past the limit.
+    fn check_declared(&self, declared: u64) -> Result<(), FileError> {
+        if declared > self.limit {
+            return Err(bomb(self.limit));
+        }
+        Ok(())
     }
 
     /// The safe place for an entry name, or None (and counted) when it would leave the folder.
@@ -341,6 +365,11 @@ impl Guard {
             };
             out.write_all(&buf[..n]).map_err(super::io_err)?;
             self.written += n as u64;
+            if self.written > self.limit {
+                drop(out);
+                let _ = std::fs::remove_file(to);
+                return Err(bomb(self.limit));
+            }
             if self.written >= self.next_check {
                 if free_space(&self.root) < DISK_RESERVE {
                     return Err(FileError::new(codes::DISK_FULL));
@@ -424,6 +453,8 @@ fn unzip(ctx: &Ctx, f: &FileRef, path: &Path, dest: &Path, password: Option<&str
     let file = std::fs::File::open(path).map_err(super::io_err)?;
     let mut z = zip::ZipArchive::new(std::io::BufReader::new(file)).map_err(|_| FileError::new("unpack_failed"))?;
     let n = z.len();
+    let declared = (0..n).filter_map(|i| z.by_index_raw(i).ok().map(|e| e.size())).fold(0u64, u64::saturating_add);
+    guard.check_declared(declared)?;
     for i in 0..n {
         ctx.check_cancel()?;
         if i % 16 == 0 {
@@ -476,6 +507,7 @@ fn un7z(ctx: &Ctx, f: &FileRef, path: &Path, dest: &Path, password: Option<&str>
     };
     let mut reader = sevenz_rust2::ArchiveReader::open(path, pw).map_err(map_err)?;
     let total = reader.archive().files.len().max(1);
+    guard.check_declared(reader.archive().files.iter().map(|e| e.size()).fold(0u64, u64::saturating_add))?;
     let mut done = 0usize;
     let mut failure: Option<FileError> = None;
     let res = reader.for_each_entries(|entry, data| {
@@ -507,7 +539,7 @@ fn un7z(ctx: &Ctx, f: &FileRef, path: &Path, dest: &Path, password: Option<&str>
 /// Everything else, with tar.exe (libarchive). By default it refuses "..", absolute
 /// paths and writing through links; links it made are removed afterwards. It runs with
 /// the disk watched, and is stopped if room runs out or on cancel.
-fn untar(ctx: &Ctx, f: &FileRef, path: &Path, dest: &Path) -> Result<(bool, bool), FileError> {
+fn untar(ctx: &Ctx, f: &FileRef, path: &Path, dest: &Path, limit: u64) -> Result<(bool, bool), FileError> {
     let tar = tar_exe().ok_or_else(|| FileError::with(codes::ENGINE_MISSING, json!({ "component": "tar" })))?;
     let log = ctx.work_dir.join(format!("{}-tar.log", f.id));
     let mut cmd = std::process::Command::new(tar);
@@ -522,16 +554,24 @@ fn untar(ctx: &Ctx, f: &FileRef, path: &Path, dest: &Path) -> Result<(bool, bool
     }
     let mut child = cmd.spawn().map_err(|e| FileError::with(codes::ENGINE_MISSING, json!({ "component": "tar", "message": e.to_string() })))?;
     ctx.progress(&f.id, 0.3, "unpack", 1, 1);
+    // tar.exe writes on its own: what it unpacked is read from the free space it used.
+    let free_at_start = free_space(dest);
     let status = loop {
         if ctx.cancel.is_cancelled() {
             let _ = child.kill();
             let _ = child.wait();
             return Err(FileError::new(codes::CANCELLED));
         }
-        if free_space(dest) < DISK_RESERVE {
+        let free = free_space(dest);
+        if free < DISK_RESERVE {
             let _ = child.kill();
             let _ = child.wait();
             return Err(FileError::new(codes::DISK_FULL));
+        }
+        if free_at_start != u64::MAX && free_at_start.saturating_sub(free) > limit {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(bomb(limit));
         }
         match child.try_wait() {
             Ok(Some(s)) => break s,
@@ -980,6 +1020,23 @@ mod tests {
         assert_eq!(safe_relative("CON.txt"), Some(PathBuf::from("_CON.txt")));
         assert_eq!(safe_relative("dir./name. "), Some(PathBuf::from("dir").join("name")));
         assert_eq!(safe_relative("a?b*.txt"), Some(PathBuf::from("a_b_.txt")));
+    }
+
+    #[test]
+    fn bombs_stop_at_the_limit() {
+        assert_eq!(unpack_limit(1000), 4 << 30);
+        assert_eq!(unpack_limit(10 << 30), 10_000 << 30);
+        assert_eq!(unpack_limit(u64::MAX), u64::MAX);
+        let dir = std::env::temp_dir().join(format!("mqkit-bomb-{}", std::process::id()));
+        let mut g = Guard::new(&dir, 1 << 20);
+        assert_eq!(g.check_declared(u64::MAX).unwrap_err().code, "archive_bomb");
+        assert!(g.check_declared(1000).is_ok());
+        // Zeros that never end: stopped right after the limit, the partial file removed.
+        let to = dir.join("zeros.bin");
+        let e = g.write(&mut std::io::repeat(0), &to).unwrap_err();
+        assert_eq!(e.code, "archive_bomb");
+        assert!(!to.exists());
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
