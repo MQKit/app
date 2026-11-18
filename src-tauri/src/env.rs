@@ -37,6 +37,46 @@ fn has_progid(_: &str) -> bool {
     false
 }
 
+/// .NET Framework 4.8 or newer: the Office worker (Word, Excel and PowerPoint through COM)
+/// is built for it. Windows 10 1903+ and Windows 11 have it; without it Office is treated
+/// as missing, so the tools use LibreOffice instead of failing.
+#[cfg(windows)]
+fn has_dotnet48() -> bool {
+    use windows::Win32::System::Registry::{RegGetValueW, HKEY_LOCAL_MACHINE, RRF_RT_REG_DWORD};
+    let key: Vec<u16> = "SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full".encode_utf16().chain(Some(0)).collect();
+    let name: Vec<u16> = "Release".encode_utf16().chain(Some(0)).collect();
+    let mut release = 0u32;
+    let mut len = 4u32;
+    let ok = unsafe {
+        RegGetValueW(
+            HKEY_LOCAL_MACHINE,
+            windows::core::PCWSTR(key.as_ptr()),
+            windows::core::PCWSTR(name.as_ptr()),
+            RRF_RT_REG_DWORD,
+            None,
+            Some(&mut release as *mut u32 as *mut _),
+            Some(&mut len),
+        )
+        .is_ok()
+    };
+    // 528040 is the first release number of 4.8 (Microsoft's table of .NET versions).
+    ok && release >= 528040
+}
+
+#[cfg(not(windows))]
+fn has_dotnet48() -> bool {
+    false
+}
+
+/// An Office program the app can drive: installed, and the worker for it can run.
+fn office(progid: &str, dotnet: bool) -> &'static str {
+    match (has_progid(progid), dotnet) {
+        (true, true) => "ok",
+        (true, false) => "no-dotnet",
+        _ => "missing",
+    }
+}
+
 /// Mica is on (Windows 11): the UI leaves the base layer transparent.
 pub static MICA: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
@@ -80,9 +120,10 @@ pub fn props(locale: &str) -> Value {
         let st = if engine_dir(name).is_some() { "installed" } else { crate::engines::status(name) };
         p.insert(format!("engines.{name}"), json!(st));
     }
-    p.insert("office.word".into(), json!(if has_progid("Word.Application") { "ok" } else { "missing" }));
-    p.insert("office.excel".into(), json!(if has_progid("Excel.Application") { "ok" } else { "missing" }));
-    p.insert("office.powerpoint".into(), json!(if has_progid("PowerPoint.Application") { "ok" } else { "missing" }));
+    let dotnet = has_dotnet48();
+    p.insert("office.word".into(), json!(office("Word.Application", dotnet)));
+    p.insert("office.excel".into(), json!(office("Excel.Application", dotnet)));
+    p.insert("office.powerpoint".into(), json!(office("PowerPoint.Application", dotnet)));
     p.insert("locale".into(), json!(locale));
     windows_language_features(&mut p);
     Value::Object(p)
@@ -142,4 +183,13 @@ pub fn system_language() -> String {
 #[cfg(not(windows))]
 pub fn system_language() -> String {
     "en".into()
+}
+
+#[cfg(all(test, windows))]
+mod tests {
+    #[test]
+    fn dotnet48_on_this_pc() {
+        // Every Windows the tests run on (10 1903+, 11, the CI runners) has 4.8.
+        assert!(super::has_dotnet48());
+    }
 }

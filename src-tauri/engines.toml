@@ -6,6 +6,9 @@
 # published on GitHub. Later: our own build, hosted by us, with its source.
 
 [ffmpeg]
+# No copy in github.com/MQKit/engines: copying it means hosting the source of every
+# library inside it too (GPL/LGPL). See scripts/mirror-engines.mjs.
+mirror = false
 version = "9.0.2"
 url = "https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-essentials_build.zip"
 size = 114768076
@@ -19,6 +22,9 @@ files = ["bin/ffmpeg.exe", "bin/ffprobe.exe", "LICENSE"]
 # an administrative install (msiexec /a): nothing is installed in Windows and no
 # admin rights are needed. Pinned to the permanent archive address.
 [libreoffice]
+# No copy in github.com/MQKit/engines: copying it means hosting the source of every
+# library inside it too (GPL/LGPL). See scripts/mirror-engines.mjs.
+mirror = false
 version = "26.8.3.1"
 url = "https://downloadarchive.documentfoundation.org/libreoffice/old/26.8.3.1/win/x86_64/LibreOffice_26.8.3.1_Win_x86-64.msi"
 size = 376311808

@@ -87,7 +87,9 @@ impl Plugin for Transcribe {
             "outputBlock": { "defaults": { "nameTemplate": t("{name}", "{name}") } },
             "errors": {
                 "no_speech": t("Nu am auzit vorbire în fișier.", "No speech was heard in the file."),
-                "no_audio": t("Fișierul nu are sunet.", "The file has no sound.")
+                "no_audio": t("Fișierul nu are sunet.", "The file has no sound."),
+                "old_processor": t("Procesorul acestui PC e prea vechi pentru transcriere (are nevoie de AVX2, din 2013 încoace).",
+                                   "This PC's processor is too old for transcription (it needs AVX2, from 2013 on).")
             }
         })
     }
@@ -97,6 +99,11 @@ impl Plugin for Transcribe {
     }
 
     fn run(&self, ctx: &Ctx) -> Result<(), FileError> {
+        // whisper.cpp is built for AVX2 (crates/whisper/build.rs): on an older processor it
+        // would stop the worker with an illegal instruction instead of saying why.
+        if !cpu_ok() {
+            return Err(FileError::new("old_processor"));
+        }
         let mut whisper: Option<whisper::Whisper> = None;
         for f in &ctx.req.files {
             if ctx.cancel.stop_after_current() {
@@ -129,6 +136,21 @@ struct Segment {
     start: i64,
     end: i64,
     text: String,
+}
+
+/// The instructions crates/whisper/build.rs turns on (GGML_AVX2, FMA, F16C, BMI2).
+fn cpu_ok() -> bool {
+    #[cfg(target_arch = "x86_64")]
+    {
+        std::arch::is_x86_feature_detected!("avx2")
+            && std::arch::is_x86_feature_detected!("fma")
+            && std::arch::is_x86_feature_detected!("f16c")
+            && std::arch::is_x86_feature_detected!("bmi2")
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        false
+    }
 }
 
 fn transcribe(ctx: &Ctx, f: &FileRef, whisper: &mut Option<whisper::Whisper>) -> Result<Value, FileError> {
@@ -265,6 +287,12 @@ fn vtt(segs: &[Segment]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn this_processor_runs_whisper() {
+        // The PCs that build and test MQKit (and GitHub's runners) all have AVX2.
+        assert!(cpu_ok());
+    }
 
     #[test]
     fn times() {

@@ -52,12 +52,19 @@ pub struct Engine {
     pub requires: Vec<String>,
     #[serde(default)]
     pub wheels: Vec<Wheel>,
+    /// Whether MQKit keeps a copy in github.com/MQKit/engines to fall back on.
+    #[serde(default = "yes")]
+    pub mirror: bool,
     /// Paths removed after extraction (`*` matches one path segment)…
     #[serde(default)]
     pub prune: Vec<String>,
     /// …except these.
     #[serde(default)]
     pub keep: Vec<String>,
+}
+
+fn yes() -> bool {
+    true
 }
 
 fn files_mode() -> String {
@@ -296,6 +303,30 @@ pub fn download(name: &str, progress: impl Fn(u64, u64)) -> Result<PathBuf, Stri
 
 /// One verified download to `dest`. `progress(bytes of this file)`.
 /// A broken connection resumes where it stopped (HTTP Range), up to 4 times.
+/// MQKit's own copy of every engine file: a release per engine and version
+/// (`<name>-<version>`) in github.com/MQKit/engines, each asset named as at its source.
+const MIRROR: &str = "https://github.com/MQKit/engines/releases/download";
+
+/// Where the copy of `url` is kept.
+fn mirror_url(name: &str, version: &str, url: &str) -> String {
+    let file = url.rsplit('/').next().unwrap_or(url).split(['?', '#']).next().unwrap_or("");
+    format!("{MIRROR}/{name}-{version}/{file}")
+}
+
+/// From the engine's own source; when that fails (gone, moved, changed or unreachable),
+/// from MQKit's copy. Both must match the same size and SHA-256, so the copy can never
+/// be anything else.
+fn fetch_with_mirror(url: &str, mirror: Option<String>, size: u64, sha256: &str, dest: &Path, cancel: &AtomicBool, progress: &dyn Fn(u64)) -> Result<(), String> {
+    match fetch(url, size, sha256, dest, cancel, progress) {
+        Err(e) if matches!(e.as_str(), "network" | "hash_mismatch" | "unknown_engine") => {
+            let Some(mirror) = mirror else { return Err(e) };
+            let _ = std::fs::remove_file(dest);
+            fetch(&mirror, size, sha256, dest, cancel, progress).map_err(|m| if m == "cancelled" { m } else { e })
+        }
+        other => other,
+    }
+}
+
 fn fetch(url: &str, size: u64, sha256: &str, dest: &Path, cancel: &AtomicBool, progress: &dyn Fn(u64)) -> Result<(), String> {
     if !allowed_url(url) {
         return Err("unknown_engine".into());
@@ -470,7 +501,7 @@ fn install(name: &str, e: &Engine, cancel: &AtomicBool, progress: &dyn Fn(u64)) 
             let mut off = 0u64;
             for (i, w) in e.wheels.iter().enumerate() {
                 let f = tmp.join(format!("w{i}.whl"));
-                fetch(&w.url, w.size, &w.sha256, &f, cancel, &|d| progress(off + d))?;
+                fetch_with_mirror(&w.url, e.mirror.then(|| mirror_url(name, &e.version, &w.url)), w.size, &w.sha256, &f, cancel, &|d| progress(off + d))?;
                 unzip_except(&f, &site, cancel, &w.skip)?;
                 let _ = std::fs::remove_file(&f);
                 off += w.size;
@@ -487,7 +518,7 @@ fn install(name: &str, e: &Engine, cancel: &AtomicBool, progress: &dyn Fn(u64)) 
             } else {
                 tmp.join(format!("archive.{ext}"))
             };
-            fetch(&e.url, e.size, &e.sha256, &archive, cancel, progress)?;
+            fetch_with_mirror(&e.url, e.mirror.then(|| mirror_url(name, &e.version, &e.url)), e.size, &e.sha256, &archive, cancel, progress)?;
             if cancel.load(Ordering::Relaxed) {
                 return Err("cancelled".into());
             }
@@ -636,4 +667,38 @@ fn precompile(e: &Engine, site: &Path) {
     #[cfg(windows)]
     cmd.creation_flags(0x0800_0000);
     let _ = cmd.status();
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn mirror_names_the_release_and_the_file() {
+        assert_eq!(
+            super::mirror_url("ffmpeg", "9.0.2", "https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-essentials_build.zip"),
+            "https://github.com/MQKit/engines/releases/download/ffmpeg-9.0.2/ffmpeg-9.0.2-essentials_build.zip"
+        );
+        assert_eq!(
+            super::mirror_url("whisper-small", "q5_1", "https://huggingface.co/x/resolve/abc/ggml-small-q5_1.bin?download=true"),
+            "https://github.com/MQKit/engines/releases/download/whisper-small-q5_1/ggml-small-q5_1.bin"
+        );
+    }
+
+    #[test]
+    fn every_engine_has_a_mirror_name() {
+        // Release tags and asset names on GitHub: no spaces, nothing a URL would mangle.
+        let ok = |s: &str| !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric() || "._-+".contains(c));
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let mut all = std::collections::BTreeMap::new();
+        for f in ["engines.toml", "engines.python.toml"] {
+            let text = std::fs::read_to_string(dir.join(f)).unwrap();
+            all.extend(toml::from_str::<std::collections::BTreeMap<String, super::Engine>>(&text).unwrap());
+        }
+        for (name, e) in all {
+            assert!(ok(&format!("{name}-{}", e.version)), "{name} {}", e.version);
+            for url in std::iter::once(&e.url).filter(|u| !u.is_empty()).chain(e.wheels.iter().map(|w| &w.url)) {
+                let m = super::mirror_url(&name, &e.version, url);
+                assert!(ok(m.rsplit('/').next().unwrap()), "{m}");
+            }
+        }
+    }
 }

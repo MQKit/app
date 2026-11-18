@@ -1,0 +1,38 @@
+name: Engines
+
+# Every engine the app downloads (src-tauri/engines*.toml) must still be at its source
+# and in MQKit's copy (github.com/MQKit/engines). Daily: the sizes. Sundays: every file
+# whole, against its SHA-256. A failure means a tool would not install for someone:
+# the run fails, and GitHub sends an email. Actions are pinned to commits.
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Download every file and check its SHA-256"
+        type: boolean
+        default: false
+  push:
+    paths:
+      - "src-tauri/engines.toml"
+      - "src-tauri/engines.python.toml"
+      - "scripts/check-engines.mjs"
+      - "scripts/engine-catalog.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Sources and copies
+        run: |
+          if [ "${{ inputs.full }}" = "true" ] || [ "$(date -u +%u)" = "7" -a "${{ github.event_name }}" = "schedule" ]; then
+            node scripts/check-engines.mjs --full
+          else
+            node scripts/check-engines.mjs
+          fi
