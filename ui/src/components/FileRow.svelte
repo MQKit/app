@@ -38,7 +38,7 @@
     if (e === "pdf") return ["file-type-pdf", "var(--c-pdf)"];
     if (["doc", "docx", "docm", "dot", "dotx", "rtf", "odt", "txt"].includes(e)) return ["file-word", "var(--c-doc)"];
     if (["jpg", "jpeg", "png", "webp", "gif", "bmp", "tif", "tiff", "heic", "heif", "avif", "ico", "jfif"].includes(e)) return ["photo", "var(--c-image)"];
-    if (["mp3", "wav", "m4a", "flac", "ogg", "opus", "aac", "wma"].includes(e)) return ["music", "var(--c-media)"];
+    if (["mp3", "wav", "m4a", "flac", "ogg", "opus", "aac", "wma", "webm"].includes(e) && !item.props?.hasVideo) return ["music", "var(--c-media)"];
     return ["movie", "var(--c-media)"];
   });
 
@@ -49,6 +49,11 @@
     else if (p.cachedPageCount) parts.push(p.cachedPageCount === 1 ? t("page1") : t("pages", { n: p.cachedPageCount }));
     if (p.width && p.height) parts.push(`${p.width} × ${p.height}`);
     if (p.durationSec) parts.push(duration(p.durationSec));
+    // What the tool found and shows right away (tempo, key…).
+    for (const k of manifest.ui?.showProps ?? []) {
+      if (p[k] == null || p[k] === "") continue;
+      parts.push(k === "bpm" ? `${Math.round(p[k])} BPM` : String(p[k]));
+    }
     return parts.join(" · ");
   });
 

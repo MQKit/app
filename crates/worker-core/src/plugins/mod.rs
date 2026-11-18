@@ -13,6 +13,8 @@ mod heic_to_jpg;
 mod html_to_pdf;
 mod icons;
 mod mail;
+mod music_info;
+mod music_split;
 mod markdown;
 mod media_merge;
 mod media_trim;
@@ -22,16 +24,21 @@ mod office_to_pdf;
 mod image_compress;
 mod image_convert;
 mod image_resize;
+mod images_to_gif;
 mod images_to_pdf;
 mod pdf_compress;
+mod pdf_edit;
 mod pdf_merge;
 mod pdf_pages;
 mod pdf_password;
+mod pdf_redact;
 mod pdf_split;
 mod pdf_stamp;
 mod pdf_to_images;
 mod pdf_to_pptx;
 mod pdf_to_word_exact;
+mod photo_erase;
+mod qr_code;
 mod svg;
 mod subtitles;
 mod tabular;
@@ -39,8 +46,10 @@ mod transcribe;
 mod tts;
 mod video_compress;
 mod video_convert;
+mod video_crop;
 mod video_gif;
 mod video_to_mp3;
+mod voice_record;
 mod word_to_pdf_lo;
 
 use contract::{codes, Cancel, Emitter, FileError, FileRef, Request};
@@ -96,6 +105,15 @@ pub fn all() -> Vec<&'static dyn Plugin> {
         &cad_3d::Cad3d,
         &word_to_pdf_lo::WordToPdfLo,
         &pdf_to_word_exact::PdfToWordExact,
+        &qr_code::QrCodes,
+        &pdf_edit::PdfEdit,
+        &video_crop::VideoCrop,
+        &images_to_gif::ImagesToGif,
+        &voice_record::VoiceRecord,
+        &music_split::MusicSplit,
+        &music_info::MusicInfo,
+        &photo_erase::PhotoErase,
+        &pdf_redact::PdfRedact,
     ]
 }
 

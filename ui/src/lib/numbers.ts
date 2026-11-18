@@ -57,6 +57,16 @@ export const TOOL_NUMBERS: Record<string, number> = {
   fonts: 42,
   "meta-strip": 43,
   "cad-3d": 44,
+  // Version 1.2
+  "qr-code": 45,
+  "pdf-edit": 46,
+  "pdf-redact": 47,
+  "photo-erase": 48,
+  "images-to-gif": 49,
+  "video-crop": 50,
+  "voice-record": 51,
+  "music-split": 52,
+  "music-info": 53,
 };
 
 export function toolNumber(id: string): number | undefined {

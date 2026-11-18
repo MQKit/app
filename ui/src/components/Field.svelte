@@ -197,6 +197,10 @@
       <div class="custom secret">
         <input aria-labelledby={lid} type="text" class="text" readonly value={value ? String(value).split(/[\/]/).pop() : ""} placeholder={L({ ro: "Niciun fișier ales", en: "No file chosen" })} title={value ?? ""} />
         <button type="button" onclick={pickFile}>{L({ ro: "Alege…", en: "Choose…" })}</button>
+        {#if value}
+          <button type="button" class="clear" aria-label={L({ ro: "Fără fișier", en: "No file" })} title={L({ ro: "Fără fișier", en: "No file" })}
+            onclick={() => { value = ""; changed(); }}><i class="ti ti-x"></i></button>
+        {/if}
       </div>
     {:else if field.type === "password"}
       <!-- Never remembered: ToolView leaves password fields out of the saved values. -->
@@ -262,6 +266,9 @@
   }
   .secret {
     margin-top: 0;
+  }
+  .clear {
+    padding: 0 9px;
   }
   .secret input {
     flex: 1;

@@ -40,3 +40,15 @@ pub fn write(req: &Request, before: &DynamicImage, after_encoded: &[u8], after_e
         "ext": after_ext, "cropBytes": after_encoded.len()
     }))
 }
+
+/// A preview of the result alone (nothing to compare it with, as for a QR code made from
+/// text): `path` only, no `before`.
+pub fn write_single(req: &Request, encoded: &[u8], ext: &str) -> Result<Value, FileError> {
+    let dir: PathBuf = req.preview_dir.clone().ok_or_else(|| FileError::new(codes::INVALID_OPTIONS))?;
+    std::fs::create_dir_all(&dir).map_err(crate::plugins::io_err)?;
+    let id = req.id.clone().unwrap_or_else(|| "p".into());
+    let im = image::load_from_memory(encoded).map_err(crate::common::img::img_err)?;
+    let a = dir.join(format!("{id}-after.png"));
+    im.save(&a).map_err(crate::common::img::img_err)?;
+    Ok(json!({ "type": "preview", "id": id, "path": a, "width": im.width(), "height": im.height(), "ext": ext, "cropBytes": encoded.len() }))
+}

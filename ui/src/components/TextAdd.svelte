@@ -3,11 +3,17 @@
   // The text is saved as a file in Documents\MQKit, then added like any other file, so
   // the result has a place next to it.
   import { api, type FileInfo } from "../lib/api";
-  import { t, type Key } from "../lib/i18n.svelte";
+  import { t, L, type Key } from "../lib/i18n.svelte";
 
-  let { ext, onadd }: { ext: "txt" | "md" | "html"; onadd: (files: FileInfo[]) => void } = $props();
+  let {
+    ext,
+    placeholder,
+    startOpen = false,
+    onadd,
+  }: { ext: "txt" | "md" | "html"; placeholder?: { ro: string; en: string }; startOpen?: boolean; onadd: (files: FileInfo[]) => void } = $props();
 
-  let open = $state(false);
+  // svelte-ignore state_referenced_locally
+  let open = $state(startOpen);
   let text = $state("");
   let busy = $state(false);
   let error = $state("");
@@ -33,7 +39,7 @@
 {#if open}
   <div class="panel">
     <!-- svelte-ignore a11y_autofocus -->
-    <textarea bind:value={text} rows="8" placeholder={t(`typeTextPh_${ext}` as Key)} spellcheck="true" autofocus aria-label={t("typeText")}></textarea>
+    <textarea bind:value={text} rows="8" placeholder={placeholder ? L(placeholder) : t(`typeTextPh_${ext}` as Key)} spellcheck="true" autofocus aria-label={t("typeText")}></textarea>
     <div class="row">
       <span class="muted small">{t("typeTextHint")}</span>
       <button class="primary small" disabled={!text.trim() || busy} onclick={add}>{t("typeTextAdd")}</button>
@@ -43,6 +49,7 @@
 {/if}
 
 <style>
+  .link { display: flex; align-items: center; gap: 6px; background: none; border: none; color: var(--accent); padding: 6px 2px; cursor: pointer; font-size: 13px; }
   .panel { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; width: 100%; }
   textarea { width: 100%; min-height: 140px; resize: vertical; font: inherit; padding: 8px 10px; border-radius: var(--radius); border: 1px solid var(--control-stroke, var(--border)); background: var(--layer, var(--surface-1)); color: var(--text); box-sizing: border-box; }
   .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }

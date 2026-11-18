@@ -1,6 +1,6 @@
 <script lang="ts">
   import { api, fileSrc } from "../lib/api";
-  import { t } from "../lib/i18n.svelte";
+  import { t, L } from "../lib/i18n.svelte";
   import type { Item } from "../lib/item";
 
   let { tool, items, options }: { tool: string; items: Item[]; options: Record<string, any> } = $props();
@@ -49,7 +49,7 @@
 {#if current}
   <div class="ba">
     <div class="head">
-      <span class="lbl">{t("previewTitle")}</span>
+      <span class="lbl">{data && !data.before ? L({ ro: "Previzualizare", en: "Preview" }) : t("previewTitle")}</span>
       {#if choices.length > 1}
         <select value={current.id} onchange={(e) => (fileId = (e.target as HTMLSelectElement).value)}>
           {#each choices as c}<option value={c.id}>{c.info.name}</option>{/each}
@@ -57,7 +57,12 @@
       {/if}
       {#if loading}<span class="muted small">{t("previewLoading")}</span>{/if}
     </div>
-    {#if data}
+    {#if data && !data.before}
+      <!-- The result alone (nothing to compare with, as a QR code made from text). -->
+      <div class="frame" style="width:{data.width / dpr}px; aspect-ratio:{data.width} / {data.height}">
+        <img src={fileSrc(data.path) + `?v=${shown}`} alt={L({ ro: "Previzualizare", en: "Preview" })} class="smooth" draggable="false" />
+      </div>
+    {:else if data}
       <div class="frame" style="width:{data.width / dpr}px; height:{data.height / dpr}px">
         <img src={fileSrc(data.before) + `?v=${shown}`} alt={t("before")} draggable="false" />
         <img src={fileSrc(data.path) + `?v=${shown}`} alt={t("after")} class="after" style="clip-path: inset(0 0 0 {pos}%)" draggable="false" />
@@ -112,6 +117,9 @@
     height: 100%;
     object-fit: contain;
     image-rendering: pixelated;
+  }
+  img.smooth {
+    image-rendering: auto;
   }
   .line {
     position: absolute;

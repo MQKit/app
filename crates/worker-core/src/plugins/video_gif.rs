@@ -1,5 +1,5 @@
-//! Video to GIF (or animated WebP), with a palette made for the clip; and GIF to MP4,
-//! which is often ten times smaller.
+//! Video to GIF (or animated WebP), with a palette made for the clip; GIF to MP4, which is
+//! often ten times smaller; and a GIF made smaller as a GIF (fewer colours, frames, pixels).
 
 use super::video_compress::{time_opt, VIDEO_INPUTS};
 use super::{file_size, Analysis, Ctx, Plugin};
@@ -20,7 +20,7 @@ impl Plugin for VideoGif {
         json!({
             "name": t("Video în GIF", "Video to GIF"),
             "summary": t("Un clip care se repetă", "A clip that loops"),
-            "keywords": { "ro": ["gif", "animație", "meme", "webp animat", "gif în mp4"], "en": ["gif", "animation", "meme", "animated webp", "gif to mp4"] },
+            "keywords": { "ro": ["gif", "animație", "meme", "webp animat", "gif în mp4", "comprimă gif"], "en": ["gif", "animation", "meme", "animated webp", "gif to mp4", "compress gif"] },
             "category": "video",
             "icon": "gif",
             "requires": [ { "engine": "ffmpeg" } ],
@@ -33,7 +33,8 @@ impl Plugin for VideoGif {
                 { "id": "chat", "label": t("Pentru chat", "For chat"), "default": true, "values": { "format": "gif", "width": 480, "fps": 15 } },
                 { "id": "small", "label": t("Mic", "Small"), "values": { "format": "gif", "width": 320, "fps": 10 } },
                 { "id": "sharp", "label": t("Clar, WebP", "Sharp, WebP"), "values": { "format": "webp", "width": 720, "fps": 24 } },
-                { "id": "tomp4", "label": t("GIF în MP4", "GIF to MP4"), "values": { "format": "mp4" } }
+                { "id": "tomp4", "label": t("GIF în MP4", "GIF to MP4"), "values": { "format": "mp4" } },
+                { "id": "smaller", "label": t("GIF mai mic", "Smaller GIF"), "values": { "format": "gif", "width": 320, "fps": 10, "colors": 64 } }
             ],
             "groups": [ { "id": "cut", "label": t("Doar o parte", "Only a part"), "order": 1 } ],
             "fields": [
@@ -44,6 +45,9 @@ impl Plugin for VideoGif {
                                opt(720, "720 px", "720 px"), opt(0, "Ca originalul", "As original") ] },
                 { "key": "fps", "type": "select", "label": t("Cadre pe secundă", "Frames per second"), "default": 15, "showIf": to_anim,
                   "options": [ opt(10, "10 (fișier mic)", "10 (small file)"), opt(15, "15", "15"), opt(20, "20", "20"), opt(24, "24 (fluid)", "24 (smooth)") ] },
+                { "key": "colors", "type": "select", "label": t("Culori", "Colors"), "default": 256, "showIf": { "field": "format", "eq": "gif" },
+                  "options": [ opt(256, "256 (toate)", "256 (all)"), opt(128, "128", "128"), opt(64, "64 (fișier mic)", "64 (small file)"), opt(32, "32 (foarte mic)", "32 (very small)") ],
+                  "help": t("Mai puține culori, fișier mai mic.", "Fewer colors, a smaller file.") },
                 { "key": "loop", "type": "toggle", "default": true, "label": t("Se repetă la nesfârșit", "Loops forever"), "showIf": to_anim },
                 { "key": "start", "type": "time", "advanced": true, "group": "cut", "default": "", "label": t("De la", "From"), "placeholder": t("început", "start") },
                 { "key": "end", "type": "time", "advanced": true, "group": "cut", "default": "", "label": t("Până la", "To"), "placeholder": t("sfârșit", "end") }
@@ -106,7 +110,8 @@ impl Plugin for VideoGif {
             "webp" => a.extend(sv(&["-vf", &format!("fps={fps}{scale}"), "-c:v", "libwebp_anim", "-quality", "80", "-compression_level", "5", "-loop", loops])),
             _ => {
                 // A palette made from this clip, then dithered: far better colors than the default.
-                let vf = format!("[0:v:0]fps={fps}{scale},split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle[g]");
+                let colors = req.f64_or("colors", 256.0).clamp(4.0, 256.0) as i64;
+                let vf = format!("[0:v:0]fps={fps}{scale},split[s0][s1];[s0]palettegen=stats_mode=diff:max_colors={colors}[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle[g]");
                 a.extend(["-filter_complex".into(), vf, "-map".into(), "[g]".into(), "-loop".into(), loops.into()]);
             }
         }

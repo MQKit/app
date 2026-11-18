@@ -25,9 +25,15 @@ serde_json.workspace = true
 ureq = { version = "3", features = ["platform-verifier"] }
 sha2 = "0.11"
 zip = { version = "9", default-features = false, features = ["deflate"] }
+# .tar.bz2 engines (the sherpa-onnx models)
+tar = "0.4"
+bzip2 = "0.6"
 toml = "1"
 
 [target.'cfg(windows)'.dependencies]
+# The WebView2 events Tauri leaves alone (the microphone's permission for the recorder);
+# the same version Tauri's webview uses.
+webview2-com = "0.39"
 windows = { version = "0.62", features = [
   "Win32_Foundation",
   "Win32_Security",

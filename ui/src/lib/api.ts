@@ -55,11 +55,13 @@ export interface Manifest {
   icon?: string;
   entry?: { id?: string; when?: Cond; kind: string }[];
   requires?: { engine?: string; env?: string; eq?: any; when?: Cond }[];
-  /** `textEntry`: the tool also takes typed text, saved as this kind of file. */
-  input: { extensions: string[]; anyFile?: boolean; multiple?: boolean; mode?: string; ordered?: boolean; minFiles?: number; itemFields?: Field[]; textEntry?: "txt" | "md" | "html" };
+  /** `textEntry`: the tool also takes typed text, saved as this kind of file; `textPlaceholder`
+   *  says what to type; `textFirst`: typing is the usual way in, so the box starts open. */
+  input: { extensions: string[]; anyFile?: boolean; multiple?: boolean; mode?: string; ordered?: boolean; minFiles?: number; itemFields?: Field[];
+           textEntry?: "txt" | "md" | "html"; textPlaceholder?: { ro: string; en: string }; textFirst?: boolean; record?: boolean };
   output: { kind: string; extensions: string[]; replaceOriginalAllowed?: boolean; nameVariables?: { id: string; label: Loc }[] };
   analysis?: { fast?: string[] };
-  ui?: { preview?: string; estimate?: boolean; inputList?: string };
+  ui?: { preview?: string; estimate?: boolean; inputList?: string; editor?: string; editorMode?: string; showProps?: string[] };
   resources?: { class?: string };
   presets?: { id: string; label: Loc; help?: Loc; values: Record<string, any>; default?: boolean }[];
   groups?: { id: string; label: Loc; order?: number }[];
@@ -131,6 +133,9 @@ export const api = {
   diagnostics: () => invoke<string>("diagnostics"),
   /** Typed text saved as a file in Documents\\MQKit (`ext`: txt, md or html). */
   saveText: (text: string, ext: string, name: string) => invoke<FileInfo>("save_text", { text, ext, name }),
+  /** A recording's bytes, saved in Documents\MQKit as `<name> <date> <time>.<ext>`. */
+  saveRecording: (data: Uint8Array, ext: string, name: string) =>
+    invoke<FileInfo>("save_recording", data, { headers: { "x-ext": ext, "x-name": encodeURIComponent(name) } }),
   /** Files from Explorer that arrived before the interface listened (then events only). */
   shellReady: () => invoke<{ tool: string | null; files: FileInfo[] }[]>("shell_ready"),
   /** `names`: each tool's name in the interface's language, for the menu's labels. */

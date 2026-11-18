@@ -1278,7 +1278,11 @@
       "gif to video",
       "animated webp",
       "reaction gif",
-      "screen recording to gif"
+      "screen recording to gif",
+      "compress gif",
+      "gif compressor",
+      "smaller gif",
+      "reduce gif size"
     ],
     "ro": [
       "video în gif",
@@ -1290,7 +1294,10 @@
       "gif în mp4",
       "gif în video",
       "webp animat",
-      "animație"
+      "animație",
+      "comprimă gif",
+      "gif mai mic",
+      "micșorează gif"
     ],
     "de": [
       "video in gif",
@@ -2583,6 +2590,865 @@
       "fbx para glb",
       "converter modelo 3d",
       "dxf para pdf"
+    ]
+  },
+  "qr-code": {
+    "en": [
+      "qr code",
+      "qr code generator",
+      "qr generator",
+      "make qr code",
+      "create qr code",
+      "qr with logo",
+      "qr code with logo",
+      "custom qr",
+      "qr code maker",
+      "link to qr",
+      "url to qr",
+      "barcode",
+      "wifi qr",
+      "vcard qr",
+      "contact qr",
+      "qr code svg",
+      "qr for print",
+      "scan me"
+    ],
+    "ro": [
+      "cod qr",
+      "coduri qr",
+      "generator qr",
+      "fă cod qr",
+      "creează cod qr",
+      "qr cu logo",
+      "qr personalizat",
+      "link în qr",
+      "cod de bare",
+      "qr wifi",
+      "qr contact",
+      "qr pentru tipar",
+      "scanează"
+    ],
+    "de": [
+      "qr-code",
+      "qr code erstellen",
+      "qr-code generator",
+      "qr code mit logo",
+      "qr-code erzeugen"
+    ],
+    "es": [
+      "código qr",
+      "generador de qr",
+      "crear código qr",
+      "qr con logo"
+    ],
+    "fr": [
+      "code qr",
+      "générateur qr",
+      "créer un code qr",
+      "qr avec logo"
+    ],
+    "it": [
+      "codice qr",
+      "generatore qr",
+      "crea codice qr",
+      "qr con logo"
+    ],
+    "pt": [
+      "código qr",
+      "gerador de qr",
+      "criar qr code",
+      "qr com logo"
+    ],
+    "pl": [
+      "kod qr",
+      "generator kodów qr",
+      "stwórz kod qr",
+      "qr z logo"
+    ],
+    "tr": [
+      "qr kod",
+      "qr kod oluşturucu",
+      "qr kod yap",
+      "logolu qr"
+    ],
+    "ru": [
+      "qr код",
+      "генератор qr",
+      "создать qr код",
+      "qr с логотипом"
+    ],
+    "ja": [
+      "QRコード",
+      "QRコード作成",
+      "QRコード ロゴ入り"
+    ],
+    "zh": [
+      "二维码",
+      "二维码生成",
+      "生成二维码",
+      "带logo二维码"
+    ]
+  },
+  "pdf-edit": {
+    "en": [
+      "sign pdf",
+      "fill pdf",
+      "pdf editor",
+      "edit pdf",
+      "fill out form",
+      "pdf form",
+      "add text to pdf",
+      "electronic signature",
+      "e-signature",
+      "signature",
+      "pdf filler",
+      "write on pdf",
+      "add image to pdf",
+      "white out pdf",
+      "highlight pdf",
+      "checkbox",
+      "date"
+    ],
+    "ro": [
+      "semnează pdf",
+      "semnatura pdf",
+      "completează pdf",
+      "formular pdf",
+      "editează pdf",
+      "editor pdf",
+      "scrie pe pdf",
+      "adaugă text în pdf",
+      "semnătură electronică",
+      "semnătură",
+      "completare formular",
+      "bifă",
+      "data",
+      "imagine în pdf",
+      "acoperă text"
+    ],
+    "de": [
+      "pdf unterschreiben",
+      "pdf ausfüllen",
+      "pdf bearbeiten",
+      "formular ausfüllen",
+      "unterschrift",
+      "text in pdf einfügen"
+    ],
+    "es": [
+      "firmar pdf",
+      "rellenar pdf",
+      "editar pdf",
+      "rellenar formulario",
+      "firma electrónica",
+      "añadir texto a pdf"
+    ],
+    "fr": [
+      "signer pdf",
+      "remplir pdf",
+      "modifier pdf",
+      "remplir formulaire",
+      "signature électronique",
+      "ajouter texte pdf"
+    ],
+    "it": [
+      "firmare pdf",
+      "compilare pdf",
+      "modificare pdf",
+      "compilare modulo",
+      "firma elettronica",
+      "aggiungere testo pdf"
+    ],
+    "pt": [
+      "assinar pdf",
+      "preencher pdf",
+      "editar pdf",
+      "preencher formulário",
+      "assinatura eletrônica",
+      "adicionar texto pdf"
+    ],
+    "pl": [
+      "podpisz pdf",
+      "wypełnij pdf",
+      "edytuj pdf",
+      "wypełnij formularz",
+      "podpis elektroniczny",
+      "dodaj tekst do pdf"
+    ],
+    "tr": [
+      "pdf imzala",
+      "pdf doldur",
+      "pdf düzenle",
+      "form doldur",
+      "e-imza",
+      "pdf'e metin ekle"
+    ],
+    "ru": [
+      "подписать pdf",
+      "заполнить pdf",
+      "редактировать pdf",
+      "заполнить форму",
+      "электронная подпись",
+      "добавить текст в pdf"
+    ],
+    "ja": [
+      "PDF 署名",
+      "PDF 記入",
+      "PDF 編集",
+      "フォーム入力",
+      "電子署名",
+      "PDF 文字入れ"
+    ],
+    "zh": [
+      "PDF 签名",
+      "填写 PDF",
+      "编辑 PDF",
+      "填写表单",
+      "电子签名",
+      "PDF 添加文字"
+    ]
+  },
+  "video-crop": {
+    "en": [
+      "crop video",
+      "video cropper",
+      "resize video",
+      "vertical video",
+      "tiktok",
+      "reels",
+      "shorts",
+      "instagram video",
+      "square video",
+      "9:16",
+      "1:1",
+      "4:5",
+      "aspect ratio",
+      "blur background",
+      "speed up video",
+      "slow motion",
+      "mute video",
+      "remove audio from video"
+    ],
+    "ro": [
+      "decupează video",
+      "taie marginile video",
+      "video vertical",
+      "tiktok",
+      "reels",
+      "shorts",
+      "video instagram",
+      "video pătrat",
+      "format video",
+      "fundal estompat",
+      "accelerează video",
+      "încetinire",
+      "video fără sunet",
+      "scoate sunetul"
+    ],
+    "de": [
+      "video zuschneiden",
+      "hochformat video",
+      "video quadratisch",
+      "video beschleunigen",
+      "video stummschalten"
+    ],
+    "es": [
+      "recortar video",
+      "video vertical",
+      "video cuadrado",
+      "acelerar video",
+      "quitar sonido video"
+    ],
+    "fr": [
+      "recadrer vidéo",
+      "vidéo verticale",
+      "vidéo carrée",
+      "accélérer vidéo",
+      "couper le son vidéo"
+    ],
+    "it": [
+      "ritagliare video",
+      "video verticale",
+      "video quadrato",
+      "velocizzare video",
+      "togliere audio video"
+    ],
+    "pt": [
+      "cortar vídeo",
+      "vídeo vertical",
+      "vídeo quadrado",
+      "acelerar vídeo",
+      "tirar som do vídeo"
+    ],
+    "pl": [
+      "przytnij wideo",
+      "pionowe wideo",
+      "kwadratowe wideo",
+      "przyspiesz wideo",
+      "wycisz wideo"
+    ],
+    "tr": [
+      "video kırp",
+      "dikey video",
+      "kare video",
+      "video hızlandır",
+      "videonun sesini kapat"
+    ],
+    "ru": [
+      "обрезать видео",
+      "вертикальное видео",
+      "квадратное видео",
+      "ускорить видео",
+      "убрать звук из видео"
+    ],
+    "ja": [
+      "動画 トリミング",
+      "縦動画",
+      "正方形 動画",
+      "動画 倍速",
+      "動画 音声削除"
+    ],
+    "zh": [
+      "裁剪视频",
+      "竖屏视频",
+      "方形视频",
+      "视频加速",
+      "视频静音"
+    ]
+  },
+  "images-to-gif": {
+    "en": [
+      "gif maker",
+      "images to gif",
+      "photos to gif",
+      "make gif",
+      "animated gif",
+      "slideshow",
+      "photo slideshow",
+      "png to gif",
+      "jpg to gif",
+      "animation",
+      "stop motion",
+      "images to video",
+      "photos to mp4"
+    ],
+    "ro": [
+      "gif din poze",
+      "poze în gif",
+      "fă un gif",
+      "gif animat",
+      "prezentare foto",
+      "slideshow",
+      "animație",
+      "poze în video",
+      "poze în mp4",
+      "stop motion"
+    ],
+    "de": [
+      "gif erstellen",
+      "bilder zu gif",
+      "diashow",
+      "fotos zu video"
+    ],
+    "es": [
+      "crear gif",
+      "imágenes a gif",
+      "presentación de fotos",
+      "fotos a video"
+    ],
+    "fr": [
+      "créer gif",
+      "images en gif",
+      "diaporama",
+      "photos en vidéo"
+    ],
+    "it": [
+      "creare gif",
+      "immagini in gif",
+      "presentazione foto",
+      "foto in video"
+    ],
+    "pt": [
+      "criar gif",
+      "imagens para gif",
+      "apresentação de fotos",
+      "fotos para vídeo"
+    ],
+    "pl": [
+      "stwórz gif",
+      "zdjęcia do gif",
+      "pokaz slajdów",
+      "zdjęcia do wideo"
+    ],
+    "tr": [
+      "gif yap",
+      "resimlerden gif",
+      "slayt gösterisi",
+      "fotoğraflardan video"
+    ],
+    "ru": [
+      "создать gif",
+      "картинки в gif",
+      "слайд-шоу",
+      "фото в видео"
+    ],
+    "ja": [
+      "GIF 作成",
+      "画像 GIF",
+      "スライドショー",
+      "写真 動画"
+    ],
+    "zh": [
+      "制作 GIF",
+      "图片转 GIF",
+      "幻灯片",
+      "照片转视频"
+    ]
+  },
+  "voice-record": {
+    "en": [
+      "voice recorder",
+      "record audio",
+      "audio recorder",
+      "microphone",
+      "voice memo",
+      "record voice",
+      "noise reduction",
+      "remove background noise",
+      "noise remover",
+      "clean audio",
+      "normalize voice",
+      "dictaphone",
+      "podcast"
+    ],
+    "ro": [
+      "înregistrare voce",
+      "reportofon",
+      "înregistrează",
+      "microfon",
+      "notă vocală",
+      "reducere zgomot",
+      "elimină zgomotul",
+      "curăță sunetul",
+      "dictafon",
+      "podcast"
+    ],
+    "de": [
+      "sprachaufnahme",
+      "diktiergerät",
+      "rauschen entfernen",
+      "mikrofon aufnehmen"
+    ],
+    "es": [
+      "grabadora de voz",
+      "grabar audio",
+      "quitar ruido",
+      "micrófono"
+    ],
+    "fr": [
+      "enregistreur vocal",
+      "enregistrer audio",
+      "réduire le bruit",
+      "micro"
+    ],
+    "it": [
+      "registratore vocale",
+      "registrare audio",
+      "ridurre rumore",
+      "microfono"
+    ],
+    "pt": [
+      "gravador de voz",
+      "gravar áudio",
+      "remover ruído",
+      "microfone"
+    ],
+    "pl": [
+      "dyktafon",
+      "nagrywanie głosu",
+      "usuń szum",
+      "mikrofon"
+    ],
+    "tr": [
+      "ses kaydedici",
+      "ses kaydet",
+      "gürültü azaltma",
+      "mikrofon"
+    ],
+    "ru": [
+      "диктофон",
+      "запись голоса",
+      "убрать шум",
+      "микрофон"
+    ],
+    "ja": [
+      "ボイスレコーダー",
+      "録音",
+      "ノイズ除去",
+      "マイク"
+    ],
+    "zh": [
+      "录音机",
+      "录音",
+      "降噪",
+      "麦克风"
+    ]
+  },
+  "music-split": {
+    "en": [
+      "vocal remover",
+      "remove vocals",
+      "karaoke",
+      "instrumental",
+      "acapella",
+      "acapella extractor",
+      "stem splitter",
+      "separate vocals",
+      "isolate vocals",
+      "voice remover",
+      "backing track",
+      "minus one"
+    ],
+    "ro": [
+      "elimină vocea",
+      "karaoke",
+      "negativ",
+      "playback",
+      "instrumental",
+      "acapella",
+      "separă vocea",
+      "voce separată",
+      "fără voce",
+      "minus"
+    ],
+    "de": [
+      "gesang entfernen",
+      "karaoke",
+      "instrumental",
+      "stimme isolieren",
+      "playback"
+    ],
+    "es": [
+      "quitar voz",
+      "karaoke",
+      "pista instrumental",
+      "separar voz",
+      "acapella"
+    ],
+    "fr": [
+      "supprimer la voix",
+      "karaoké",
+      "instrumental",
+      "isoler la voix",
+      "acapella"
+    ],
+    "it": [
+      "rimuovere voce",
+      "karaoke",
+      "base musicale",
+      "isolare voce",
+      "acapella"
+    ],
+    "pt": [
+      "remover voz",
+      "karaokê",
+      "playback",
+      "isolar voz",
+      "acapella"
+    ],
+    "pl": [
+      "usuń wokal",
+      "karaoke",
+      "podkład",
+      "wyizoluj wokal"
+    ],
+    "tr": [
+      "vokal kaldır",
+      "karaoke",
+      "altyapı",
+      "vokali ayır"
+    ],
+    "ru": [
+      "убрать голос",
+      "караоке",
+      "минусовка",
+      "выделить вокал"
+    ],
+    "ja": [
+      "ボーカル除去",
+      "カラオケ",
+      "インスト",
+      "ボーカル抽出"
+    ],
+    "zh": [
+      "去人声",
+      "卡拉OK",
+      "伴奏",
+      "提取人声"
+    ]
+  },
+  "music-info": {
+    "en": [
+      "bpm finder",
+      "bpm",
+      "tempo",
+      "key finder",
+      "song key",
+      "musical key",
+      "camelot",
+      "dj",
+      "beats per minute",
+      "harmonic mixing",
+      "bpm tag"
+    ],
+    "ro": [
+      "bpm",
+      "tempo",
+      "tonalitate",
+      "gama melodiei",
+      "camelot",
+      "dj",
+      "bătăi pe minut",
+      "ritm",
+      "mixaj armonic"
+    ],
+    "de": [
+      "bpm",
+      "tempo",
+      "tonart",
+      "tonart bestimmen",
+      "dj"
+    ],
+    "es": [
+      "bpm",
+      "tempo",
+      "tonalidad",
+      "detectar tonalidad",
+      "dj"
+    ],
+    "fr": [
+      "bpm",
+      "tempo",
+      "tonalité",
+      "détecter tonalité",
+      "dj"
+    ],
+    "it": [
+      "bpm",
+      "tempo",
+      "tonalità",
+      "trovare tonalità",
+      "dj"
+    ],
+    "pt": [
+      "bpm",
+      "andamento",
+      "tonalidade",
+      "descobrir tom",
+      "dj"
+    ],
+    "pl": [
+      "bpm",
+      "tempo",
+      "tonacja",
+      "dj"
+    ],
+    "tr": [
+      "bpm",
+      "tempo",
+      "ton",
+      "dj"
+    ],
+    "ru": [
+      "bpm",
+      "темп",
+      "тональность",
+      "dj"
+    ],
+    "ja": [
+      "BPM",
+      "テンポ",
+      "キー",
+      "DJ"
+    ],
+    "zh": [
+      "BPM",
+      "节拍",
+      "调性",
+      "DJ"
+    ]
+  },
+  "photo-erase": {
+    "en": [
+      "object remover",
+      "remove object from photo",
+      "remove person from photo",
+      "erase",
+      "magic eraser",
+      "cleanup",
+      "retouch",
+      "inpainting",
+      "remove watermark",
+      "remove text from image",
+      "remove date stamp",
+      "remove wires",
+      "photo cleaner"
+    ],
+    "ro": [
+      "șterge obiect",
+      "elimină obiect din poză",
+      "șterge persoană din poză",
+      "radieră",
+      "retușare",
+      "curăță poza",
+      "șterge data de pe poză",
+      "elimină firele",
+      "șterge text din imagine"
+    ],
+    "de": [
+      "objekt entfernen",
+      "person aus foto entfernen",
+      "radiergummi",
+      "retuschieren"
+    ],
+    "es": [
+      "borrar objeto",
+      "quitar persona de foto",
+      "borrador mágico",
+      "retocar"
+    ],
+    "fr": [
+      "supprimer objet",
+      "effacer personne photo",
+      "gomme magique",
+      "retoucher"
+    ],
+    "it": [
+      "rimuovere oggetto",
+      "cancellare persona foto",
+      "gomma magica",
+      "ritoccare"
+    ],
+    "pt": [
+      "remover objeto",
+      "apagar pessoa da foto",
+      "borracha mágica",
+      "retocar"
+    ],
+    "pl": [
+      "usuń obiekt",
+      "usuń osobę ze zdjęcia",
+      "magiczna gumka",
+      "retusz"
+    ],
+    "tr": [
+      "nesne sil",
+      "fotoğraftan kişi sil",
+      "sihirli silgi",
+      "rötuş"
+    ],
+    "ru": [
+      "удалить объект",
+      "убрать человека с фото",
+      "ластик",
+      "ретушь"
+    ],
+    "ja": [
+      "消しゴム",
+      "物体除去",
+      "人物消去",
+      "レタッチ"
+    ],
+    "zh": [
+      "消除物体",
+      "去除路人",
+      "魔法橡皮擦",
+      "修图"
+    ]
+  },
+  "pdf-redact": {
+    "en": [
+      "redact pdf",
+      "black out",
+      "anonymize",
+      "hide personal data",
+      "gdpr",
+      "remove sensitive information",
+      "censor pdf",
+      "redaction",
+      "hide text in pdf",
+      "privacy"
+    ],
+    "ro": [
+      "anonimizare",
+      "anonimizează",
+      "ascunde date personale",
+      "gdpr",
+      "înnegrește",
+      "acoperă date",
+      "cenzurează pdf",
+      "date sensibile",
+      "confidențialitate"
+    ],
+    "de": [
+      "pdf schwärzen",
+      "anonymisieren",
+      "dsgvo",
+      "daten schwärzen"
+    ],
+    "es": [
+      "censurar pdf",
+      "anonimizar",
+      "rgpd",
+      "ocultar datos"
+    ],
+    "fr": [
+      "caviarder pdf",
+      "anonymiser",
+      "rgpd",
+      "masquer données"
+    ],
+    "it": [
+      "oscurare pdf",
+      "anonimizzare",
+      "gdpr",
+      "nascondere dati"
+    ],
+    "pt": [
+      "ocultar dados pdf",
+      "anonimizar",
+      "lgpd",
+      "rgpd",
+      "tarjar"
+    ],
+    "pl": [
+      "zaczernij pdf",
+      "anonimizacja",
+      "rodo",
+      "ukryj dane"
+    ],
+    "tr": [
+      "pdf karart",
+      "anonimleştir",
+      "kvkk",
+      "veri gizle"
+    ],
+    "ru": [
+      "скрыть данные pdf",
+      "анонимизировать",
+      "зачернить",
+      "персональные данные"
+    ],
+    "ja": [
+      "PDF 墨消し",
+      "黒塗り",
+      "匿名化",
+      "個人情報"
+    ],
+    "zh": [
+      "PDF 涂黑",
+      "脱敏",
+      "匿名化",
+      "个人信息"
     ]
   }
 }

@@ -1,6 +1,7 @@
 """Dev helper: runs a worker-core plugin command and prints the JSON lines.
 
   python scripts/try-worker.py <plugin> <analyze|run|preview|probe> <file>... [--opt key=value]... [--item key=value]...
+                               (a value "@path" is read from that file)
                                [--worker path] [--out dir] [--password p] [--base folder] [--engine name=folder]
 """
 import json, os, subprocess, sys, time
@@ -16,6 +17,9 @@ while i < len(args):
     a = args[i]
     if a in ("--opt", "--item"):
         k, v = args[i + 1].split("=", 1)
+        if v.startswith("@"):
+            # @file: the value is the file's text (a long data: URL, a JSON list…).
+            v = open(v[1:], encoding="utf-8").read().strip()
         try:
             v = json.loads(v)
         except ValueError:
@@ -45,7 +49,7 @@ while i < len(args):
 req = {"cmd": cmd, "id": "t1", "level": "fast", "locale": "ro-RO",
        "files": [{"id": f"f{n + 1}", "path": p, "item": items, **({"base": base} if base else {})} for n, p in enumerate(files)],
        "options": opts, "workDir": os.path.join(out, "work"), "outDir": os.path.join(out, "out"),
-       "previewDir": os.path.join(out, "preview"), "target": {"kind": "estimate"},
+       "previewDir": os.path.join(out, "preview"), "target": {"kind": os.environ.get("TRY_TARGET", "estimate"), "maxPx": 900},
        "engines": {"ffmpeg": {"path": os.path.dirname(subprocess.run(["where", "ffmpeg"], capture_output=True, text=True).stdout.splitlines()[0]) if subprocess.run(["where", "ffmpeg"], capture_output=True).returncode == 0 else ""}},
        "limits": {"threads": 4, "memoryMb": 2048, "maxMegapixels": 250, "idleTimeoutSec": 120}}
 # The LibreOffice the app downloaded, if any.

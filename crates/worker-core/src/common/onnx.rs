@@ -85,11 +85,15 @@ pub fn session(req: &Request, model: &Path, threads: usize) -> Result<(Session, 
             return Ok((s, Device::Gpu));
         }
     }
-    let cpu = || -> Result<Session, String> {
-        Session::builder(&env).map_err(|e| e.to_string())?
-            .with_intra_threads(threads.max(1)).map_err(|e| e.to_string())?
-            .commit_from_file(model).map_err(|e| e.to_string())
-    };
-    let s = cpu().map_err(FileError::engine)?;
-    Ok((s, Device::Cpu))
+    Ok((session_cpu(req, model, threads)?, Device::Cpu))
+}
+
+/// A session on the processor only: for models DirectML can't run (LaMa's Fourier
+/// convolutions stop with a MatMul error on the graphics card).
+pub fn session_cpu(req: &Request, model: &Path, threads: usize) -> Result<Session, FileError> {
+    let dir = runtime_dir(req)?;
+    let env = environment(&dir)?;
+    Session::builder(&env).map_err(|e| FileError::engine(e.to_string()))?
+        .with_intra_threads(threads.max(1)).map_err(|e| FileError::engine(e.to_string()))?
+        .commit_from_file(model).map_err(|e| FileError::engine(e.to_string()))
 }

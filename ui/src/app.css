@@ -10,6 +10,8 @@
   --base: #eef0f3;
   --layer: rgba(255, 255, 255, 0.72);
   --layer-solid: #ffffff;
+  /* Windows over the app (dialogs): opaque even where Mica shows through. */
+  --dialog: #ffffff;
   --layer-stroke: rgba(16, 24, 40, 0.08);
   --card: #ffffff;
   --card-hover: #ffffff;
@@ -65,6 +67,7 @@
   --base: #191a1d;
   --layer: rgba(40, 41, 45, 0.55);
   --layer-solid: #222327;
+  --dialog: #2a2b30;
   --layer-stroke: rgba(255, 255, 255, 0.07);
   --card: rgba(255, 255, 255, 0.04);
   --card-hover: rgba(255, 255, 255, 0.07);

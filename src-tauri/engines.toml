@@ -104,6 +104,31 @@ extract = "all"
 files = ["real_esrgan_x4plus-onnx-float/real_esrgan_x4plus.onnx", "real_esrgan_x4plus-onnx-float/real_esrgan_x4plus.data"]
 requires = ["onnxruntime"]
 
+# Erase objects from photos: LaMa, big-lama (Apache-2.0), as exported to ONNX by Carve.
+[lama]
+version = "big-lama-fp32"
+url = "https://huggingface.co/Carve/LaMa-ONNX/resolve/c3c0c9e468934d62e79c329e35d82dd09ff8c444/lama_fp32.onnx"
+size = 208044816
+sha256 = "1faef5301d78db7dda502fe59966957ec4b79dd64e16f03ed96913c7a4eb68d6"
+license = "Apache-2.0"
+source = "https://github.com/advimman/lama"
+extract = "file"
+files = ["lama_fp32.onnx"]
+requires = ["onnxruntime"]
+
+# Vocals and instrumental: Deezer's Spleeter, 2 stems (MIT), as exported to ONNX (fp16)
+# by sherpa-onnx (Apache-2.0).
+[spleeter]
+version = "2stems-fp16"
+url = "https://github.com/k2-fsa/sherpa-onnx/releases/download/source-separation-models/sherpa-onnx-spleeter-2stems-fp16.tar.bz2"
+size = 35271738
+sha256 = "d54561979bd2e08a51e7dbd99ac36bb47564e089eefd403636dbca93e811bba2"
+license = "MIT"
+source = "https://github.com/deezer/spleeter"
+extract = "tarbz2"
+files = ["vocals.fp16.onnx", "accompaniment.fp16.onnx"]
+requires = ["onnxruntime"]
+
 # Transcribe, fast model: Whisper small (MIT), whisper.cpp's quantized file. whisper.cpp
 # itself is compiled into the worker (crates/whisper).
 [whisper-small]

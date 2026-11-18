@@ -1,3 +1,5 @@
+pub mod audio;
+pub mod b64;
 pub mod edge;
 pub mod font;
 #[cfg(windows)]

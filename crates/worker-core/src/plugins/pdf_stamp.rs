@@ -4,7 +4,7 @@
 use super::{file_size, Analysis, Ctx, Plugin};
 use crate::common::{font::PdfFont, img, pdf};
 use contract::{codes, opt, pages, t, FileError, FileRef, Request};
-use lopdf::{dictionary, Document, Object, ObjectId, Stream};
+use lopdf::{dictionary, Document, Object, ObjectId};
 use serde_json::{json, Value};
 
 pub struct PdfStamp;
@@ -224,20 +224,5 @@ fn load_mark(doc: &mut Document, req: &Request) -> Result<(ObjectId, f64, f64), 
     let path = req.options.get("image").and_then(|v| v.as_str().map(String::from).or_else(|| v["path"].as_str().map(String::from)));
     let path = path.filter(|p| !p.is_empty()).ok_or_else(|| FileError::new("no_image"))?;
     let im = img::load(std::path::Path::new(&path), req)?.img;
-    let (w, h) = (im.width(), im.height());
-    let rgba = im.to_rgba8();
-    let mut rgb = Vec::with_capacity((w * h * 3) as usize);
-    let mut alpha = Vec::with_capacity((w * h) as usize);
-    for px in rgba.pixels() {
-        rgb.extend_from_slice(&px.0[..3]);
-        alpha.push(px.0[3]);
-    }
-    let mut smask = Stream::new(dictionary! { "Type" => "XObject", "Subtype" => "Image", "Width" => w as i64, "Height" => h as i64,
-                                              "ColorSpace" => "DeviceGray", "BitsPerComponent" => 8 }, alpha);
-    let _ = smask.compress();
-    let smask_id = doc.add_object(smask);
-    let mut s = Stream::new(dictionary! { "Type" => "XObject", "Subtype" => "Image", "Width" => w as i64, "Height" => h as i64,
-                                          "ColorSpace" => "DeviceRGB", "BitsPerComponent" => 8, "SMask" => smask_id }, rgb);
-    let _ = s.compress();
-    Ok((doc.add_object(s), w as f64, h as f64))
+    Ok(pdf::image_xobject(doc, &im))
 }

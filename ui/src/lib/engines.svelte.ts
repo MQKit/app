@@ -17,6 +17,8 @@ export const ENGINE_NAMES: Record<string, string> = {
   kokoro: "Kokoro",
   "kokoro-model": "Kokoro (model)",
   "kokoro-voices": "Kokoro (voices)",
+  lama: "LaMa",
+  spleeter: "Spleeter",
 };
 
 /** Download state per engine, shared by every screen. `installed` stays true after a

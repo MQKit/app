@@ -15,7 +15,10 @@
   import FolderAdd from "../components/FolderAdd.svelte";
   import LinkAdd from "../components/LinkAdd.svelte";
   import TextAdd from "../components/TextAdd.svelte";
+  import RecordAdd from "../components/RecordAdd.svelte";
   import BeforeAfter from "../components/BeforeAfter.svelte";
+  import PdfEditor from "../components/PdfEditor.svelte";
+  import MaskEditor from "../components/MaskEditor.svelte";
   import { downloads, downloadEngine, ENGINE_NAMES } from "../lib/engines.svelte";
 
   let {
@@ -589,7 +592,7 @@
     </button>
   </div>
 
-  <div class="panes">
+  <div class="panes" class:wide={m.ui?.editor && items.some((i) => i.status === "ok")}>
     <!-- left: files -->
     <section class="left scroll">
       {#if items.length || phase !== "edit"}
@@ -608,8 +611,16 @@
           onretry={() => retryAnalysis(it)}
         />
       {/each}
+      {#if m.ui?.editor && phase === "edit"}
+        {#each items as it, idx (it.id)}
+          {#if it.status === "ok" && m.ui.editor === "pdf"}<PdfEditor tool={id} bind:item={items[idx]} mode={m.ui.editorMode ?? "fill"} />{/if}
+          {#if it.status === "ok" && m.ui.editor === "mask"}<MaskEditor tool={id} bind:item={items[idx]} />{/if}
+        {/each}
+      {/if}
       {#if phase === "edit"}
-        {#if items.length}
+        {#if items.length && m.ui?.editor === "pdf" && m.input.multiple === false}
+          <!-- The file being edited: nothing to add next to it. -->
+        {:else if items.length}
           <button class="add" onclick={pick}><i class="ti ti-plus"></i>{t("addFiles")}</button>
         {:else}
           <!-- Nothing yet: the whole pane invites the files. -->
@@ -629,8 +640,11 @@
           {#if m.input.multiple !== false || !items.length}
             <LinkAdd extensions={m.input.extensions} anyFile={!!m.input.anyFile} multiple={m.input.multiple !== false} onadd={addFiles} />
           {/if}
+          {#if m.input.record}
+            <RecordAdd onadd={addFiles} />
+          {/if}
           {#if m.input.textEntry}
-            <TextAdd ext={m.input.textEntry} onadd={addFiles} />
+            <TextAdd ext={m.input.textEntry} placeholder={m.input.textPlaceholder} startOpen={!!m.input.textFirst && !items.length} onadd={addFiles} />
           {/if}
         </div>
         {#if skippedText}
@@ -771,7 +785,7 @@
             </div>
           {/if}
 
-          {#if m.ui?.preview === "beforeAfter" && phase === "edit"}
+          {#if (m.ui?.preview === "beforeAfter" || m.ui?.preview === "result") && phase === "edit"}
             <BeforeAfter tool={id} {items} options={finalOptions()} />
           {/if}
 
@@ -958,6 +972,10 @@
     min-height: 0;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  }
+  /* A page to write on takes the room; the options stay beside it. */
+  .panes.wide {
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
   }
   .left {
     border-right: 1px solid var(--layer-stroke);

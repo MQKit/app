@@ -989,3 +989,28 @@ pub fn append_content(doc: &mut Document, page: ObjectId, content: Vec<u8>, reso
     Ok(())
 }
 
+
+/// A picture as an image XObject, its transparency kept as an SMask; with its width and
+/// height in pixels.
+pub fn image_xobject(doc: &mut Document, im: &image::DynamicImage) -> (ObjectId, f64, f64) {
+    let (w, h) = (im.width(), im.height());
+    let rgba = im.to_rgba8();
+    let mut rgb = Vec::with_capacity((w * h * 3) as usize);
+    let mut alpha = Vec::with_capacity((w * h) as usize);
+    for px in rgba.pixels() {
+        rgb.extend_from_slice(&px.0[..3]);
+        alpha.push(px.0[3]);
+    }
+    let opaque = alpha.iter().all(|a| *a == 255);
+    let mut dict = lopdf::dictionary! { "Type" => "XObject", "Subtype" => "Image", "Width" => w as i64, "Height" => h as i64,
+                                        "ColorSpace" => "DeviceRGB", "BitsPerComponent" => 8 };
+    if !opaque {
+        let mut smask = lopdf::Stream::new(lopdf::dictionary! { "Type" => "XObject", "Subtype" => "Image", "Width" => w as i64, "Height" => h as i64,
+                                                                "ColorSpace" => "DeviceGray", "BitsPerComponent" => 8 }, alpha);
+        let _ = smask.compress();
+        dict.set("SMask", doc.add_object(smask));
+    }
+    let mut s = lopdf::Stream::new(dict, rgb);
+    let _ = s.compress();
+    (doc.add_object(s), w as f64, h as f64)
+}

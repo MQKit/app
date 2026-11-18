@@ -485,6 +485,84 @@ async fn save_text(text: String, ext: String, name: String) -> Result<FileInfo, 
     .map_err(|e| e.to_string())?
 }
 
+/// A recording made in the window (the microphone, through the WebView), saved like
+/// typed text: in Documents\MQKit, then added as a file. The body is the bytes; the
+/// headers give the kind (`x-ext`: webm, ogg or mp4) and the name (`x-name`, URI-encoded).
+#[tauri::command]
+async fn save_recording(request: tauri::ipc::Request<'_>) -> Result<FileInfo, String> {
+    let tauri::ipc::InvokeBody::Raw(data) = request.body() else { return Err("invalid".into()) };
+    let header = |k: &str| request.headers().get(k).and_then(|v| v.to_str().ok()).unwrap_or("").to_string();
+    let ext = header("x-ext");
+    if !matches!(ext.as_str(), "webm" | "ogg" | "mp4") || data.is_empty() || data.len() > 2_000_000_000 {
+        return Err("invalid".into());
+    }
+    let name = percent_decode(&header("x-name"));
+    let data = data.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let dir = winutil::documents_dir().join("MQKit");
+        std::fs::create_dir_all(&dir).map_err(|_| "permission_denied")?;
+        let (date, time) = state::local_date_time();
+        let stem = naming::safe(&format!("{} {date} {time}", name.trim()));
+        let mut path = dir.join(format!("{stem}.{ext}"));
+        if path.exists() {
+            path = naming::unique(&path, &std::collections::HashSet::new());
+        }
+        std::fs::write(&path, data).map_err(|_| "permission_denied")?;
+        file_info(&path, None).ok_or_else(|| "permission_denied".to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+/// The voice recorder asks for the microphone from the app's own page, when the user
+/// presses "Record…": allowed without WebView2's prompt (which names a localhost address
+/// people don't know). Only the microphone, and only for the app's own page; Windows'
+/// own microphone privacy switch still applies.
+#[cfg(windows)]
+fn allow_microphone(w: &tauri::WebviewWindow) {
+    let _ = w.with_webview(|wv| unsafe {
+        use webview2_com::Microsoft::Web::WebView2::Win32::*;
+        use webview2_com::PermissionRequestedEventHandler;
+        let Ok(core) = wv.controller().CoreWebView2() else { return };
+        let handler = PermissionRequestedEventHandler::create(Box::new(|_, args: Option<ICoreWebView2PermissionRequestedEventArgs>| {
+            let Some(args) = args else { return Ok(()) };
+            let mut kind = COREWEBVIEW2_PERMISSION_KIND_UNKNOWN_PERMISSION;
+            args.PermissionKind(&mut kind)?;
+            let mut uri = windows::core::PWSTR::null();
+            args.Uri(&mut uri)?;
+            let uri = webview2_com::take_pwstr(uri);
+            let own = ["http://tauri.localhost", "https://tauri.localhost", "tauri://localhost", "http://localhost:5199"]
+                .iter()
+                .any(|o| uri == *o || uri.starts_with(&format!("{o}/")));
+            if kind == COREWEBVIEW2_PERMISSION_KIND_MICROPHONE && own {
+                args.SetState(COREWEBVIEW2_PERMISSION_STATE_ALLOW)?;
+            }
+            Ok(())
+        }));
+        let mut token = 0i64;
+        let _ = core.add_PermissionRequested(&handler, &mut token);
+    });
+}
+
+/// "%C8%98" → "Ș": the name sent in a header (headers carry only ASCII).
+fn percent_decode(s: &str) -> String {
+    let b = s.as_bytes();
+    let mut out = Vec::with_capacity(b.len());
+    let mut i = 0;
+    while i < b.len() {
+        if b[i] == b'%' && i + 2 < b.len() {
+            if let Ok(v) = u8::from_str_radix(&s[i + 1..i + 3], 16) {
+                out.push(v);
+                i += 3;
+                continue;
+            }
+        }
+        out.push(b[i]);
+        i += 1;
+    }
+    String::from_utf8_lossy(&out).into_owned()
+}
+
 /// What to paste into a bug report: version, Windows, components, the end of the log.
 /// No file names from the user's folder (see applog::redact), no settings beyond these.
 #[tauri::command]
@@ -622,6 +700,8 @@ pub fn run() {
                         env::MICA.store(true, std::sync::atomic::Ordering::Relaxed);
                     }
                 }
+                #[cfg(windows)]
+                allow_microphone(&w);
                 let _ = w.show();
             }
             #[cfg(debug_assertions)]
@@ -630,6 +710,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             save_text,
+            save_recording,
             diagnostics,
             shell_ready,
             expand_paths,

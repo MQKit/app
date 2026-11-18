@@ -520,7 +520,7 @@ fn install(name: &str, e: &Engine, cancel: &AtomicBool, progress: &dyn Fn(u64)) 
             }
         }
         mode => {
-            let ext = if mode == "msi" { "msi" } else { "zip" };
+            let ext = match mode { "msi" => "msi", "tarbz2" => "tar.bz2", _ => "zip" };
             // Windows Installer can't open a package inside the app's data folder
             // (error 1619): an MSI waits in %TEMP%, kept there until it installs.
             let archive = if mode == "msi" {
@@ -548,6 +548,7 @@ fn install(name: &str, e: &Engine, cancel: &AtomicBool, progress: &dyn Fn(u64)) 
                         crate::paths::remove_tree(d);
                     }
                 }
+                "tarbz2" => extract_listed_tar_bz2(&archive, &staging, e, cancel)?,
                 _ => extract_listed(&archive, &staging, e, cancel)?,
             }
             let _ = std::fs::remove_file(&archive);
@@ -610,6 +611,28 @@ fn extract_listed(archive: &Path, staging: &Path, e: &Engine, cancel: &AtomicBoo
         }
         let entry_name = entry.name().map_err(|_| "bad_archive")?.replace('\\', "/").to_ascii_lowercase();
         let Some((_, out_name)) = wanted.iter().find(|(k, _)| entry_name.ends_with(&format!("/{k}")) || entry_name == *k) else { continue };
+        let mut out = std::fs::File::create(staging.join(out_name)).map_err(|_| "permission_denied")?;
+        std::io::copy(&mut entry, &mut out).map_err(|_| "bad_archive")?;
+    }
+    Ok(())
+}
+
+/// The listed files out of a .tar.bz2 (as the sherpa-onnx models come), by the end of
+/// their path, into `staging` under their own names.
+fn extract_listed_tar_bz2(archive: &Path, staging: &Path, e: &Engine, cancel: &AtomicBool) -> Result<(), String> {
+    let f = std::fs::File::open(archive).map_err(|_| "permission_denied")?;
+    let mut tar = tar::Archive::new(bzip2::read::BzDecoder::new(std::io::BufReader::new(f)));
+    let wanted: Vec<(String, String)> = e.files.iter().map(|f| (f.to_ascii_lowercase(), base_name(f).to_string())).collect();
+    for entry in tar.entries().map_err(|_| "bad_archive")? {
+        if cancel.load(Ordering::Relaxed) {
+            return Err("cancelled".into());
+        }
+        let mut entry = entry.map_err(|_| "bad_archive")?;
+        if !entry.header().entry_type().is_file() {
+            continue;
+        }
+        let name = entry.path().map_err(|_| "bad_archive")?.to_string_lossy().replace('\\', "/").to_ascii_lowercase();
+        let Some((_, out_name)) = wanted.iter().find(|(k, _)| name.ends_with(&format!("/{k}")) || name == *k) else { continue };
         let mut out = std::fs::File::create(staging.join(out_name)).map_err(|_| "permission_denied")?;
         std::io::copy(&mut entry, &mut out).map_err(|_| "bad_archive")?;
     }
