@@ -5,9 +5,16 @@ name: CI
 # signed installer is never built here: signing needs the Certum token, on the release PC
 # (scripts\package.ps1 -Release). Actions are pinned to commits: a tag can be moved.
 
+# Branches only: a release tag points at a commit already checked on main.
 on:
   push:
+    branches: ["**"]
   pull_request:
+
+# A newer push to the same branch replaces a run still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -26,6 +33,9 @@ jobs:
       # the version in rust-toolchain.toml
       - name: Rust
         run: rustup toolchain install
+      # target/ kept between runs (Rust crates, whisper.cpp built by CMake): only what
+      # changed is compiled again. A new Cargo.lock or toolchain starts it afresh.
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - name: Interface
         run: |
           npm ci
@@ -47,12 +57,13 @@ jobs:
       - name: Clippy
         run: cargo clippy --locked --all-targets -- -D warnings
 
+  # On Linux, with cargo-deny ready-made (no build of it each time); deny.toml names
+  # the Windows target, so it judges the same dependency graph.
   deny:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: cargo-deny
-        run: |
-          # a fixed version: a newer one can change what the check reports
-          cargo install cargo-deny --locked --version 0.20.2
-          cargo deny check
+      - uses: EmbarkStudios/cargo-deny-action@70f81531115945ba6eb6b941ec9d39d063438eb9 # v2.1.2
+        with:
+          command: check
+          arguments: ""
